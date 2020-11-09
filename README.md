@@ -72,6 +72,10 @@ pub fn build(b: *Builder) void {
     exe.install();
 ```
 
+## Prior Art
+- https://golang.org/ref/mod#go-mod-file
+- https://github.com/mattnite/zkg
+
 ## Contact
 - hello@nektro.net
 - https://twitter.com/nektro
