@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os/exec"
+	"strings"
+
 	"github.com/nektro/go-util/util"
 	"github.com/spf13/cobra"
 )
@@ -24,4 +27,16 @@ var rootCmd = &cobra.Command{
 
 func assert(x bool, msg string) {
 	util.DieOnError(util.Assert(x, msg))
+}
+
+func runCmd(dir, cm string, args ...string) {
+	c := exec.Command(cm, args...)
+	if len(dir) > 0 {
+		c.Dir = dir
+	}
+	util.DieOnError(c.Run())
+}
+
+func join(a ...string) string {
+	return strings.Join(a, " ")
 }
