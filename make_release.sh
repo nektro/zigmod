@@ -12,4 +12,4 @@ $GOPATH/bin/ghr \
     -r ${CIRCLE_PROJECT_REPONAME} \
     -b "$(./changelog.sh)" \
     "$tag" \
-    "./bin/"
+    "/artifacts/"
