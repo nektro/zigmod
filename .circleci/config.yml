@@ -1,8 +1,6 @@
 # Golang CircleCI 2.0 configuration file
 # See https://circleci.com/docs/2.0/language-go/
 version: 2.1
-orbs:
-  docker: circleci/docker@1.0.1
 jobs:
   build:
     working_directory: /home/circleci/zigmod
