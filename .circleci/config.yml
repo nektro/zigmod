@@ -7,6 +7,8 @@ jobs:
     docker:
       - image: alpine:edge
     steps:
+      - run: apk update
+      - run: apk add git
       - checkout
 
       - run: apk add go
