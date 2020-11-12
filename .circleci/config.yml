@@ -5,9 +5,11 @@ jobs:
   build:
     working_directory: /home/circleci/zigmod
     docker:
-      - image: circleci/golang:1.14
+      - image: alpine:edge
     steps:
       - checkout
+
+      - run: apk add go
       - run: go version
       - run: go env
       - run: go get -v .
