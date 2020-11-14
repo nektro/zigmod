@@ -18,8 +18,8 @@ type ModFile struct {
 
 // this is the string enum because Go doesnt have those
 var (
-	DepTypeGit    = "git"
-	AllDepTypes   = []string{
+	DepTypeGit  = "git" // https://git-scm.com/
+	AllDepTypes = []string{
 		DepTypeGit,
 	}
 )
