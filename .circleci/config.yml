@@ -20,4 +20,14 @@ jobs:
       - store_artifacts:
           path: ./bin/
           destination: /artifacts/
+
+      - run: ./download_zig.sh 0.7.0
+      - run: zig version
+      - run: zig env
+      - run: apk add jq grep
+      - run: ./build_all_zig.sh
+      - store_artifacts:
+          path: ./zig-cache/bin/
+          destination: /artifacts/
+
       - run: ./make_release.sh
