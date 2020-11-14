@@ -25,6 +25,7 @@ jobs:
       - run: zig version
       - run: zig env
       - run: apk add jq grep
+      - run: apk add yaml-dev
       - run: ./build_all_zig.sh
       - store_artifacts:
           path: ./zig-cache/bin/

@@ -17,6 +17,11 @@ pub fn build(b: *Builder) void {
     exe.setBuildMode(mode);
     exe.strip = true;
 
+    exe.linkLibC();
+
+    exe.addIncludeDir("./libs/yaml/include");
+    exe.linkSystemLibrary("yaml");
+
     exe.install();
 
     const run_cmd = exe.run();
