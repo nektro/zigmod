@@ -22,6 +22,8 @@ pub fn build(b: *Builder) void {
     exe.addIncludeDir("./libs/yaml/include");
     exe.linkSystemLibrary("yaml");
 
+    exe.addPackagePath("known-folders", "./libs/zig-known-folders/known-folders.zig");
+
     exe.install();
 
     const run_cmd = exe.run();

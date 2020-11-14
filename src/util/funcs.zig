@@ -58,3 +58,48 @@ pub fn _join(comptime delim: []const u8, comptime xs: [][]const u8) []const u8 {
     }
     return buf;
 }
+
+pub fn trim_suffix(comptime T: type, in: []const T, suffix: []const T) []const T {
+    if (std.mem.endsWith(T, in, suffix)) {
+        return in[0..in.len-suffix.len];
+    }
+    return in;
+}
+
+pub fn repeat(s: []const u8, times: i32) ![]const u8 {
+    const list = &std.ArrayList([]const u8).init(gpa);
+    var i: i32 = 0;
+    while (i < times) : (i += 1) {
+        try list.append(s);
+    }
+    return join(list.items, "");
+}
+
+pub fn join(xs: [][]const u8, delim: []const u8) ![]const u8 {
+    var res: []const u8 = "";
+    for (xs) |x, i| {
+        res = try std.fmt.allocPrint(gpa, "{}{}{}", .{res, x, if (i < xs.len-1) delim else ""});
+    }
+    return res;
+}
+
+pub fn concat(items: [][]const u8) ![]const u8 {
+    var buf: []const u8 = "";
+    for (items) |x| {
+        buf = try std.fmt.allocPrint(gpa, "{}{}", .{buf, x});
+    }
+    return buf;
+}
+
+pub fn print_all(w: std.fs.File.Writer, items: anytype, ln: bool) !void {
+    inline for (items) |x, i| {
+        if (i == 0) {
+            try w.print("{}", .{x});
+        } else {
+            try w.print(" {}", .{x});
+        }
+    }
+    if (ln) {
+        try w.print("\n", .{});
+    }
+}
