@@ -8,6 +8,7 @@ const u = @import("./util/index.zig");
 
 const commands = struct {
     const init = @import("./cmd_init.zig");
+    const add = @import("./cmd_add.zig");
 };
 
 pub fn main() !void {
