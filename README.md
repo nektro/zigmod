@@ -10,18 +10,22 @@
 
 A package manager for the Zig programming language.
 
-Zig
+## Zig
 - https://ziglang.org/
 - https://github.com/ziglang/zig
 - https://github.com/ziglang/zig/wiki/Community
 
 ## Download
-Releases
 - https://github.com/nektro/zigmod/releases
 
-Source
-- `git clone https://github.com/nektro/zigmod.git`
-- https://github.com/nektro/zigmod/archive/master.zip
+## Built With
+- Zig 0.7.0
+
+### Build from Source
+```
+$ zig build
+$ ./zig-cache/bin/zigmod
+```
 
 ## Usage
 
