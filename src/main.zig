@@ -18,11 +18,6 @@ pub fn main() !void {
     const proc_args = try std.process.argsAlloc(gpa);
     const args = proc_args[1..];
 
-    u.print("args len: {}", .{args.len});
-    for (args) |a, i| {
-        u.print("arg {}: {}", .{i, a});
-    }
-
     if (args.len == 0) {
         u.print("zigmod-{}-{}-{}", .{@tagName(builtin.os.tag), @tagName(builtin.arch), @tagName(builtin.abi)});
         return;
