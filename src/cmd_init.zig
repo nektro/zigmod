@@ -35,12 +35,12 @@ fn detect_pkgname(def: []const u8) ![]const u8 {
 
 fn detct_mainfile(def: []const u8) ![]const u8 {
     if (def.len > 0) {
-        if (u.does_file_exist(def)) {
+        if (try u.does_file_exist(def)) {
             if (std.mem.endsWith(u8, def, ".zig")) {
                 return def;
             }
         }
     }
-    std.debug.assert(u.does_file_exist("./src/main.zig"));
+    std.debug.assert(try u.does_file_exist("./src/main.zig"));
     return "src/main.zig";
 }
