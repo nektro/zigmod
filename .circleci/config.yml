@@ -10,6 +10,7 @@ jobs:
       - run: apk update
       - run: apk add git
       - checkout
+      - run: git submodule update --init --recursive
 
       - run: apk add go
       - run: go version
