@@ -7,6 +7,7 @@ const u = @import("./util/index.zig");
 //
 
 const commands = struct {
+    const init = @import("./cmd_init.zig");
 };
 
 pub fn main() !void {
