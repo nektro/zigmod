@@ -79,6 +79,7 @@ pub fn build(b: *Builder) void {
 ## Prior Art
 - https://golang.org/ref/mod#go-mod-file
 - https://github.com/mattnite/zkg
+- https://github.com/MasterQ32/LoLa
 
 ## Contact
 - hello@nektro.net
