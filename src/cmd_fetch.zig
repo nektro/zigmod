@@ -45,9 +45,6 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!void {
                     try run_cmd(p, &[_][]const u8{"git", "pull"});
                 }
             },
-            else => {
-                std.debug.panic("fetch: unhandled dep type: {}\n", .{@tagName(d.type)});
-            }
         }
         switch (d.type) {
             else => {
