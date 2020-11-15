@@ -10,7 +10,8 @@ pub fn build(b: *Builder) void {
 
     const use_full_name = b.option(bool, "use-full-name", "") orelse false;
     const with_os_arch = b.fmt("-{}-{}", .{@tagName(target.os_tag orelse builtin.os.tag), @tagName(target.cpu_arch orelse builtin.arch)});
-    const exe_name = b.fmt("{}{}", .{ "zigmod-zig", if (use_full_name) with_os_arch else "" });
+    const version_tag = if (b.option([]const u8, "tag", "")) |vt| b.fmt("-{}", .{vt}) else "";
+    const exe_name = b.fmt("{}{}{}", .{ "zigmod-zig", version_tag, if (use_full_name) with_os_arch else "" });
 
     const exe = b.addExecutable(exe_name, "src/main.zig");
     exe.setTarget(target);
