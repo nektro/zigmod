@@ -21,7 +21,20 @@ pub fn build(b: *Builder) void {
     exe.linkLibC();
 
     exe.addIncludeDir("./libs/yaml/include");
-    exe.linkSystemLibrary("yaml");
+    exe.addCSourceFile("./libs/yaml/src/api.c", &[_][]const u8{
+        // taken from https://github.com/yaml/libyaml/blob/0.2.5/CMakeLists.txt#L5-L8
+        "-DYAML_VERSION_MAJOR=0",
+        "-DYAML_VERSION_MINOR=2",
+        "-DYAML_VERSION_PATCH=5",
+        "-DYAML_VERSION_STRING=\"0.2.5\"",
+    });
+    exe.addCSourceFile("./libs/yaml/src/dumper.c", &[_][]const u8{});
+    exe.addCSourceFile("./libs/yaml/src/emitter.c", &[_][]const u8{});
+    exe.addCSourceFile("./libs/yaml/src/loader.c", &[_][]const u8{});
+    exe.addCSourceFile("./libs/yaml/src/parser.c", &[_][]const u8{});
+    exe.addCSourceFile("./libs/yaml/src/reader.c", &[_][]const u8{});
+    exe.addCSourceFile("./libs/yaml/src/scanner.c", &[_][]const u8{});
+    exe.addCSourceFile("./libs/yaml/src/writer.c", &[_][]const u8{});
 
     exe.addPackagePath("known-folders", "./libs/zig-known-folders/known-folders.zig");
 
