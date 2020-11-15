@@ -6,6 +6,8 @@ jobs:
     working_directory: /home/circleci/zigmod
     docker:
       - image: alpine:edge
+    environment:
+      GOPATH: /usr/lib/go
     steps:
       - run: apk update
       - run: apk add git
