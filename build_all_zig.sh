@@ -8,6 +8,6 @@ tag=v$version-$(git log --format=%h -1)
 
 for item in $(zig targets | jq --raw-output '.libc[]' | grep gnu$ | grep x86_64)
 do
-    echo $item
+    echo "$tag-$item"
     zig build -Dtarget=$item -Drelease -Duse-full-name -Dtag=$tag
 done
