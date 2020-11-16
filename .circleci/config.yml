@@ -32,4 +32,7 @@ jobs:
           path: ./zig-cache/bin/
           destination: /artifacts/
 
+      - run: mkdir -p /artifacts/
+      - run: cp -R ./bin/. /artifacts/
+      - run: cp -R ./zig-cache/bin/. /artifacts/
       - run: ./make_release.sh
