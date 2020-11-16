@@ -5,16 +5,15 @@ jobs:
   build:
     working_directory: /home/circleci/zigmod
     docker:
-      - image: alpine:edge
+      - image: golang
     environment:
-      GOPATH: /usr/lib/go
+      DEBIAN_FRONTEND: noninteractive
     steps:
-      - run: apk update
-      - run: apk add git
+      - run: apt update
+      - run: apt -y upgrade
       - checkout
       - run: git submodule update --init --recursive
 
-      - run: apk add go
       - run: go version
       - run: go env
       - run: go get -v .
@@ -24,10 +23,10 @@ jobs:
           path: ./bin/
           destination: /artifacts/
 
+      - run: apt -y install xz-utils jq
       - run: ./download_zig.sh 0.7.0
       - run: zig version
       - run: zig env
-      - run: apk add jq grep
       - run: ./build_all_zig.sh
       - store_artifacts:
           path: ./zig-cache/bin/

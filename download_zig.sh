@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -x
 set -e
@@ -10,8 +10,7 @@ version="$1"
 dir="zig-$os-$arch-$version"
 file="$dir.tar.xz"
 
-cd ~
-apk add wget tar
+cd /
 wget https://ziglang.org/download/$version/$file
 tar -vxf $file
-ln -s ~/$dir/zig /bin
+ln -s /$dir/zig /usr/local/bin
