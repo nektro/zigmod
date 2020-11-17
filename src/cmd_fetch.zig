@@ -72,7 +72,7 @@ fn run_cmd(dir: ?[]const u8, args: []const []const u8) !void {
 }
 
 fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.ModFile, tabs: i32) anyerror!void {
-    if (m.deps.len == 0) {
+    if (m.deps.len == 0 and tabs > 0) {
         try w.print("null", .{});
         return;
     }
