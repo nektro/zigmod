@@ -30,6 +30,9 @@ pub fn execute(args: [][]u8) !void {
         \\    for (packages) |pkg| {
         \\        exe.addPackage(pkg);
         \\    }
+        \\    if (c_include_dirs.len > 0 or c_source_files.len > 0) {
+        \\        exe.linkLibC();
+        \\    }
         \\    for (c_include_dirs) |dir| {
         \\        exe.addIncludeDir(dir);
         \\    }
