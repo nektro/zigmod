@@ -26,7 +26,7 @@ pub fn execute(args: [][]u8) !void {
     try w.print("const cache = home ++ \"/.cache/zigmod/deps\";\n", .{});
     try w.print("\n", .{});
     try w.print("{}\n", .{
-        \\pub fn addAllTo(exe: build.LibExeObjStep) void {
+        \\pub fn addAllTo(exe: *build.LibExeObjStep) void {
         \\    for (packages) |pkg| {
         \\        exe.addPackage(pkg);
         \\    }
