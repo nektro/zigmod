@@ -20,10 +20,18 @@ pub fn execute(args: [][]u8) !void {
 
     const w = f.writer();
     try w.print("const std = @import(\"std\");\n", .{});
-    try w.print("const Pkg = std.build.Pkg;\n", .{});
+    try w.print("const build = std.build;\n", .{});
     try w.print("\n", .{});
     try w.print("const home = \"{}\";\n", .{home});
     try w.print("const cache = home ++ \"/.cache/zigmod/deps\";\n", .{});
+    try w.print("\n", .{});
+    try w.print("{}\n", .{
+        \\pub fn addAllTo(exe: build.LibExeObjStep) void {
+        \\    for (packages) |pkg| {
+        \\        exe.addPackage(pkg);
+        \\    }
+        \\}
+    });
     try w.print("\n", .{});
     try w.print("pub const packages = ", .{});
     try print_deps(w, dir, try u.ModFile.init(gpa, "./zig.mod"), 0);
@@ -68,7 +76,7 @@ fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.ModFile, tabs: i32) a
         try w.print("null", .{});
         return;
     }
-    try u.print_all(w, .{"&[_]Pkg{"}, true);
+    try u.print_all(w, .{"&[_]build.Pkg{"}, true);
     const t = "    ";
     const r = try u.repeat(t, tabs);
     for (m.deps) |d| {
@@ -77,7 +85,7 @@ fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.ModFile, tabs: i32) a
         const np = try u.concat(&[_][]const u8{p, "/zig.mod"});
         const n = try u.ModFile.init(gpa, np);
 
-        try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,"Pkg{"})});
+        try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,"build.Pkg{"})});
         try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,t,".name = \"",n.name,"\","})});
         try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,t,".path = cache ++ \"/",dcpath,"/",n.main,"\","})});
         try w.print("{}", .{try u.concat(&[_][]const u8{r,t,t,".dependencies = "})});

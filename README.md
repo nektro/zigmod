@@ -67,9 +67,7 @@ pub fn build(b: *Builder) void {
     const exe = b.addExecutable("zigmod", "src/main.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
-+    for (deps.packages) |pkg| {
-+        exe.addPackage(pkg);
-+    }
++   deps.addAllTo(exe);
     for (deps.system_libs) |lib| {
         exe.linkSystemLibrary(lib);
     }
