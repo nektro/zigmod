@@ -22,6 +22,12 @@ A package manager for the Zig programming language.
 - Zig 0.7.0
 
 ### Build from Source
+Initially,
+```
+$ git clone https://github.com/nektro/zigmod --recursive
+```
+
+To build,
 ```
 $ zig build
 $ ./zig-cache/bin/zigmod
