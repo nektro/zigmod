@@ -30,7 +30,7 @@ pub fn execute(args: [][]u8) !void {
         \\    for (packages) |pkg| {
         \\        exe.addPackage(pkg);
         \\    }
-        \\    for (c_inlude_dirs) |dir| {
+        \\    for (c_include_dirs) |dir| {
         \\        exe.addIncludeDir(dir);
         \\    }
         \\    for (c_source_files) |fpath| {
@@ -43,7 +43,7 @@ pub fn execute(args: [][]u8) !void {
     try print_deps(w, dir, top_module, 0);
     try w.print(";\n", .{});
     try w.print("\n", .{});
-    try w.print("{}\n", .{"pub const c_inlude_dirs = &[_][]const u8{"});
+    try w.print("{}\n", .{"pub const c_include_dirs = &[_][]const u8{"});
     try print_incl_dirs_to(w, top_module);
     try w.print("{};\n", .{"}"});
     try w.print("\n", .{});
