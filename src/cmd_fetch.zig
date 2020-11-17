@@ -12,7 +12,7 @@ pub fn execute(args: [][]u8) !void {
     const home = try known_folders.getPath(gpa, .home);
     const dir = try std.fmt.allocPrint(gpa, "{}{}", .{home, "/.cache/zigmod/deps"});
 
-    try fetch_deps(dir, "./zig.mod");
+    const top_module = try fetch_deps(dir, "./zig.mod");
 
     //
     const f = try std.fs.cwd().createFile("./deps.zig", .{});
@@ -34,12 +34,13 @@ pub fn execute(args: [][]u8) !void {
     });
     try w.print("\n", .{});
     try w.print("pub const packages = ", .{});
-    try print_deps(w, dir, try u.ModFile.init(gpa, "./zig.mod"), 0);
+    try print_deps(w, dir, top_module, 0);
     try w.print(";\n", .{});
 }
 
-fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!void {
+fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
+    const moduledeps = &std.ArrayList(u.Module).init(gpa);
     for (m.deps) |d| {
         const p = try std.fmt.allocPrint(gpa, "{}{}{}", .{dir, "/", try d.clean_path()});
         switch (d.type) {
@@ -56,10 +57,18 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!void {
         }
         switch (d.type) {
             else => {
-                try fetch_deps(dir, try std.fmt.allocPrint(gpa, "{}{}", .{p, "/zig.mod"}));
+                var dd = try fetch_deps(dir, try std.fmt.allocPrint(gpa, "{}{}", .{p, "/zig.mod"}));
+                dd.clean_path = try d.clean_path();
+                try moduledeps.append(dd);
             },
         }
     }
+    return u.Module{
+        .name = m.name,
+        .main = m.main,
+        .deps = moduledeps.items,
+        .clean_path = "",
+    };
 }
 
 fn run_cmd(dir: ?[]const u8, args: []const []const u8) !void {
@@ -71,7 +80,7 @@ fn run_cmd(dir: ?[]const u8, args: []const []const u8) !void {
     };
 }
 
-fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.ModFile, tabs: i32) anyerror!void {
+fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32) anyerror!void {
     if (m.deps.len == 0 and tabs > 0) {
         try w.print("null", .{});
         return;
@@ -80,16 +89,11 @@ fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.ModFile, tabs: i32) a
     const t = "    ";
     const r = try u.repeat(t, tabs);
     for (m.deps) |d| {
-        const dcpath = try d.clean_path();
-        const p = try u.concat(&[_][]const u8{dir, "/", dcpath});
-        const np = try u.concat(&[_][]const u8{p, "/zig.mod"});
-        const n = try u.ModFile.init(gpa, np);
-
         try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,"build.Pkg{"})});
-        try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,t,".name = \"",n.name,"\","})});
-        try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,t,".path = cache ++ \"/",dcpath,"/",n.main,"\","})});
+        try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,t,".name = \"",d.name,"\","})});
+        try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,t,".path = cache ++ \"/",d.clean_path,"/",d.main,"\","})});
         try w.print("{}", .{try u.concat(&[_][]const u8{r,t,t,".dependencies = "})});
-        try print_deps(w, dir, n, tabs+2);
+        try print_deps(w, dir, d, tabs+2);
         try w.print("{}\n", .{","});
         try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,"},"})});
     }
