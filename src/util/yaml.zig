@@ -18,6 +18,7 @@ pub const Item = union(enum) {
     mapping: Mapping,
     sequence: []Item,
     document: Document,
+    string: []const u8,
 };
 
 pub const Key = struct {
@@ -190,20 +191,27 @@ fn condense_event_list_sequence(from: []Item, at: usize, to: *std.ArrayList(Item
     var i: usize = 1;
     while (true) : (i += 1) {
         const ele = from[at+i];
-        if (ele == .event and @enumToInt(ele.event.type) == c.YAML_SEQUENCE_END_EVENT) {
-            break;
-        }
         if (ele == .event) {
+            if (@enumToInt(ele.event.type) == c.YAML_SEQUENCE_END_EVENT) {
+                break;
+            }
+            if (@enumToInt(ele.event.type) == c.YAML_SCALAR_EVENT) {
+                continue;
+            }
             return null;
         }
     }
 
-    const result = from[at+1..at+i];
-    for (result) |item| {
-        std.debug.assert(item == .mapping);
+    const result = &std.ArrayList(Item).init(to.allocator);
+    for (from[at+1..at+i]) |item| {
+        try result.append(switch (item) {
+            .mapping => item,
+            .event => Item{ .string = get_event_string(item.event, lines) },
+            else => unreachable,
+        });
     }
     try to.append(Item{
-        .sequence = result,
+        .sequence = result.items,
     });
     return 0+i;
 }
