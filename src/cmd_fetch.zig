@@ -30,12 +30,26 @@ pub fn execute(args: [][]u8) !void {
         \\    for (packages) |pkg| {
         \\        exe.addPackage(pkg);
         \\    }
+        \\    for (c_inlude_dirs) |dir| {
+        \\        exe.addIncludeDir(dir);
+        \\    }
+        \\    for (c_source_files) |fpath| {
+        \\        exe.addCSourceFile(fpath, &[_][]const u8{});
+        \\    }
         \\}
     });
     try w.print("\n", .{});
     try w.print("pub const packages = ", .{});
     try print_deps(w, dir, top_module, 0);
     try w.print(";\n", .{});
+    try w.print("\n", .{});
+    try w.print("{}\n", .{"pub const c_inlude_dirs = &[_][]const u8{"});
+    try print_incl_dirs_to(w, top_module);
+    try w.print("{};\n", .{"}"});
+    try w.print("\n", .{});
+    try w.print("{}\n", .{"pub const c_source_files = &[_][]const u8{"});
+    try print_csrc_dirs_to(w, top_module);
+    try w.print("{};\n", .{"}"});
 }
 
 fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
@@ -66,6 +80,8 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     return u.Module{
         .name = m.name,
         .main = m.main,
+        .c_include_dirs = m.c_include_dirs,
+        .c_source_files = m.c_source_files,
         .deps = moduledeps.items,
         .clean_path = "",
     };
@@ -98,4 +114,22 @@ fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32) an
         try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,"},"})});
     }
     try w.print("{}", .{try u.concat(&[_][]const u8{r,"}"})});
+}
+
+fn print_incl_dirs_to(w: std.fs.File.Writer, mod: u.Module) anyerror!void {
+    for (mod.c_include_dirs) |it| {
+        try w.print("    cache ++ \"/{}/{}\",\n", .{mod.clean_path, it});
+    }
+    for (mod.deps) |d| {
+        try print_incl_dirs_to(w, d);
+    }
+}
+
+fn print_csrc_dirs_to(w: std.fs.File.Writer, mod: u.Module) anyerror!void {
+    for (mod.c_source_files) |it| {
+        try w.print("    cache ++ \"/{}/{}\",\n", .{mod.clean_path, it});
+    }
+    for (mod.deps) |d| {
+        try print_csrc_dirs_to(w, d);
+    }
 }
