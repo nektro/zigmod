@@ -106,3 +106,12 @@ pub fn print_all(w: std.fs.File.Writer, items: anytype, ln: bool) !void {
         try w.print("\n", .{});
     }
 }
+
+pub fn list_contains(haystack: *std.ArrayList([]const u8), needle: []const u8) bool {
+    for (haystack.items) |item| {
+        if (std.mem.eql(u8, item, needle)) {
+            return true;
+        }
+    }
+    return false;
+}
