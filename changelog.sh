@@ -34,7 +34,7 @@ while IFS= read -r lineVAR; do
         if [[ "$t" == '2' ]]; then
             break
         fi
-        echo "<li><a href='https://github.com/nektro/$CIRCLE_PROJECT_REPONAME/commit/$hash'>$hash_abrev</a> $title ($author)</li>"
+        echo "<li><a href='https://github.com/nektro/$CIRCLE_PROJECT_REPONAME/commit/$hash'><code>$hash_abrev</code></a> $title ($author)</li>"
     fi
     c=$(($c+1))
     #
