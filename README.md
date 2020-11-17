@@ -54,7 +54,7 @@ zigmod fetch
 - This command takes no parameters and will generate a `deps.zig` in the root of your project.
 - `deps.zig` should not be checked into your source control.
 
-### `deps.zig`
+### Adding `deps.zig` to `build.zig
 ```diff
 const Builder = @import("std").build.Builder;
 +const deps = @import("./deps.zig");
