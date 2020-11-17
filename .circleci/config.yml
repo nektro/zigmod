@@ -14,15 +14,6 @@ jobs:
       - checkout
       - run: git submodule update --init --recursive
 
-      - run: go version
-      - run: go env
-      - run: go get -v .
-      - run: go test -v .
-      - run: ./build_all.sh
-      - store_artifacts:
-          path: ./bin/
-          destination: /artifacts/
-
       - run: apt -y install xz-utils jq
       - run: ./download_zig.sh 0.7.0
       - run: zig version
@@ -33,6 +24,5 @@ jobs:
           destination: /artifacts/
 
       - run: mkdir -p /artifacts/
-      - run: cp -R ./bin/. /artifacts/
       - run: cp -R ./zig-cache/bin/. /artifacts/
       - run: ./make_release.sh
