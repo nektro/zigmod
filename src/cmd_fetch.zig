@@ -47,11 +47,11 @@ pub fn execute(args: [][]u8) !void {
     try w.print(";\n", .{});
     try w.print("\n", .{});
     try w.print("{}\n", .{"pub const c_include_dirs = &[_][]const u8{"});
-    try print_incl_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa));
+    try print_incl_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
     try w.print("{};\n", .{"}"});
     try w.print("\n", .{});
     try w.print("{}\n", .{"pub const c_source_files = &[_][]const u8{"});
-    try print_csrc_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa));
+    try print_csrc_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
     try w.print("{};\n", .{"}"});
 }
 
@@ -119,28 +119,36 @@ fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32) an
     try w.print("{}", .{try u.concat(&[_][]const u8{r,"}"})});
 }
 
-fn print_incl_dirs_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8)) anyerror!void {
+fn print_incl_dirs_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
     if (u.list_contains(list, mod.clean_path)) {
         return;
     }
     try list.append(mod.clean_path);
     for (mod.c_include_dirs) |it| {
-        try w.print("    cache ++ \"/{}/{}\",\n", .{mod.clean_path, it});
+        if (!local) {
+            try w.print("    cache ++ \"/{}/{}\",\n", .{mod.clean_path, it});
+        } else {
+            try w.print("    \".{}/{}\",\n", .{mod.clean_path, it});
+        }
     }
     for (mod.deps) |d| {
-        try print_incl_dirs_to(w, d, list);
+        try print_incl_dirs_to(w, d, list, false);
     }
 }
 
-fn print_csrc_dirs_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8)) anyerror!void {
+fn print_csrc_dirs_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
     if (u.list_contains(list, mod.clean_path)) {
         return;
     }
     try list.append(mod.clean_path);
     for (mod.c_source_files) |it| {
-        try w.print("    cache ++ \"/{}/{}\",\n", .{mod.clean_path, it});
+        if (!local) {
+            try w.print("    cache ++ \"/{}/{}\",\n", .{mod.clean_path, it});
+        } else {
+            try w.print("    \".{}/{}\",\n", .{mod.clean_path, it});
+        }
     }
     for (mod.deps) |d| {
-        try print_csrc_dirs_to(w, d, list);
+        try print_csrc_dirs_to(w, d, list, false);
     }
 }
