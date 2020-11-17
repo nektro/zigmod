@@ -68,9 +68,6 @@ pub fn build(b: *Builder) void {
     exe.setTarget(target);
     exe.setBuildMode(mode);
 +   deps.addAllTo(exe);
-    for (deps.system_libs) |lib| {
-        exe.linkSystemLibrary(lib);
-    }
     exe.install();
 ```
 
