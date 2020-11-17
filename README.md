@@ -4,8 +4,6 @@
 [![discord](https://img.shields.io/discord/551971034593755159.svg?logo=discord)](https://discord.gg/P6Y4zQC)
 [![circleci](https://circleci.com/gh/nektro/zigmod.svg?style=svg)](https://circleci.com/gh/nektro/zigmod)
 [![release](https://img.shields.io/github/v/release/nektro/zigmod)](https://github.com/nektro/zigmod/releases/latest)
-[![goreportcard](https://goreportcard.com/badge/github.com/nektro/zigmod)](https://goreportcard.com/report/github.com/nektro/zigmod)
-[![codefactor](https://www.codefactor.io/repository/github/nektro/zigmod/badge)](https://www.codefactor.io/repository/github/nektro/zigmod)
 [![downloads](https://img.shields.io/github/downloads/nektro/zigmod/total.svg)](https://github.com/nektro/zigmod/releases)
 
 A package manager for the Zig programming language.
