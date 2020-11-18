@@ -1,7 +1,3 @@
-const std = @import("std");
-
-const u = @import("index.zig");
-
 //
 //
 
