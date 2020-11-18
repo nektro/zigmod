@@ -60,9 +60,9 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     for (m.deps) |d| {
         const p = try std.fmt.allocPrint(gpa, "{}{}{}", .{dir, "/", try d.clean_path()});
+        u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
         switch (d.type) {
             .git => {
-                u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
                 if (!try u.does_file_exist(p)) {
                     try run_cmd(null, &[_][]const u8{"git", "clone", d.path, p});
                 }
