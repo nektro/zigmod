@@ -50,7 +50,7 @@ zigmod add <type> <path>
 - `<type>` is the type of package we're adding.
 - `<path>` is the URL to the package you'd like to include.
 
-#### Available `fetch` types
+#### Available types
 - `git`
 - `hg`
 
