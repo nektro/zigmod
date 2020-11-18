@@ -47,8 +47,11 @@ zigmod init [name] [entry_file]
 zigmod add <type> <path>
 ```
 
-- `<type>` is the type of package we're adding. Currently `git` is the only valid type. More to come.
+- `<type>` is the type of package we're adding.
 - `<path>` is the URL to the package you'd like to include.
+
+#### Available `fetch` types
+- `git`
 
 ### `fetch` command
 ```
