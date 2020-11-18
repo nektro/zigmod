@@ -43,6 +43,21 @@ pub const Mapping = struct {
         }
         return null;
     }
+
+    pub fn get_string_array(self: Mapping, alloc: *std.mem.Allocator, k: []const u8) ![][]const u8 {
+        const list = &std.ArrayList([]const u8).init(alloc);
+        if (self.get(k)) |val| {
+            if (val == .sequence) {
+                for (val.sequence) |item, i| {
+                    if (item != .string) {
+                        continue;
+                    }
+                    try list.append(item.string);
+                }
+            }
+        }
+        return list.items;
+    }
 };
 
 //

@@ -31,26 +31,6 @@ pub const ModFile = struct {
         const name = doc.mapping.get("name").?.string;
         const main = doc.mapping.get("main").?.string;
 
-        const cinclude_list = &std.ArrayList([]const u8).init(alloc);
-        if (doc.mapping.get("c_include_dirs")) |val| {
-            if (val == .sequence) {
-                for (val.sequence) |item, i| {
-                    u.assert(item == .string, "modfile: {}[{}] is not a string", .{"c_include_dirs", i});
-                    try cinclude_list.append(item.string);
-                }
-            }
-        }
-
-        const csrc_list = &std.ArrayList([]const u8).init(alloc);
-        if (doc.mapping.get("c_source_files")) |val| {
-            if (val == .sequence) {
-                for (val.sequence) |item, i| {
-                    u.assert(item == .string, "modfile: {}[{}] is not a string", .{"c_source_files", i});
-                    try csrc_list.append(item.string);
-                }
-            }
-        }
-
         const dep_list = &std.ArrayList(u.Dep).init(alloc);
         if (doc.mapping.get("dependencies")) |dep_seq| {
             if (dep_seq == .sequence) {
@@ -71,8 +51,8 @@ pub const ModFile = struct {
             .alloc = alloc,
             .name = name,
             .main = main,
-            .c_include_dirs = cinclude_list.items,
-            .c_source_files = csrc_list.items,
+            .c_include_dirs = try doc.mapping.get_string_array(alloc, "c_include_dirs"),
+            .c_source_files = try doc.mapping.get_string_array(alloc, "c_source_files"),
             .deps = dep_list.items,
         };
     }
