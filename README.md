@@ -52,6 +52,7 @@ zigmod add <type> <path>
 
 #### Available `fetch` types
 - `git`
+- `hg`
 
 ### `fetch` command
 ```

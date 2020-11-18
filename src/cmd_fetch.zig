@@ -71,6 +71,14 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                     try run_cmd(p, &[_][]const u8{"git", "pull"});
                 }
             },
+            .hg => {
+                if (!try u.does_file_exist(p)) {
+                    try run_cmd(null, &[_][]const u8{"hg", "clone", d.path, p});
+                }
+                else {
+                    try run_cmd(p, &[_][]const u8{"hg", "pull"});
+                }
+            },
         }
         switch (d.type) {
             else => {
