@@ -36,8 +36,8 @@ pub fn execute(args: [][]u8) !void {
         \\    for (c_include_dirs) |dir| {
         \\        exe.addIncludeDir(dir);
         \\    }
-        \\    for (c_source_files) |fpath| {
-        \\        exe.addCSourceFile(fpath, &[_][]const u8{});
+        \\    inline for (c_source_files) |fpath| {
+        \\        exe.addCSourceFile(fpath[1], @field(c_source_flags, fpath[0]));
         \\    }
         \\}
     });
@@ -50,7 +50,11 @@ pub fn execute(args: [][]u8) !void {
     try print_incl_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
     try w.print("{};\n", .{"}"});
     try w.print("\n", .{});
-    try w.print("{}\n", .{"pub const c_source_files = &[_][]const u8{"});
+    try w.print("{}\n", .{"pub const c_source_flags = struct {"});
+    try print_csrc_flags_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
+    try w.print("{};\n", .{"}"});
+    try w.print("\n", .{});
+    try w.print("{}\n", .{"pub const c_source_files = &[_][2][]const u8{"});
     try print_csrc_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
     try w.print("{};\n", .{"}"});
 }
@@ -92,6 +96,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         .name = m.name,
         .main = m.main,
         .c_include_dirs = m.c_include_dirs,
+        .c_source_flags = m.c_source_flags,
         .c_source_files = m.c_source_files,
         .deps = moduledeps.items,
         .clean_path = "",
@@ -151,12 +156,32 @@ fn print_csrc_dirs_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList
     try list.append(mod.clean_path);
     for (mod.c_source_files) |it| {
         if (!local) {
-            try w.print("    cache ++ \"/{}/{}\",\n", .{mod.clean_path, it});
+            try w.print("    {}\"{}\", cache ++ \"/{}/{}\"{},\n", .{"[_][]const u8{", mod.clean_path, mod.clean_path, it, "}"});
         } else {
-            try w.print("    \".{}/{}\",\n", .{mod.clean_path, it});
+            try w.print("    {}\"{}\", \".{}/{}\"{},\n", .{"[_][]const u8{", mod.clean_path, mod.clean_path, it, "}"});
         }
     }
     for (mod.deps) |d| {
         try print_csrc_dirs_to(w, d, list, false);
+    }
+}
+
+fn print_csrc_flags_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
+    if (u.list_contains(list, mod.clean_path)) {
+        return;
+    }
+    try list.append(mod.clean_path);
+    if (local) {
+        try w.print("    pub const @\"{}\" = {};\n", .{"", "&[_][]const u8{}"});
+    }
+    else {
+        try w.print("    pub const @\"{}\" = {}", .{mod.clean_path, "&[_][]const u8{"});
+        for (mod.c_source_flags) |it| {
+            try w.print("\"{Z}\",", .{it});
+        }
+        try w.print("{};\n", .{"}"});
+    }
+    for (mod.deps) |d| {
+        try print_csrc_flags_to(w, d, list, false);
     }
 }

@@ -17,6 +17,7 @@ pub const ModFile = struct {
     name: []const u8,
     main: []const u8,
     c_include_dirs: [][]const u8,
+    c_source_flags: [][]const u8,
     c_source_files: [][]const u8,
     deps: []u.Dep,
 
@@ -52,6 +53,7 @@ pub const ModFile = struct {
             .name = name,
             .main = main,
             .c_include_dirs = try doc.mapping.get_string_array(alloc, "c_include_dirs"),
+            .c_source_flags = try doc.mapping.get_string_array(alloc, "c_source_flags"),
             .c_source_files = try doc.mapping.get_string_array(alloc, "c_source_files"),
             .deps = dep_list.items,
         };
