@@ -44,6 +44,10 @@ pub const Mapping = struct {
         return null;
     }
 
+    pub fn get_string(self: Mapping, k: []const u8) []const u8 {
+        return if (self.get(k)) |v| v.string else "";
+    }
+
     pub fn get_string_array(self: Mapping, alloc: *std.mem.Allocator, k: []const u8) ![][]const u8 {
         const list = &std.ArrayList([]const u8).init(alloc);
         if (self.get(k)) |val| {

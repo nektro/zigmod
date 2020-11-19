@@ -12,6 +12,12 @@ pub const Dep = struct {
     type: u.DepType,
     path: []const u8,
 
+    name: []const u8,
+    main: []const u8,
+    c_include_dirs: [][]const u8,
+    c_source_flags: [][]const u8,
+    c_source_files: [][]const u8,
+
     pub fn clean_path(self: Dep) ![]const u8 {
         var p = self.path;
         p = u.trim_prefix(p, "https://");

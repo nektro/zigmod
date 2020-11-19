@@ -29,6 +29,11 @@ pub fn execute(args: [][]u8) !void {
     try ndl.append(u.Dep{
         .type = dep_type.?,
         .path = path,
+        .name = "",
+        .main = "",
+        .c_include_dirs = &[_][]const u8{},
+        .c_source_flags = &[_][]const u8{},
+        .c_source_files = &[_][]const u8{},
     });
 
     //
