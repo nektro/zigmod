@@ -10,7 +10,7 @@ const u = @import("./util/index.zig");
 pub fn execute(args: [][]u8) !void {
     //
     const home = try known_folders.getPath(gpa, .home);
-    const dir = try std.fmt.allocPrint(gpa, "{}{}", .{home, "/.cache/zigmod/deps"});
+    const dir = try std.fmt.allocPrint(gpa, "{}{}", .{home, "/.cache/zigmod"});
 
     const top_module = try fetch_deps(dir, "./zig.mod");
 
@@ -62,13 +62,16 @@ pub fn execute(args: [][]u8) !void {
 fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
+    var moddir: []const u8 = undefined;
     for (m.deps) |d| {
         const p = try u.concat(&[_][]const u8{dir, "/deps/", try d.clean_path()});
         const pv = try u.concat(&[_][]const u8{dir, "/v/", try d.clean_path(), "/", d.version});
         u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
+        moddir = p;
         switch (d.type) {
             .git => blk: {
                 if (try u.does_file_exist(pv)) {
+                    moddir = pv;
                     break :blk;
                 }
                 if (!try u.does_file_exist(p)) {
@@ -90,6 +93,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         _ = try run_cmd(pv, &[_][]const u8{"git", "checkout", ref});
                         const pvd = try std.fs.openDirAbsolute(pv, .{});
                         try pvd.deleteTree(".git");
+                        moddir = pv;
                     }
                     else {
                         u.assert(false, "fetch: git: version type: '{}' on {} is invalid.", .{v_type_s, d.path});
@@ -109,12 +113,14 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
             else => {
                 if (d.main.len == 0) {
                     if (d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
-                        try moduledeps.append(try u.Module.from(d));
+                        var mod_from = try u.Module.from(d);
+                        mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
+                        try moduledeps.append(mod_from);
                     }
                     break;
                 }
-                var dd = try fetch_deps(dir, try u.concat(&[_][]const u8{p, "/zig.mod"}));
-                dd.clean_path = try d.clean_path();
+                var dd = try fetch_deps(dir, try u.concat(&[_][]const u8{moddir, "/zig.mod"}));
+                dd.clean_path = u.trim_prefix(moddir, dir)[1..];
 
                 if (d.name.len > 0) dd.name = d.name;
                 if (d.main.len > 0) dd.main = d.main;
