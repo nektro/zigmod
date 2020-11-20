@@ -31,6 +31,7 @@ pub fn execute(args: [][]u8) !void {
         .path = path,
         .name = "",
         .main = "",
+        .version = "",
         .c_include_dirs = &[_][]const u8{},
         .c_source_flags = &[_][]const u8{},
         .c_source_files = &[_][]const u8{},

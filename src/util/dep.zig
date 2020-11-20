@@ -14,6 +14,7 @@ pub const Dep = struct {
 
     name: []const u8,
     main: []const u8,
+    version: []const u8,
     c_include_dirs: [][]const u8,
     c_source_flags: [][]const u8,
     c_source_files: [][]const u8,

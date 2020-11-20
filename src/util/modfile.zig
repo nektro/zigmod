@@ -45,6 +45,7 @@ pub const ModFile = struct {
                         .path = path,
                         .name = item.mapping.get_string("name"),
                         .main = item.mapping.get_string("main"),
+                        .version = item.mapping.get_string("version"),
                         .c_include_dirs = try item.mapping.get_string_array(alloc, "c_include_dirs"),
                         .c_source_flags = try item.mapping.get_string_array(alloc, "c_source_flags"),
                         .c_source_files = try item.mapping.get_string_array(alloc, "c_source_files"),
