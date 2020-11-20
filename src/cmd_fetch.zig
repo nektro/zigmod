@@ -63,7 +63,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     for (m.deps) |d| {
-        const p = try std.fmt.allocPrint(gpa, "{}{}{}", .{dir, "/", try d.clean_path()});
+        const p = try u.concat(&[_][]const u8{dir, "/", try d.clean_path()});
         u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
         switch (d.type) {
             .git => {
@@ -92,7 +92,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                     }
                     break;
                 }
-                var dd = try fetch_deps(dir, try std.fmt.allocPrint(gpa, "{}{}", .{p, "/zig.mod"}));
+                var dd = try fetch_deps(dir, try u.concat(&[_][]const u8{p, "/zig.mod"}));
                 dd.clean_path = try d.clean_path();
 
                 if (d.name.len > 0) dd.name = d.name;
