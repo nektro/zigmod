@@ -110,16 +110,18 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
             },
         }
         switch (d.type) {
-            else => {
-                if (d.main.len == 0) {
-                    if (d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
-                        var mod_from = try u.Module.from(d);
-                        mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
-                        try moduledeps.append(mod_from);
-                    }
-                    break;
-                }
-                var dd = try fetch_deps(dir, try u.concat(&[_][]const u8{moddir, "/zig.mod"}));
+            else => blk: {
+                var dd = try fetch_deps(dir, try u.concat(&[_][]const u8{moddir, "/zig.mod"})) catch |e| switch (e) {
+                    error.FileNotFound => {
+                        if (d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
+                            var mod_from = try u.Module.from(d);
+                            mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
+                            try moduledeps.append(mod_from);
+                        }
+                        break :blk;
+                    },
+                    else => e,
+                };
                 dd.clean_path = u.trim_prefix(moddir, dir)[1..];
 
                 if (d.name.len > 0) dd.name = d.name;
