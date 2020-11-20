@@ -86,13 +86,25 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                     const v_type_s = iter.next().?;
                     if (std.meta.stringToEnum(u.GitVersionType, v_type_s)) |v_type| {
                         const ref = iter.rest();
-                        if ((try run_cmd(p, &[_][]const u8{"git", "rev-parse", ref})) > 0) {
+                        if (try u.does_file_exist(pv)) {
+                            if (v_type == .branch) {
+                                _ = try run_cmd(pv, &[_][]const u8{"git", "fetch"});
+                                _ = try run_cmd(pv, &[_][]const u8{"git", "pull"});
+                            }
+                            moddir = pv;
+                            break :blk;
+                        }
+                        if ((try run_cmd(p, &[_][]const u8{"git", "checkout", ref})) > 0) {
                             u.assert(false, "fetch: git: {}: {} {} does not exist", .{d.path, @tagName(v_type), ref});
+                        } else {
+                            _ = try run_cmd(p, &[_][]const u8{"git", "checkout", "-"});
                         }
                         _ = try run_cmd(null, &[_][]const u8{"git", "clone", d.path, pv});
                         _ = try run_cmd(pv, &[_][]const u8{"git", "checkout", ref});
-                        const pvd = try u.open_dir_absolute(pv);
-                        try pvd.deleteTree(".git");
+                        if (v_type != .branch) {
+                            const pvd = try u.open_dir_absolute(pv);
+                            try pvd.deleteTree(".git");
+                        }
                         moddir = pv;
                     }
                     else {
