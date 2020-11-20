@@ -23,7 +23,7 @@ pub fn execute(args: [][]u8) !void {
     try w.print("const build = std.build;\n", .{});
     try w.print("\n", .{});
     try w.print("const home = \"{}\";\n", .{home});
-    try w.print("const cache = home ++ \"/.cache/zigmod/deps\";\n", .{});
+    try w.print("const cache = home ++ \"/.cache/zigmod\";\n", .{});
     try w.print("\n", .{});
     try w.print("{}\n", .{
         \\pub fn addAllTo(exe: *build.LibExeObjStep) void {
@@ -63,7 +63,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     for (m.deps) |d| {
-        const p = try u.concat(&[_][]const u8{dir, "/", try d.clean_path()});
+        const p = try u.concat(&[_][]const u8{dir, "/deps/", try d.clean_path()});
         const pv = try u.concat(&[_][]const u8{dir, "/v/", try d.clean_path(), "/", d.version});
         u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
         switch (d.type) {
