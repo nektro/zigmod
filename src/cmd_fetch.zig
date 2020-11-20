@@ -67,7 +67,10 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         const pv = try u.concat(&[_][]const u8{dir, "/v/", try d.clean_path(), "/", d.version});
         u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
         switch (d.type) {
-            .git => {
+            .git => blk: {
+                if (try u.does_file_exist(pv)) {
+                    break :blk;
+                }
                 if (!try u.does_file_exist(p)) {
                     _ = try run_cmd(null, &[_][]const u8{"git", "clone", d.path, p});
                 }
