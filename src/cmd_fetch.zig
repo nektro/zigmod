@@ -64,6 +64,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     for (m.deps) |d| {
         const p = try u.concat(&[_][]const u8{dir, "/", try d.clean_path()});
+        const pv = try u.concat(&[_][]const u8{dir, "/v/", try d.clean_path(), "/", d.version});
         u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
         switch (d.type) {
             .git => {
@@ -73,6 +74,23 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                 else {
                     _ = try run_cmd(p, &[_][]const u8{"git", "fetch"});
                     _ = try run_cmd(p, &[_][]const u8{"git", "pull"});
+                }
+                if (d.version.len > 0) {
+                    const iter = &std.mem.split(d.version, "-");
+                    const v_type_s = iter.next().?;
+                    if (std.meta.stringToEnum(u.GitVersionType, v_type_s)) |v_type| {
+                        const ref = iter.rest();
+                        if ((try run_cmd(p, &[_][]const u8{"git", "rev-parse", ref})) > 0) {
+                            u.assert(false, "fetch: git: {}: {} {} does not exist", .{d.path, @tagName(v_type), ref});
+                        }
+                        _ = try run_cmd(null, &[_][]const u8{"git", "clone", d.path, pv});
+                        _ = try run_cmd(pv, &[_][]const u8{"git", "checkout", ref});
+                        const pvd = try std.fs.openDirAbsolute(pv, .{});
+                        try pvd.deleteTree(".git");
+                    }
+                    else {
+                        u.assert(false, "fetch: git: version type: '{}' on {} is invalid.", .{v_type_s, d.path});
+                    }
                 }
             },
             .hg => {
