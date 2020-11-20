@@ -68,19 +68,19 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         switch (d.type) {
             .git => {
                 if (!try u.does_file_exist(p)) {
-                    try run_cmd(null, &[_][]const u8{"git", "clone", d.path, p});
+                    _ = try run_cmd(null, &[_][]const u8{"git", "clone", d.path, p});
                 }
                 else {
-                    try run_cmd(p, &[_][]const u8{"git", "fetch"});
-                    try run_cmd(p, &[_][]const u8{"git", "pull"});
+                    _ = try run_cmd(p, &[_][]const u8{"git", "fetch"});
+                    _ = try run_cmd(p, &[_][]const u8{"git", "pull"});
                 }
             },
             .hg => {
                 if (!try u.does_file_exist(p)) {
-                    try run_cmd(null, &[_][]const u8{"hg", "clone", d.path, p});
+                    _= try run_cmd(null, &[_][]const u8{"hg", "clone", d.path, p});
                 }
                 else {
-                    try run_cmd(p, &[_][]const u8{"hg", "pull"});
+                    _= try run_cmd(p, &[_][]const u8{"hg", "pull"});
                 }
             },
         }
@@ -116,13 +116,15 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     };
 }
 
-fn run_cmd(dir: ?[]const u8, args: []const []const u8) !void {
-    _ = std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, }) catch |e| switch(e) {
+fn run_cmd(dir: ?[]const u8, args: []const []const u8) !u32 {
+    const result = std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, }) catch |e| switch(e) {
         error.FileNotFound => {
             u.assert(false, "\"{}\" command not found", .{args[0]});
+            unreachable;
         },
         else => return e,
     };
+    return result.term.Exited;
 }
 
 fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32) anyerror!void {
