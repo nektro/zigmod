@@ -91,7 +91,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         }
                         _ = try run_cmd(null, &[_][]const u8{"git", "clone", d.path, pv});
                         _ = try run_cmd(pv, &[_][]const u8{"git", "checkout", ref});
-                        const pvd = try std.fs.openDirAbsolute(pv, .{});
+                        const pvd = try u.open_dir_absolute(pv);
                         try pvd.deleteTree(".git");
                         moddir = pv;
                     }
