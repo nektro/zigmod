@@ -121,3 +121,12 @@ pub fn open_dir_absolute(dpath: []const u8) !std.fs.Dir {
         .fd = (try std.fs.openFileAbsolute(dpath, .{})).handle,
     };
 }
+
+pub fn list_contains_gen(comptime T: type, haystack: *std.ArrayList(T), needle: T) bool {
+    for (haystack.items) |item| {
+        if (item.eql(needle)) {
+            return true;
+        }
+    }
+    return false;
+}
