@@ -64,6 +64,14 @@ zigmod fetch
 - This command takes no parameters and will generate a `deps.zig` in the root of your project.
 - `deps.zig` should not be checked into your source control.
 
+### `sum` command
+```
+zigmod sum
+```
+
+- This will generate a `zig.sum` file with the blake3 hashes of your modules.
+- Place that hash in the `hash: blake3:<hash>` property of a dependency to be able to check it with `verify`.
+
 ### Adding `deps.zig` to `build.zig`
 ```diff
 const Builder = @import("std").build.Builder;
