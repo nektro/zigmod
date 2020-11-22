@@ -130,3 +130,18 @@ pub fn list_contains_gen(comptime T: type, haystack: *std.ArrayList(T), needle: 
     }
     return false;
 }
+
+pub fn file_list(dpath: []const u8, list: *std.ArrayList([]const u8)) !void {
+    var walk = try std.fs.walkPath(gpa, dpath);
+    while (true) {
+        if (try walk.next()) |entry| {
+            if (entry.kind != .File) {
+                continue;
+            }
+            try list.append(try gpa.dupe(u8, entry.path));
+        }
+        else {
+            break;
+        }
+    }
+}
