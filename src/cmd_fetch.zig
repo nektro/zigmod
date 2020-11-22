@@ -70,10 +70,6 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         moddir = p;
         switch (d.type) {
             .git => blk: {
-                if (try u.does_file_exist(pv)) {
-                    moddir = pv;
-                    break :blk;
-                }
                 if (!try u.does_file_exist(p)) {
                     _ = try run_cmd(null, &[_][]const u8{"git", "clone", d.path, p});
                 }
