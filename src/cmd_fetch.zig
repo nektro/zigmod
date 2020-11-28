@@ -40,6 +40,10 @@ pub fn execute(args: [][]u8) !void {
         \\        exe.addCSourceFile(fpath[1], @field(c_source_flags, fpath[0]));
         \\    }
         \\}
+        \\
+        \\fn get_flags(comptime index: usize) []const u8 {
+        \\    return std.meta.declarations(c_source_flags)[index].name;
+        \\}
     });
     try w.print("\n", .{});
     try w.print("pub const packages = ", .{});
@@ -211,9 +215,9 @@ fn print_csrc_dirs_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList
     try list.append(mod.clean_path);
     for (mod.c_source_files) |it| {
         if (!local) {
-            try w.print("    {}\"{}\", cache ++ \"/{}/{}\"{},\n", .{"[_][]const u8{", mod.clean_path, mod.clean_path, it, "}"});
+            try w.print("    {}comptime get_flags({}), cache ++ \"/{}/{}\"{},\n", .{"[_][]const u8{", list.items.len-1, mod.clean_path, it, "}"});
         } else {
-            try w.print("    {}\"{}\", \".{}/{}\"{},\n", .{"[_][]const u8{", mod.clean_path, mod.clean_path, it, "}"});
+            try w.print("    {}comptime get_flags({}), \".{}/{}\"{},\n", .{"[_][]const u8{", list.items.len-1, mod.clean_path, it, "}"});
         }
     }
     for (mod.deps) |d| {
