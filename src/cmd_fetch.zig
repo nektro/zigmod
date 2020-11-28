@@ -112,10 +112,10 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
             },
             .hg => {
                 if (!try u.does_file_exist(p)) {
-                    _= try u.run_cmd(null, &[_][]const u8{"hg", "clone", d.path, p});
+                    _ = try d.type.pull(d.path, p);
                 }
                 else {
-                    _= try u.run_cmd(p, &[_][]const u8{"hg", "pull"});
+                    _ = try d.type.update(p, d.path);
                 }
             },
         }
