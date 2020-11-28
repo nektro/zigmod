@@ -16,7 +16,9 @@ pub fn build(b: *Builder) void {
     const exe = b.addExecutable(exe_name, "src/main.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
-    exe.strip = true;
+    if (builtin.mode != .Debug) {
+        exe.strip = true;
+    }
 
     exe.linkLibC();
 
