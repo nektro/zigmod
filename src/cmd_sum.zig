@@ -11,7 +11,7 @@ const common = @import("./common.zig");
 pub fn execute(args: [][]u8) !void {
     //
     const home = try known_folders.getPath(gpa, .home);
-    const dir = try std.fmt.allocPrint(gpa, "{}{}", .{home, "/.cache/zigmod"});
+    const dir = try std.fs.path.join(gpa, &[_][]const u8{home.?, ".cache", "zigmod"});
     const top_module = try common.collect_deps(dir, "./zig.mod");
     
     //
