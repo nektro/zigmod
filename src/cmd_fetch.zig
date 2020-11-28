@@ -75,11 +75,10 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         switch (d.type) {
             .git => blk: {
                 if (!try u.does_file_exist(p)) {
-                    _ = try run_cmd(null, &[_][]const u8{"git", "clone", d.path, p});
+                    _ = try d.type.pull(d.path, p);
                 }
                 else {
-                    _ = try run_cmd(p, &[_][]const u8{"git", "fetch"});
-                    _ = try run_cmd(p, &[_][]const u8{"git", "pull"});
+                    _ = try d.type.update(p, d.path);
                 }
                 if (d.version.len > 0) {
                     const iter = &std.mem.split(d.version, "-");
@@ -88,19 +87,18 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         const ref = iter.rest();
                         if (try u.does_file_exist(pv)) {
                             if (v_type == .branch) {
-                                _ = try run_cmd(pv, &[_][]const u8{"git", "fetch"});
-                                _ = try run_cmd(pv, &[_][]const u8{"git", "pull"});
+                                try d.type.update(p, d.path);
                             }
                             moddir = pv;
                             break :blk;
                         }
-                        if ((try run_cmd(p, &[_][]const u8{"git", "checkout", ref})) > 0) {
+                        if ((try u.run_cmd(p, &[_][]const u8{"git", "checkout", ref})) > 0) {
                             u.assert(false, "fetch: git: {}: {} {} does not exist", .{d.path, @tagName(v_type), ref});
                         } else {
-                            _ = try run_cmd(p, &[_][]const u8{"git", "checkout", "-"});
+                            _ = try u.run_cmd(p, &[_][]const u8{"git", "checkout", "-"});
                         }
-                        _ = try run_cmd(null, &[_][]const u8{"git", "clone", d.path, pv});
-                        _ = try run_cmd(pv, &[_][]const u8{"git", "checkout", ref});
+                        _ = try u.run_cmd(null, &[_][]const u8{"git", "clone", d.path, pv});
+                        _ = try u.run_cmd(pv, &[_][]const u8{"git", "checkout", ref});
                         if (v_type != .branch) {
                             const pvd = try u.open_dir_absolute(pv);
                             try pvd.deleteTree(".git");
@@ -114,10 +112,10 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
             },
             .hg => {
                 if (!try u.does_file_exist(p)) {
-                    _= try run_cmd(null, &[_][]const u8{"hg", "clone", d.path, p});
+                    _= try u.run_cmd(null, &[_][]const u8{"hg", "clone", d.path, p});
                 }
                 else {
-                    _= try run_cmd(p, &[_][]const u8{"hg", "pull"});
+                    _= try u.run_cmd(p, &[_][]const u8{"hg", "pull"});
                 }
             },
         }
@@ -155,17 +153,6 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         .deps = moduledeps.items,
         .clean_path = "",
     };
-}
-
-fn run_cmd(dir: ?[]const u8, args: []const []const u8) !u32 {
-    const result = std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, }) catch |e| switch(e) {
-        error.FileNotFound => {
-            u.assert(false, "\"{}\" command not found", .{args[0]});
-            unreachable;
-        },
-        else => return e,
-    };
-    return result.term.Exited;
 }
 
 fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32) anyerror!void {
