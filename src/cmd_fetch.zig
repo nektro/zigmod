@@ -10,7 +10,7 @@ const u = @import("./util/index.zig");
 pub fn execute(args: [][]u8) !void {
     //
     const home = try known_folders.getPath(gpa, .home);
-    const dir = try std.fs.path.join(gpa, &[_][]const u8{home.?, ".cache", "zigmod"});
+    const dir = try std.fs.path.join(gpa, &[_][]const u8{home.?, ".cache", "zigmod", "deps"});
 
     const top_module = try fetch_deps(dir, "./zig.mod");
 
@@ -23,7 +23,7 @@ pub fn execute(args: [][]u8) !void {
     try w.print("const build = std.build;\n", .{});
     try w.print("\n", .{});
     try w.print("const home = \"{}\";\n", .{home});
-    try w.print("const cache = home ++ \"/.cache/zigmod\";\n", .{});
+    try w.print("const cache = home ++ \"/.cache/zigmod/deps\";\n", .{});
     try w.print("\n", .{});
     try w.print("{}\n", .{
         \\pub fn addAllTo(exe: *build.LibExeObjStep) void {
@@ -64,7 +64,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     var moddir: []const u8 = undefined;
     for (m.deps) |d| {
-        const p = try u.concat(&[_][]const u8{dir, "/deps/", try d.clean_path()});
+        const p = try u.concat(&[_][]const u8{dir, "/", try d.clean_path()});
         const pv = try u.concat(&[_][]const u8{dir, "/v/", try d.clean_path(), "/", d.version});
         u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
         moddir = p;
