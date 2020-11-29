@@ -127,7 +127,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         if (d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                             var mod_from = try u.Module.from(d);
                             mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
-                            try moduledeps.append(mod_from);
+                            if (mod_from.is_for_this()) try moduledeps.append(mod_from);
                         }
                         break :blk;
                     },
@@ -140,8 +140,10 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                 if (d.c_include_dirs.len > 0) dd.c_include_dirs = d.c_include_dirs;
                 if (d.c_source_flags.len > 0) dd.c_source_flags = d.c_source_flags;
                 if (d.c_source_files.len > 0) dd.c_source_files = d.c_source_files;
+                if (d.only_os.len > 0) dd.only_os = d.only_os;
+                if (d.except_os.len > 0) dd.except_os = d.except_os;
 
-                try moduledeps.append(dd);
+                if (dd.is_for_this()) try moduledeps.append(dd);
             },
         }
     }
@@ -153,6 +155,8 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         .c_source_files = m.c_source_files,
         .deps = moduledeps.items,
         .clean_path = "",
+        .only_os = &[_][]const u8{},
+        .except_os = &[_][]const u8{},
     };
 }
 

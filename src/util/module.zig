@@ -1,5 +1,6 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
+const builtin = @import("builtin");
 
 const u = @import("index.zig");
 
@@ -16,6 +17,8 @@ pub const Module = struct {
     c_include_dirs: [][]const u8,
     c_source_flags: [][]const u8,
     c_source_files: [][]const u8,
+    only_os: [][]const u8,
+    except_os: [][]const u8,
 
     deps: []Module,
     clean_path: []const u8,
@@ -29,6 +32,8 @@ pub const Module = struct {
             .c_source_files = dep.c_source_files,
             .deps = &[_]Module{},
             .clean_path = try dep.clean_path(),
+            .only_os = dep.only_os,
+            .except_os = dep.except_os,
         };
     }
 
@@ -66,5 +71,16 @@ pub const Module = struct {
         h.final(&out);
         const hex = try std.fmt.allocPrint(gpa, "{x}", .{out});
         return hex;
+    }
+
+    pub fn is_for_this(self: Module) bool {
+        const os = @tagName(builtin.os.tag);
+        if (self.only_os.len > 0) {
+            return u.list_contains(self.only_os, os);
+        }
+        if (self.except_os.len > 0) {
+            return !u.list_contains(self.except_os, os);
+        }
+        return true;
     }
 };

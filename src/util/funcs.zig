@@ -156,3 +156,13 @@ pub fn run_cmd(dir: ?[]const u8, args: []const []const u8) !u32 {
     };
     return result.term.Exited;
 }
+
+pub fn list_remove(input: [][]const u8, search: []const u8) ![][]const u8 {
+    const list = &std.ArrayList([]const u8).init(gpa);
+    for (input) |item| {
+        if (!std.mem.eql(u8, item, search)) {
+            try list.append(item);
+        }
+    }
+    return list.items;
+}

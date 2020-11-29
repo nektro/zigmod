@@ -18,6 +18,8 @@ pub const Dep = struct {
     c_include_dirs: [][]const u8,
     c_source_flags: [][]const u8,
     c_source_files: [][]const u8,
+    only_os: [][]const u8,
+    except_os: [][]const u8,
 
     pub fn clean_path(self: Dep) ![]const u8 {
         var p = self.path;

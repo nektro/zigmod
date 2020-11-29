@@ -49,6 +49,8 @@ pub const ModFile = struct {
                         .c_include_dirs = try item.mapping.get_string_array(alloc, "c_include_dirs"),
                         .c_source_flags = try item.mapping.get_string_array(alloc, "c_source_flags"),
                         .c_source_files = try item.mapping.get_string_array(alloc, "c_source_files"),
+                        .only_os = try u.list_remove(try u.split(item.mapping.get_string("only_os"), ","), ""),
+                        .except_os = try u.list_remove(try u.split(item.mapping.get_string("except_os"), ","), ""),
                     });
                 }
             }
