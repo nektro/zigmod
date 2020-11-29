@@ -29,7 +29,7 @@ fn detect_pkgname(def: []const u8) ![]const u8 {
     const split = try u.split(dpath, "/");
     var name = split[split.len-1];
     name = u.trim_prefix(name, "zig-");
-    std.debug.assert(name.len > 0);
+    u.assert(name.len > 0, "package name must not be an empty string", .{});
     return name;
 }
 
@@ -41,6 +41,6 @@ fn detct_mainfile(def: []const u8) ![]const u8 {
             }
         }
     }
-    std.debug.assert(try u.does_file_exist("./src/main.zig"));
     return "src/main.zig";
+    u.assert(false, "unable to detect package entry point", .{});
 }
