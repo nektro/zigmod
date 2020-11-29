@@ -23,7 +23,13 @@ pub const ModFile = struct {
 
     pub fn init(alloc: *std.mem.Allocator, fpath: []const u8) !Self {
         //
-        const mpath = try std.fs.realpathAlloc(alloc, fpath);
+        const mpath = try std.fs.realpathAlloc(alloc, fpath) catch |e| switch (e) {
+            error.FileNotFound => {
+                u.assert(false, "zig.mod file not found in the current directory, run 'zigmod init' to get started.", .{});
+                unreachable;
+            },
+            else => e,
+        };
         const file = try std.fs.openFileAbsolute(mpath, .{});
         defer file.close();
         const input = try file.reader().readAllAlloc(alloc, mb);
