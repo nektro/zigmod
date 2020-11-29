@@ -41,6 +41,12 @@ fn detct_mainfile(def: []const u8) ![]const u8 {
             }
         }
     }
-    return "src/main.zig";
+    if (try u.does_file_exist("./src/lib.zig")) {
+        return "src/lib.zig";
+    }
+    if (try u.does_file_exist("./src/main.zig")) {
+        return "src/main.zig";
+    }
     u.assert(false, "unable to detect package entry point", .{});
+    unreachable;
 }
