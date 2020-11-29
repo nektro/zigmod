@@ -89,6 +89,28 @@ pub fn build(b: *Builder) void {
     exe.install();
 ```
 
+### `zig.mod` Reference
+| Name | Type | Note | Description |
+|------|------|------|-------------|
+| `name` | `string` | required | The value users will put into `@import` |
+| `main` | `string` | required | The `.zig` entry point into your package |
+| `c_include_dirs` | `[]string` | | A list of relative paths to directories with `.h` files |
+| `c_source_flags` | `[]string` | | A list of clang flags to pass to each of the `.c` files in `c_source_files` |
+| `c_source_files` | `[]string` | | A list of relative paths to `.c` files to compile along with project |
+| `dependencies` | `[]Dep` | | An array of dependency objects |
+
+#### Dep object
+| Name | Type | Note | Description |
+|------|------|------|-------------|
+| `type` | `string` | required, enum | One of `git`, `hg` |
+| `path` | `string` | required | URL/path to this dependency. depends on the type |
+| `version` | `string` | only on some types | pin this dependency at a specific version |
+| `only_os` | `string` | | comma separated list of OS names to add this Dep to |
+| `except_os` | `string` | | comma separated list of OS names to exclude this Dep from |
+
+- `name`, `main`, `c_include_dirs`, `c_source_flags`, `c_source_files`, can be overwritten as well.
+- `type.git` supports version pinning by `branch-XX`, `tag-XX`, and `commit-XX`.
+
 ## Prior Art
 - https://golang.org/ref/mod#go-mod-file
 - https://github.com/mattnite/zkg
