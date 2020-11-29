@@ -104,7 +104,7 @@ pub fn parse(alloc: *std.mem.Allocator, input: []const u8) !Document {
         l = all_events.items.len;
     }
 
-    u.assert(all_events.items.len == 1, "failure parsing zig.mod. please report an issue at https://github.com/nektro/zigmod/issues/new that contains the text of your zig.mod.");
+    u.assert(all_events.items.len == 1, "failure parsing zig.mod. please report an issue at https://github.com/nektro/zigmod/issues/new that contains the text of your zig.mod.", .{});
     return all_events.items[0].document;
 }
 
