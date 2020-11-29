@@ -179,8 +179,8 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32) anyerr
     try w.print("{}", .{try u.concat(&[_][]const u8{r,"}"})});
 }
 
-    if (u.list_contains(list, mod.clean_path)) {
 fn print_incl_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
+    if (u.list_contains(list.items, mod.clean_path)) {
         return;
     }
     try list.append(mod.clean_path);
@@ -196,8 +196,8 @@ fn print_incl_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]c
     }
 }
 
-    if (u.list_contains(list, mod.clean_path)) {
 fn print_csrc_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
+    if (u.list_contains(list.items, mod.clean_path)) {
         return;
     }
     try list.append(mod.clean_path);
@@ -213,8 +213,8 @@ fn print_csrc_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]c
     }
 }
 
-    if (u.list_contains(list, mod.clean_path)) {
 fn print_csrc_flags_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
+    if (u.list_contains(list.items, mod.clean_path)) {
         return;
     }
     try list.append(mod.clean_path);
