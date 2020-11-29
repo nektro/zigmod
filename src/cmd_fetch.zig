@@ -1,5 +1,6 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
+const fs = std.fs;
 
 const known_folders = @import("known-folders");
 const u = @import("./util/index.zig");
@@ -10,12 +11,12 @@ const u = @import("./util/index.zig");
 pub fn execute(args: [][]u8) !void {
     //
     const home = try known_folders.getPath(gpa, .home);
-    const dir = try std.fs.path.join(gpa, &[_][]const u8{home.?, ".cache", "zigmod", "deps"});
+    const dir = try fs.path.join(gpa, &[_][]const u8{home.?, ".cache", "zigmod", "deps"});
 
     const top_module = try fetch_deps(dir, "./zig.mod");
 
     //
-    const f = try std.fs.cwd().createFile("./deps.zig", .{});
+    const f = try fs.cwd().createFile("./deps.zig", .{});
     defer f.close();
 
     const w = f.writer();
@@ -155,7 +156,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     };
 }
 
-fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32) anyerror!void {
+fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32) anyerror!void {
     if (m.deps.len == 0 and tabs > 0) {
         try w.print("null", .{});
         return;
@@ -178,8 +179,8 @@ fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32) an
     try w.print("{}", .{try u.concat(&[_][]const u8{r,"}"})});
 }
 
-fn print_incl_dirs_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
     if (u.list_contains(list, mod.clean_path)) {
+fn print_incl_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
         return;
     }
     try list.append(mod.clean_path);
@@ -195,8 +196,8 @@ fn print_incl_dirs_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList
     }
 }
 
-fn print_csrc_dirs_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
     if (u.list_contains(list, mod.clean_path)) {
+fn print_csrc_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
         return;
     }
     try list.append(mod.clean_path);
@@ -212,8 +213,8 @@ fn print_csrc_dirs_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList
     }
 }
 
-fn print_csrc_flags_to(w: std.fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
     if (u.list_contains(list, mod.clean_path)) {
+fn print_csrc_flags_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
         return;
     }
     try list.append(mod.clean_path);
