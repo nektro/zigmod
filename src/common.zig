@@ -11,7 +11,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     var moddir: []const u8 = undefined;
     for (m.deps) |d| {
-        const p = try u.concat(&[_][]const u8{dir, "/deps/", try d.clean_path()});
+        const p = try u.concat(&[_][]const u8{dir, "/", try d.clean_path()});
         const pv = try u.concat(&[_][]const u8{dir, "/v/", try d.clean_path(), "/", d.version});
         if (try u.does_file_exist(pv)) {
             moddir = pv;
