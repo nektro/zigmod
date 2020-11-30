@@ -40,6 +40,9 @@ pub fn execute(args: [][]u8) !void {
         \\    inline for (c_source_files) |fpath| {
         \\        exe.addCSourceFile(fpath[1], @field(c_source_flags, fpath[0]));
         \\    }
+        \\    for (system_libs) |lib| {
+        \\        exe.linkSystemLibrary(lib);
+        \\    }
         \\}
         \\
         \\fn get_flags(comptime index: usize) []const u8 {
@@ -62,6 +65,11 @@ pub fn execute(args: [][]u8) !void {
     try w.print("{}\n", .{"pub const c_source_files = &[_][2][]const u8{"});
     try print_csrc_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
     try w.print("{};\n", .{"}"});
+    try w.print("\n", .{});
+    try w.print("{}\n", .{"pub const system_libs = &[_][]const u8{"});
+    try print_sys_libs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), &std.ArrayList([]const u8).init(gpa));
+    try w.print("{};\n", .{"}"});
+
 }
 
 fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
@@ -74,6 +82,9 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
         moddir = p;
         switch (d.type) {
+            .system_lib => {
+                // no op
+            },
             .git => blk: {
                 if (!try u.does_file_exist(p)) {
                     _ = try d.type.pull(d.path, p);
@@ -121,6 +132,20 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
             },
         }
         switch (d.type) {
+            .system_lib => {
+                if (d.is_for_this()) try moduledeps.append(u.Module{
+                    .is_sys_lib = true,
+                    .name = d.path,
+                    .only_os = d.only_os,
+                    .except_os = d.except_os,
+                    .main = "",
+                    .c_include_dirs = &[_][]const u8{},
+                    .c_source_flags = &[_][]const u8{},
+                    .c_source_files = &[_][]const u8{},
+                    .deps = &[_]u.Module{},
+                    .clean_path = "",
+                });
+            },
             else => blk: {
                 var dd = try fetch_deps(dir, try u.concat(&[_][]const u8{moddir, "/zig.mod"})) catch |e| switch (e) {
                     error.FileNotFound => {
@@ -148,6 +173,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         }
     }
     return u.Module{
+        .is_sys_lib = false,
         .name = m.name,
         .main = m.main,
         .c_include_dirs = m.c_include_dirs,
@@ -196,6 +222,7 @@ fn print_incl_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]c
         }
     }
     for (mod.deps) |d| {
+        if (d.is_sys_lib) continue;
         try print_incl_dirs_to(w, d, list, false);
     }
 }
@@ -213,6 +240,7 @@ fn print_csrc_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]c
         }
     }
     for (mod.deps) |d| {
+        if (d.is_sys_lib) continue;
         try print_csrc_dirs_to(w, d, list, false);
     }
 }
@@ -233,6 +261,25 @@ fn print_csrc_flags_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]
         try w.print("{};\n", .{"}"});
     }
     for (mod.deps) |d| {
+        if (d.is_sys_lib) continue;
         try print_csrc_flags_to(w, d, list, false);
+    }
+}
+
+fn print_sys_libs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), list2: *std.ArrayList([]const u8)) anyerror!void {
+    if (u.list_contains(list.items, mod.clean_path)) {
+        return;
+    }
+    try list.append(mod.clean_path);
+    //
+    for (mod.deps) |d| {
+        if (!d.is_sys_lib) continue;
+        //
+        if (!u.list_contains(list2.items, d.name)) {
+            try w.print("    \"{}\",\n", .{d.name});
+            try list2.append(d.name);
+        }
+        //
+        try print_sys_libs_to(w, d, list, list2);
     }
 }

@@ -1,5 +1,6 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
+const builtin = @import("builtin");
 
 const u = @import("index.zig");
 
@@ -28,5 +29,16 @@ pub const Dep = struct {
         p = u.trim_suffix(u8, p, ".git");
         p = try std.fmt.allocPrint(gpa, "{}{}{}", .{@tagName(self.type), "/", p});
         return p;
+    }
+
+    pub fn is_for_this(self: Dep) bool {
+        const os = @tagName(builtin.os.tag);
+        if (self.only_os.len > 0) {
+            return u.list_contains(self.only_os, os);
+        }
+        if (self.except_os.len > 0) {
+            return !u.list_contains(self.except_os, os);
+        }
+        return true;
     }
 };

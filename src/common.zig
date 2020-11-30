@@ -21,6 +21,20 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
             moddir = p;
         }
         switch (d.type) {
+            .system_lib => {
+                if (d.is_for_this()) try moduledeps.append(u.Module{
+                    .is_sys_lib = true,
+                    .name = d.path,
+                    .only_os = d.only_os,
+                    .except_os = d.except_os,
+                    .main = "",
+                    .c_include_dirs = &[_][]const u8{},
+                    .c_source_flags = &[_][]const u8{},
+                    .c_source_files = &[_][]const u8{},
+                    .deps = &[_]u.Module{},
+                    .clean_path = "",
+                });
+            },
             else => blk: {
                 var dd = try collect_deps(dir, try u.concat(&[_][]const u8{moddir, "/zig.mod"})) catch |e| switch (e) {
                     error.FileNotFound => {
@@ -48,6 +62,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         }
     }
     return u.Module{
+        .is_sys_lib = false,
         .name = m.name,
         .main = m.main,
         .c_include_dirs = m.c_include_dirs,

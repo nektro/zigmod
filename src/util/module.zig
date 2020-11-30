@@ -12,6 +12,7 @@ const kb = b * 1024;
 const mb = kb * 1024;
 
 pub const Module = struct {
+    is_sys_lib: bool,
     name: []const u8,
     main: []const u8,
     c_include_dirs: [][]const u8,
@@ -25,6 +26,7 @@ pub const Module = struct {
 
     pub fn from(dep: u.Dep) !Module {
         return Module{
+            .is_sys_lib = false,
             .name = dep.name,
             .main = dep.main,
             .c_include_dirs = dep.c_include_dirs,

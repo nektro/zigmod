@@ -53,6 +53,7 @@ zigmod add <type> <path>
 -->
 
 #### Available types
+- `system_lib`
 - `git`
 - `hg`
 
@@ -102,7 +103,7 @@ pub fn build(b: *Builder) void {
 #### Dep object
 | Name | Type | Note | Description |
 |------|------|------|-------------|
-| `type` | `string` | required, enum | One of `git`, `hg` |
+| `type` | `string` | required, enum | One of `system_lib`, `git`, `hg` |
 | `path` | `string` | required | URL/path to this dependency. depends on the type |
 | `version` | `string` | only on some types | pin this dependency at a specific version |
 | `only_os` | `string` | | comma separated list of OS names to add this Dep to |
