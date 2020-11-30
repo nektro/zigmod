@@ -15,9 +15,6 @@ pub const DepType = enum {
                 _ = try u.run_cmd(null, &[_][]const u8{"git", "clone", rpath, dpath});
             },
             .hg => { _ = try u.run_cmd(null, &[_][]const u8{"hg", "clone", rpath, dpath}); },
-            else => {
-                u.assert(false, "dep type {} not configured for pull: {}", .{@tagName(self), rpath});
-            },
         }
     }
 
@@ -29,9 +26,6 @@ pub const DepType = enum {
                 _ = try u.run_cmd(dpath, &[_][]const u8{"git", "pull"});
             },
             .hg => { _ = try u.run_cmd(dpath, &[_][]const u8{"hg", "pull"}); },
-            else => {
-                u.assert(false, "dep type {} not configured for update: {}", .{@tagName(self), rpath});
-            },
         }
     }
 };
