@@ -1,4 +1,3 @@
-/zigmod*
 /zig-cache
 /zig.mod
 /deps.zig
