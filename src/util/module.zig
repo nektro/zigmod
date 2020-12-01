@@ -71,7 +71,7 @@ pub const Module = struct {
         }
         var out: [32]u8 = undefined;
         h.final(&out);
-        const hex = try std.fmt.allocPrint(gpa, "{x}", .{out});
+        const hex = try std.fmt.allocPrint(gpa, "blake3-{x}", .{out});
         return hex;
     }
 
