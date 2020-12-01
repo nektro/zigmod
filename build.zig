@@ -29,6 +29,7 @@ pub fn build(b: *Builder) void {
         "-DYAML_VERSION_MINOR=2",
         "-DYAML_VERSION_PATCH=5",
         "-DYAML_VERSION_STRING=\"0.2.5\"",
+        "-DYAML_DECLARE_STATIC=1",
     });
     exe.addCSourceFile("./libs/yaml/src/dumper.c", &[_][]const u8{});
     exe.addCSourceFile("./libs/yaml/src/emitter.c", &[_][]const u8{});
