@@ -12,10 +12,10 @@ pub fn execute(args: [][]u8) !void {
     //
     const home = try known_folders.getPath(gpa, .home);
     const dir = try std.fs.path.join(gpa, &[_][]const u8{home.?, ".cache", "zigmod", "deps"});
-    const top_module = try common.collect_deps(dir, "./zig.mod");
+    const top_module = try common.collect_deps(dir, "zig.mod");
     
     //
-    const f = try std.fs.cwd().createFile("./zig.sum", .{});
+    const f = try std.fs.cwd().createFile("zig.sum", .{});
     defer f.close();
     const w = f.writer();
 

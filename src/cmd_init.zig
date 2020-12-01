@@ -10,7 +10,7 @@ pub fn execute(args: [][]u8) !void {
     const name = try detect_pkgname(u.try_index([]const u8, args, 0, ""));
     const mainf = try detct_mainfile(u.try_index([]const u8, args, 1, ""));
 
-    const file = try std.fs.cwd().createFile("./zig.mod", .{});
+    const file = try std.fs.cwd().createFile("zig.mod", .{});
     defer file.close();
 
     const fwriter = file.writer();

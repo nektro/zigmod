@@ -17,7 +17,7 @@ pub fn execute(args: [][]u8) !void {
     const dep_type = std.meta.stringToEnum(u.DepType, dept);
     u.assert(dep_type != null, "provided <type> parameter \"{}\" is not a valid dependency type", .{dept});
 
-    const m = try u.ModFile.init(gpa, "./zig.mod");
+    const m = try u.ModFile.init(gpa, "zig.mod");
     for (m.deps) |d| {
         u.assert(!(d.type == dep_type.? and std.mem.eql(u8, d.path, path)), "dependency already added, skipping!", .{});
     }
@@ -38,7 +38,7 @@ pub fn execute(args: [][]u8) !void {
     });
 
     //
-    const f = try std.fs.cwd().createFile("./zig.mod", .{});
+    const f = try std.fs.cwd().createFile("zig.mod", .{});
     defer f.close();
 
     const w = f.writer();
