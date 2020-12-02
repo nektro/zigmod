@@ -25,8 +25,8 @@ fn detect_pkgname(def: []const u8) ![]const u8 {
     if (def.len > 0) {
         return def;
     }
-    const dpath = try std.fs.realpathAlloc(gpa, "./");
-    const split = try u.split(dpath, "/");
+    const dpath = try std.fs.cwd().realpathAlloc(gpa, ".");
+    const split = try u.split(dpath, std.fs.path.sep_str);
     var name = split[split.len-1];
     name = u.trim_prefix(name, "zig-");
     u.assert(name.len > 0, "package name must not be an empty string", .{});
