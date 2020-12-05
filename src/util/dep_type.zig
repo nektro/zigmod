@@ -13,6 +13,7 @@ pub const DepType = enum {
             .system_lib => {},
             .git => {
                 _ = try u.run_cmd(null, &[_][]const u8{"git", "clone", rpath, dpath});
+                _ = try u.run_cmd(null, &[_][]const u8{"git", "submodule", "update", "--init", "--recursive"});
             },
             .hg => { _ = try u.run_cmd(null, &[_][]const u8{"hg", "clone", rpath, dpath}); },
         }
