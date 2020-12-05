@@ -53,6 +53,20 @@ pub fn does_file_exist(fpath: []const u8) !bool {
     return true;
 }
 
+pub fn does_folder_exist(fpath: []const u8) !bool {
+    const abs_path = std.fs.realpathAlloc(gpa, fpath) catch |e| switch (e) {
+        error.FileNotFound => return false,
+        else => return e,
+    };
+    const file = try std.fs.openFileAbsolute(abs_path, .{});
+    defer file.close();
+    const s = try file.stat();
+    if (s.kind != .Directory) {
+        return false;
+    }
+    return true;
+}
+
 pub fn _join(comptime delim: []const u8, comptime xs: [][]const u8) []const u8 {
     var buf: []const u8 = "";
     for (xs) |x,i| {
@@ -165,4 +179,46 @@ pub fn list_remove(input: [][]const u8, search: []const u8) ![][]const u8 {
         }
     }
     return list.items;
+}
+
+pub fn last(in: [][]const u8) ![]const u8 {
+    if (in.len == 0) {
+        return error.EmptyArray;
+    }
+    return in[in.len - 1];
+}
+
+pub fn mkdir_all(dpath: []const u8) anyerror!void {
+    const d = if (dpath[dpath.len-1] == std.fs.path.sep) dpath[0..dpath.len-1] else dpath;
+    const ps = std.fs.path.sep_str;
+    const e = dpath[0..std.mem.lastIndexOf(u8, dpath, ps).?];
+    if (std.mem.indexOf(u8, e, ps)) |_| {} else {
+        return;
+    }
+    try mkdir_all(e);
+    if (!try does_folder_exist(d)) {
+        std.log.debug("mkdir_all: {} doesnt exist, making", .{d});
+        try std.fs.makeDirAbsolute(d);
+    }
+}
+
+pub fn rm_recv(path: []const u8) anyerror!void {
+    const abs_path = std.fs.realpathAlloc(gpa, path) catch |e| switch (e) {
+        error.FileNotFound => return,
+        else => return e,
+    };
+    const file = try std.fs.openFileAbsolute(abs_path, .{});
+    defer file.close();
+    const s = try file.stat();
+    if (s.kind == .Directory) {
+        const dir = std.fs.cwd().openDir(abs_path, .{ .iterate=true, }) catch unreachable;
+        var iter = dir.iterate();
+        while (try iter.next()) |item| {
+            try rm_recv(try std.fs.path.join(gpa, &[_][]const u8{abs_path, item.name}));
+        }
+        try std.fs.deleteDirAbsolute(abs_path);
+    }
+    else {
+        try std.fs.deleteFileAbsolute(abs_path);
+    }
 }
