@@ -1,3 +1,6 @@
+const std = @import("std");
+const gpa = std.heap.c_allocator;
+
 const u = @import("./index.zig");
 
 //
@@ -7,6 +10,7 @@ pub const DepType = enum {
     system_lib, // std.build.LibExeObjStep.linkSystemLibrary
     git,        // https://git-scm.com/
     hg,         // https://www.mercurial-scm.org/
+    http,       // https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
 
     pub fn pull(self: DepType, rpath: []const u8, dpath: []const u8) !void {
         switch (self) {
@@ -17,6 +21,24 @@ pub const DepType = enum {
             },
             .hg => {
                 _ = try u.run_cmd(null, &[_][]const u8{"hg", "clone", rpath, dpath});
+            },
+            .http => {
+                try u.mkdir_all(dpath);
+                _ = try u.run_cmd(dpath, &[_][]const u8{"wget", rpath});
+                const f = rpath[std.mem.lastIndexOf(u8, rpath, "/").?+1..];
+                if (std.mem.endsWith(u8, f, ".zip")) {
+                    _ = try u.run_cmd(dpath, &[_][]const u8{"unzip", f, "-d", "."});
+                    try std.fs.deleteFileAbsolute(try std.fs.path.join(gpa, &[_][]const u8{dpath, f}));
+                }
+                if (
+                    std.mem.endsWith(u8, f, ".tar")
+                    or std.mem.endsWith(u8, f, ".tar.gz")
+                    or std.mem.endsWith(u8, f, ".tar.xz")
+                    or std.mem.endsWith(u8, f, ".tar.zst")
+                ) {
+                    _ = try u.run_cmd(dpath, &[_][]const u8{"tar", "-xf", f, "-C", "."});
+                    try std.fs.deleteFileAbsolute(try std.fs.path.join(gpa, &[_][]const u8{dpath, f}));
+                }
             },
         }
     }
@@ -30,6 +52,9 @@ pub const DepType = enum {
             },
             .hg => {
                 _ = try u.run_cmd(dpath, &[_][]const u8{"hg", "pull"});
+            },
+            .http => {
+                //
             },
         }
     }

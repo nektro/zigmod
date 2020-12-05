@@ -56,6 +56,7 @@ zigmod add <type> <path>
 - `system_lib`
 - `git`
 - `hg`
+- `http`
 
 ### `fetch` command
 ```
@@ -103,7 +104,7 @@ pub fn build(b: *Builder) void {
 #### Dep object
 | Name | Type | Note | Description |
 |------|------|------|-------------|
-| `type` | `string` | required, enum | One of `system_lib`, `git`, `hg` |
+| `type` | `string` | required, enum | One of `system_lib`, `git`, `hg`, `http` |
 | `path` | `string` | required | URL/path to this dependency. depends on the type |
 | `version` | `string` | only on some types | pin this dependency at a specific version |
 | `only_os` | `string` | | comma separated list of OS names to add this Dep to |

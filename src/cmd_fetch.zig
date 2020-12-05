@@ -130,6 +130,13 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                     _ = try d.type.update(p, d.path);
                 }
             },
+            .http => {
+                const file_name = try u.last(try u.split(d.path, "/"));
+                if (try u.does_file_exist(p)) {
+                    try u.rm_recv(p);
+                }
+                _ = try d.type.pull(d.path, p);
+            },
         }
         switch (d.type) {
             .system_lib => {
