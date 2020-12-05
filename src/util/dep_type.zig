@@ -15,7 +15,9 @@ pub const DepType = enum {
                 _ = try u.run_cmd(null, &[_][]const u8{"git", "clone", rpath, dpath});
                 _ = try u.run_cmd(null, &[_][]const u8{"git", "submodule", "update", "--init", "--recursive"});
             },
-            .hg => { _ = try u.run_cmd(null, &[_][]const u8{"hg", "clone", rpath, dpath}); },
+            .hg => {
+                _ = try u.run_cmd(null, &[_][]const u8{"hg", "clone", rpath, dpath});
+            },
         }
     }
 
@@ -26,7 +28,9 @@ pub const DepType = enum {
                 _ = try u.run_cmd(dpath, &[_][]const u8{"git", "fetch"});
                 _ = try u.run_cmd(dpath, &[_][]const u8{"git", "pull"});
             },
-            .hg => { _ = try u.run_cmd(dpath, &[_][]const u8{"hg", "pull"}); },
+            .hg => {
+                _ = try u.run_cmd(dpath, &[_][]const u8{"hg", "pull"});
+            },
         }
     }
 };
