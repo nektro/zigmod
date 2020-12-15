@@ -7,8 +7,8 @@ version=${CIRCLE_BUILD_NUM-$date}
 tag=v$version.$(git log --format=%h -1)
 
 targets="
-aarch64-linux-gnu
-x86_64-linux-gnu
+aarch64-linux-musl
+x86_64-linux-musl
 x86_64-windows-gnu
 x86_64-macos-gnu
 "
