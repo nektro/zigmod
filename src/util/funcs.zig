@@ -45,11 +45,7 @@ pub fn trim_prefix(in: []const u8, prefix: []const u8) []const u8 {
 }
 
 pub fn does_file_exist(fpath: []const u8) !bool {
-    const abs_path = std.fs.realpathAlloc(gpa, fpath) catch |e| switch (e) {
-        error.FileNotFound => return false,
-        else => return e,
-    };
-    const file = std.fs.openFileAbsolute(abs_path, .{}) catch |e| switch (e) {
+    const file = std.fs.cwd().openFile(fpath, .{}) catch |e| switch (e) {
         error.FileNotFound => return false,
         else => return e,
     };
@@ -58,11 +54,10 @@ pub fn does_file_exist(fpath: []const u8) !bool {
 }
 
 pub fn does_folder_exist(fpath: []const u8) !bool {
-    const abs_path = std.fs.realpathAlloc(gpa, fpath) catch |e| switch (e) {
+    const file = try std.fs.cwd().openFile(abs_path, .{}) catch |e| switch (e) {
         error.FileNotFound => return false,
         else => return e,
     };
-    const file = try std.fs.openFileAbsolute(abs_path, .{});
     defer file.close();
     const s = try file.stat();
     if (s.kind != .Directory) {
