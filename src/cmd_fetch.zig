@@ -78,7 +78,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     var moddir: []const u8 = undefined;
     for (m.deps) |d| {
         const p = try fs.path.join(gpa, &[_][]const u8{dir, try d.clean_path()});
-        const pv = try fs.path.join(gpa, &[_][]const u8{dir, "v", try d.clean_path(), d.version});
+        const pv = try fs.path.join(gpa, &[_][]const u8{dir, try d.clean_path_v()});
         u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
         moddir = p;
         switch (d.type) {

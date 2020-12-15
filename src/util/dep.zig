@@ -32,6 +32,13 @@ pub const Dep = struct {
         return p;
     }
 
+    pub fn clean_path_v(self: Dep) ![]const u8 {
+        if (self.type == .http and self.version.len > 0) {
+            return std.fs.path.join(gpa, &[_][]const u8{"v", @tagName(self.type), self.version});
+        }
+        return std.fs.path.join(gpa, &[_][]const u8{"v", try self.clean_path(), self.version});
+    }
+
     pub fn is_for_this(self: Dep) bool {
         const os = @tagName(builtin.os.tag);
         if (self.only_os.len > 0) {
