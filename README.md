@@ -91,6 +91,23 @@ pub fn build(b: *Builder) void {
     exe.install();
 ```
 
+### Example
+```yml
+id: t5ch3nfmdaa25ndlch7ucz7yztq8n1iaanv2d7iwiw4q5n65
+name: my_app
+main: src/main.zig
+dependencies:
+- type: git
+  path: https://github.com/Hejsil/zig-clap
+- type: git
+  path: https://github.com/alexnask/ctregex.zig
+  # ctregex.zig doesn't have a zig.mod file so we can manually
+  # define its entry point. this can also be used generally to
+  # override any attribute we want in this dependency.
+  name: ctregex
+  main: ctregex.zig
+```
+
 ### `zig.mod` Reference
 | Name | Type | Note | Description |
 |------|------|------|-------------|
