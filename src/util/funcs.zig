@@ -197,7 +197,6 @@ pub fn mkdir_all(dpath: []const u8) anyerror!void {
     }
     try mkdir_all(e);
     if (!try does_folder_exist(d)) {
-        std.log.debug("mkdir_all: {} doesnt exist, making", .{d});
         try std.fs.makeDirAbsolute(d);
     }
 }
