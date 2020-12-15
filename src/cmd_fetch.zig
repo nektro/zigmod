@@ -86,18 +86,18 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                 // no op
             },
             .git => blk: {
-                if (!try u.does_file_exist(p)) {
-                    _ = try d.type.pull(d.path, p);
+                if (!try u.does_folder_exist(p)) {
+                    try d.type.pull(d.path, p);
                 }
                 else {
-                    _ = try d.type.update(p, d.path);
+                    try d.type.update(p, d.path);
                 }
                 if (d.version.len > 0) {
                     const iter = &std.mem.split(d.version, "-");
                     const v_type_s = iter.next().?;
                     if (std.meta.stringToEnum(u.GitVersionType, v_type_s)) |v_type| {
                         const ref = iter.rest();
-                        if (try u.does_file_exist(pv)) {
+                        if (try u.does_folder_exist(pv)) {
                             if (v_type == .branch) {
                                 try d.type.update(p, d.path);
                             }
@@ -109,7 +109,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         } else {
                             _ = try u.run_cmd(p, &[_][]const u8{"git", "checkout", "-"});
                         }
-                        _ = try u.run_cmd(null, &[_][]const u8{"git", "clone", d.path, pv});
+                        try d.type.pull(d.path, pv);
                         _ = try u.run_cmd(pv, &[_][]const u8{"git", "checkout", ref});
                         if (v_type != .branch) {
                             const pvd = try u.open_dir_absolute(pv);
@@ -123,19 +123,37 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                 }
             },
             .hg => {
-                if (!try u.does_file_exist(p)) {
-                    _ = try d.type.pull(d.path, p);
+                if (!try u.does_folder_exist(p)) {
+                    try d.type.pull(d.path, p);
                 }
                 else {
-                    _ = try d.type.update(p, d.path);
+                    try d.type.update(p, d.path);
                 }
             },
-            .http => {
+            .http => blk: {
+                if (try u.does_folder_exist(pv)) {
+                    moddir = pv;
+                    break :blk;
+                }
                 const file_name = try u.last(try u.split(d.path, "/"));
-                if (try u.does_file_exist(p)) {
+                if (d.version.len > 0) {
+                    const file_path = try std.fs.path.join(gpa, &[_][]const u8{pv, file_name});
+                    try d.type.pull(d.path, pv);
+                    if (try u.validate_hash(try u.last(try u.split(pv, "/")), file_path)) {
+                        try std.fs.deleteFileAbsolute(file_path);
+                        moddir = pv;
+                        break :blk;
+                    }
+                    try u.rm_recv(pv);
+                    u.assert(false, "{} does not match hash {}", .{d.path, d.version});
+                    break :blk;
+                }
+                if (try u.does_folder_exist(p)) {
                     try u.rm_recv(p);
                 }
-                _ = try d.type.pull(d.path, p);
+                const file_path = try std.fs.path.join(gpa, &[_][]const u8{p, file_name});
+                try d.type.pull(d.path, p);
+                try std.fs.deleteFileAbsolute(file_path);
             },
         }
         switch (d.type) {

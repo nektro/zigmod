@@ -27,7 +27,6 @@ pub const DepType = enum {
                 const f = rpath[std.mem.lastIndexOf(u8, rpath, "/").?+1..];
                 if (std.mem.endsWith(u8, f, ".zip")) {
                     _ = try u.run_cmd(dpath, &[_][]const u8{"unzip", f, "-d", "."});
-                    try std.fs.deleteFileAbsolute(try std.fs.path.join(gpa, &[_][]const u8{dpath, f}));
                 }
                 if (
                     std.mem.endsWith(u8, f, ".tar")
@@ -36,7 +35,6 @@ pub const DepType = enum {
                     or std.mem.endsWith(u8, f, ".tar.zst")
                 ) {
                     _ = try u.run_cmd(dpath, &[_][]const u8{"tar", "-xf", f, "-C", "."});
-                    try std.fs.deleteFileAbsolute(try std.fs.path.join(gpa, &[_][]const u8{dpath, f}));
                 }
             },
         }
