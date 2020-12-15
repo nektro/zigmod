@@ -234,3 +234,56 @@ pub fn random_string(len: usize) ![]const u8 {
     }
     return buf;
 }
+
+pub fn parse_split(comptime T: type, delim: []const u8) type {
+    return struct {
+        const Self = @This();
+
+        id: T,
+        string: []const u8,
+
+        pub fn do(input: []const u8) !Self {
+            const iter = &std.mem.split(input, delim);
+            return Self{
+                .id = std.meta.stringToEnum(T, iter.next() orelse return error.IterEmpty) orelse return error.NoMemberFound,
+                .string = iter.rest(),
+            };
+        }
+    };
+}
+
+pub const HashFn = enum {
+    blake3,
+    sha256,
+    sha512,
+};
+
+pub fn validate_hash(input: []const u8, file_path: []const u8) !bool {
+    const hash = parse_split(HashFn, "-").do(input) catch return false;
+    const file = try std.fs.cwd().openFile(file_path, .{});
+    defer file.close();
+    const data = try file.reader().readAllAlloc(gpa, mb);
+    return std.mem.eql(u8, hash.string, switch (hash.id) {
+        .blake3 => blk: {
+            const h = &std.crypto.hash.Blake3.init(.{});
+            var out: [32]u8 = undefined;
+            h.update(data);
+            h.final(&out);
+            break :blk try std.fmt.allocPrint(gpa, "{x}", .{out});
+        },
+        .sha256 => blk: {
+            const h = &std.crypto.hash.sha2.Sha256.init(.{});
+            var out: [32]u8 = undefined;
+            h.update(data);
+            h.final(&out);
+            break :blk try std.fmt.allocPrint(gpa, "{x}", .{out});
+        },
+        .sha512 => blk: {
+            const h = &std.crypto.hash.sha2.Sha512.init(.{});
+            var out: [64]u8 = undefined;
+            h.update(data);
+            h.final(&out);
+            break :blk try std.fmt.allocPrint(gpa, "{x}", .{out});
+        },
+    });
+}
