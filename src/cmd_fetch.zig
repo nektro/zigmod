@@ -93,33 +93,33 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                     try d.type.update(p, d.path);
                 }
                 if (d.version.len > 0) {
-                    const iter = &std.mem.split(d.version, "-");
-                    const v_type_s = iter.next().?;
-                    if (std.meta.stringToEnum(u.GitVersionType, v_type_s)) |v_type| {
-                        const ref = iter.rest();
-                        if (try u.does_folder_exist(pv)) {
-                            if (v_type == .branch) {
-                                try d.type.update(p, d.path);
-                            }
-                            moddir = pv;
-                            break :blk;
-                        }
-                        if ((try u.run_cmd(p, &[_][]const u8{"git", "checkout", ref})) > 0) {
-                            u.assert(false, "fetch: git: {}: {} {} does not exist", .{d.path, @tagName(v_type), ref});
-                        } else {
-                            _ = try u.run_cmd(p, &[_][]const u8{"git", "checkout", "-"});
-                        }
-                        try d.type.pull(d.path, pv);
-                        _ = try u.run_cmd(pv, &[_][]const u8{"git", "checkout", ref});
-                        if (v_type != .branch) {
-                            const pvd = try u.open_dir_absolute(pv);
-                            try pvd.deleteTree(".git");
+                    const vers = u.parse_split(u.GitVersionType, "-").do(d.version) catch |e| switch (e) {
+                        error.IterEmpty => unreachable,
+                        error.NoMemberFound => {
+                            const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];
+                            u.assert(false, "fetch: git: version type '{}' is invalid.", .{vtype});
+                            unreachable;
+                        },
+                    };
+                    if (try u.does_folder_exist(pv)) {
+                        if (vers.id == .branch) {
+                            try d.type.update(p, d.path);
                         }
                         moddir = pv;
+                        break :blk;
                     }
-                    else {
-                        u.assert(false, "fetch: git: version type: '{}' on {} is invalid.", .{v_type_s, d.path});
+                    if ((try u.run_cmd(p, &[_][]const u8{"git", "checkout", vers.string})) > 0) {
+                        u.assert(false, "fetch: git: {}: {} {} does not exist", .{d.path, @tagName(vers.id), vers.string});
+                    } else {
+                        _ = try u.run_cmd(p, &[_][]const u8{"git", "checkout", "-"});
                     }
+                    try d.type.pull(d.path, pv);
+                    _ = try u.run_cmd(pv, &[_][]const u8{"git", "checkout", vers.string});
+                    if (vers.id != .branch) {
+                        const pvd = try u.open_dir_absolute(pv);
+                        try pvd.deleteTree(".git");
+                    }
+                    moddir = pv;
                 }
             },
             .hg => {
