@@ -14,6 +14,7 @@ pub fn execute(args: [][]u8) !void {
     defer file.close();
 
     const fwriter = file.writer();
+    try fwriter.print("id: {}\n", .{u.random_string(48)});
     try fwriter.print("name: {}\n", .{name});
     try fwriter.print("main: {}\n", .{mainf});
     try fwriter.print("dependencies:\n", .{});

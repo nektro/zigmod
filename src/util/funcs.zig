@@ -222,3 +222,17 @@ pub fn rm_recv(path: []const u8) anyerror!void {
         try std.fs.deleteFileAbsolute(abs_path);
     }
 }
+
+const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+pub fn random_string(len: usize) ![]const u8 {
+    const now = @intCast(u64, std.time.nanoTimestamp());
+    var rand = std.rand.DefaultPrng.init(now);
+    const r = &rand.random;
+    var buf = try gpa.alloc(u8, len);
+    var i: usize = 0;
+    while (i < len) : (i += 1) {
+        buf[i] = alphabet[r.int(usize)%alphabet.len];
+    }
+    return buf;
+}
