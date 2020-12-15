@@ -7,10 +7,6 @@ const u = @import("index.zig");
 //
 //
 
-const b = 1;
-const kb = b * 1024;
-const mb = kb * 1024;
-
 pub const Module = struct {
     is_sys_lib: bool,
     name: []const u8,
@@ -66,7 +62,7 @@ pub const Module = struct {
             const abs_path = try u.concat(&[_][]const u8{cdpath, "/", self.clean_path, "/", item});
             const file = try std.fs.openFileAbsolute(abs_path, .{});
             defer file.close();
-            const input = try file.reader().readAllAlloc(gpa, mb);
+            const input = try file.reader().readAllAlloc(gpa, u.mb);
             h.update(input);
         }
         var out: [32]u8 = undefined;

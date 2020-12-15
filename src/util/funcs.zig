@@ -6,6 +6,10 @@ const u = @import("index.zig");
 //
 //
 
+pub const b = 1;
+pub const kb = b * 1024;
+pub const mb = kb * 1024;
+
 pub fn print(comptime fmt: []const u8, args: anytype) void {
     std.debug.print(fmt++"\n", args);
 }
