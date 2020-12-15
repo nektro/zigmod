@@ -53,7 +53,7 @@ pub fn does_file_exist(fpath: []const u8) !bool {
         error.FileNotFound => return false,
         else => return e,
     };
-    file.close();
+    defer file.close();
     return true;
 }
 
