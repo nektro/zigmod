@@ -40,6 +40,7 @@ pub fn build(b: *Builder) void {
     exe.addCSourceFile("./libs/yaml/src/writer.c", &[_][]const u8{});
 
     exe.addPackagePath("known-folders", "./libs/zig-known-folders/known-folders.zig");
+    exe.addPackagePath("ansi", "./libs/zig-ansi/src/lib.zig");
 
     exe.install();
 

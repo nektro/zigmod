@@ -4,3 +4,6 @@
 [submodule "libs/zig-known-folders"]
 	path = libs/zig-known-folders
 	url = https://github.com/ziglibs/known-folders
+[submodule "libs/zig-ansi"]
+	path = libs/zig-ansi
+	url = https://github.com/nektro/zig-ansi
