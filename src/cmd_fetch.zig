@@ -51,7 +51,11 @@ pub fn execute(args: [][]u8) !void {
     });
     try w.print("\n", .{});
     try w.print("pub const packages = ", .{});
-    try print_deps(w, dir, top_module, 0);
+    try print_deps(w, dir, top_module, 0, true);
+    try w.print(";\n", .{});
+    try w.print("\n", .{});
+    try w.print("pub const pkgs = ", .{});
+    try print_deps(w, dir, top_module, 0, false);
     try w.print(";\n", .{});
     try w.print("\n", .{});
     try w.print("{}\n", .{"pub const c_include_dirs = &[_][]const u8{"});
@@ -211,23 +215,33 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     };
 }
 
-fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32) anyerror!void {
+fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array: bool) anyerror!void {
     if (m.deps.len == 0 and tabs > 0) {
         try w.print("null", .{});
         return;
     }
-    try u.print_all(w, .{"&[_]build.Pkg{"}, true);
+    if (array) {
+        try u.print_all(w, .{"&[_]build.Pkg{"}, true);
+    } else {
+        try u.print_all(w, .{"struct {"}, true);
+    }
     const t = "    ";
     const r = try u.repeat(t, tabs);
+    var c: usize = 0;
     for (m.deps) |d| {
         if (d.main.len == 0) {
+            continue;
+        }
+        c += 1;
+        if (!array) {
+            try w.print("    pub const {} = packages[{}];\n", .{d.name, c-1});
             continue;
         }
         try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,"build.Pkg{"})});
         try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,t,".name = \"",d.name,"\","})});
         try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,t,".path = cache ++ \"/",d.clean_path,"/",d.main,"\","})});
         try w.print("{}", .{try u.concat(&[_][]const u8{r,t,t,".dependencies = "})});
-        try print_deps(w, dir, d, tabs+2);
+        try print_deps(w, dir, d, tabs+2, array);
         try w.print("{}\n", .{","});
         try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,"},"})});
     }
