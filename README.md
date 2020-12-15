@@ -129,6 +129,7 @@ dependencies:
 
 - `name`, `main`, `c_include_dirs`, `c_source_flags`, `c_source_files`, can be overwritten as well.
 - `type.git` supports version pinning by `branch-XX`, `tag-XX`, and `commit-XX`.
+- `type.http` supports version checking by `blake3-XX`, `sha256-XX`, and `sha512-XX`.
 
 ## Prior Art
 - https://golang.org/ref/mod#go-mod-file
