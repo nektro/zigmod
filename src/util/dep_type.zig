@@ -16,8 +16,7 @@ pub const DepType = enum {
         switch (self) {
             .system_lib => {},
             .git => {
-                _ = try u.run_cmd(null, &[_][]const u8{"git", "clone", rpath, dpath});
-                _ = try u.run_cmd(null, &[_][]const u8{"git", "submodule", "update", "--init", "--recursive"});
+                _ = try u.run_cmd(null, &[_][]const u8{"git", "clone", "--recurse-submodules", rpath, dpath});
             },
             .hg => {
                 _ = try u.run_cmd(null, &[_][]const u8{"hg", "clone", rpath, dpath});
