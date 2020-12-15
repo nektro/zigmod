@@ -156,7 +156,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
             else => blk: {
                 var dd = try fetch_deps(dir, try u.concat(&[_][]const u8{moddir, "/zig.mod"})) catch |e| switch (e) {
                     error.FileNotFound => {
-                        if (d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
+                        if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                             var mod_from = try u.Module.from(d);
                             mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
                             if (mod_from.is_for_this()) try moduledeps.append(mod_from);
