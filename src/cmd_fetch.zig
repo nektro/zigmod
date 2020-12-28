@@ -216,7 +216,7 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
     if (array) {
         try w.writeAll("&[_]build.Pkg{\n");
     } else {
-        try w.writeAll("struct {");
+        try w.writeAll("struct {\n");
     }
 
     const t = "    ";
