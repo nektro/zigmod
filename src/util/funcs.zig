@@ -57,6 +57,7 @@ pub fn does_file_exist(fpath: []const u8) !bool {
 pub fn does_folder_exist(fpath: []const u8) !bool {
     const file = std.fs.cwd().openFile(fpath, .{}) catch |e| switch (e) {
         error.FileNotFound => return false,
+        error.IsDir => return true,
         else => return e,
     };
     defer file.close();
