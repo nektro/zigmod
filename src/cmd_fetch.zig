@@ -305,7 +305,7 @@ fn print_incl_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]c
         if (!local) {
             try w.print("    cache ++ _paths[{}] ++ \"{Z}\",\n", .{list.items.len-1, it});
         } else {
-            try w.print("    \"\",\n", .{mod.clean_path, it});
+            try w.print("    \"\",\n", .{});
         }
     }
     for (mod.deps) |d| {
