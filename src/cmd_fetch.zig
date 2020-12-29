@@ -45,7 +45,7 @@ pub fn execute(args: [][]u8) !void {
         \\}
         \\
         \\fn get_flags(comptime index: usize) []const u8 {
-        \\    return std.meta.declarations(c_source_flags)[index].name;
+        \\    return @field(c_source_flags, _paths[index]);
         \\}
     });
     try w.print("\n", .{});
