@@ -16,7 +16,7 @@ pub fn build(b: *Builder) void {
     const exe = b.addExecutable(exe_name, "src/main.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
-    if (builtin.mode != .Debug) {
+    if (mode != .Debug) {
         exe.strip = true;
     }
 
