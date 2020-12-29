@@ -10,6 +10,7 @@ const u = @import("index.zig");
 pub const b = 1;
 pub const kb = b * 1024;
 pub const mb = kb * 1024;
+pub const gb = mb * 1024;
 
 pub fn print(comptime fmt: []const u8, args: anytype) void {
     std.debug.print(fmt++"\n", args);
@@ -263,7 +264,7 @@ pub fn validate_hash(input: []const u8, file_path: []const u8) !bool {
     const hash = parse_split(HashFn, "-").do(input) catch return false;
     const file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
-    const data = try file.reader().readAllAlloc(gpa, mb);
+    const data = try file.reader().readAllAlloc(gpa, gb);
     return std.mem.eql(u8, hash.string, switch (hash.id) {
         .blake3 => blk: {
             const h = &std.crypto.hash.Blake3.init(.{});
