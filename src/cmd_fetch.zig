@@ -23,8 +23,7 @@ pub fn execute(args: [][]u8) !void {
     try w.print("const std = @import(\"std\");\n", .{});
     try w.print("const build = std.build;\n", .{});
     try w.print("\n", .{});
-    try w.print("const home = \"{}\";\n", .{home});
-    try w.print("const cache = home ++ \"/.cache/zigmod/deps\";\n", .{});
+    try w.print("const cache = \"{Z}\";\n", .{dir});
     try w.print("\n", .{});
     try w.print("{}\n", .{
         \\pub fn addAllTo(exe: *build.LibExeObjStep) void {
@@ -73,7 +72,6 @@ pub fn execute(args: [][]u8) !void {
     try w.print("{}\n", .{"pub const system_libs = &[_][]const u8{"});
     try print_sys_libs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), &std.ArrayList([]const u8).init(gpa));
     try w.print("{};\n", .{"}"});
-
 }
 
 fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
