@@ -49,6 +49,14 @@ pub fn execute(args: [][]u8) !void {
         \\}
     });
     try w.print("\n", .{});
+    try w.print("pub const _ids = {}\n", .{".{"});
+    try print_ids(w, top_module, &std.ArrayList([]const u8).init(gpa));
+    try w.print("{}\n", .{"};"});
+    try w.print("\n", .{});
+    try w.print("pub const _paths = {}\n", .{".{"});
+    try print_paths(w, top_module, &std.ArrayList([]const u8).init(gpa));
+    try w.print("{}\n", .{"};"});
+    try w.print("\n", .{});
     try w.print("pub const packages = ", .{});
     try print_deps(w, dir, top_module, 0, true);
     try w.print(";\n", .{});
@@ -162,6 +170,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
             .system_lib => {
                 if (d.is_for_this()) try moduledeps.append(u.Module{
                     .is_sys_lib = true,
+                    .id = "",
                     .name = d.path,
                     .only_os = d.only_os,
                     .except_os = d.except_os,
@@ -178,6 +187,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                     error.FileNotFound => {
                         if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                             var mod_from = try u.Module.from(d);
+                            mod_from.id = try u.random_string(48);
                             mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
                             if (mod_from.is_for_this()) try moduledeps.append(mod_from);
                         }
@@ -187,6 +197,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                 };
                 dd.clean_path = u.trim_prefix(moddir, dir)[1..];
 
+                if (dd.id.len == 0) dd.id = try u.random_string(48);
                 if (d.name.len > 0) dd.name = d.name;
                 if (d.main.len > 0) dd.main = d.main;
                 if (d.c_include_dirs.len > 0) dd.c_include_dirs = d.c_include_dirs;
@@ -201,6 +212,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     }
     return u.Module{
         .is_sys_lib = false,
+        .id = m.id,
         .name = m.name,
         .main = m.main,
         .c_include_dirs = m.c_include_dirs,
@@ -211,6 +223,43 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         .only_os = &[_][]const u8{},
         .except_os = &[_][]const u8{},
     };
+}
+
+fn print_ids(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8)) anyerror!void {
+    if (u.list_contains(list.items, mod.clean_path)) {
+        return;
+    }
+    try list.append(mod.clean_path);
+    //
+    if (mod.clean_path.len == 0) {
+        try w.print("    \"\",\n", .{});
+    } else {
+        try w.print("    \"{}\",\n", .{mod.id});
+    }
+    //
+    for (mod.deps) |d| {
+        if (d.is_sys_lib) continue;
+        try print_ids(w, d, list);
+    }
+}
+
+fn print_paths(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8)) anyerror!void {
+    if (u.list_contains(list.items, mod.clean_path)) {
+        return;
+    }
+    try list.append(mod.clean_path);
+    //
+    if (mod.clean_path.len == 0) {
+        try w.print("    \"\",\n", .{});
+    } else {
+        const s = std.fs.path.sep_str;
+        try w.print("    \"{Z}{Z}{Z}\",\n", .{s, mod.clean_path, s});
+    }
+    //
+    for (mod.deps) |d| {
+        if (d.is_sys_lib) continue;
+        try print_paths(w, d, list);
+    }
 }
 
 fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array: bool) anyerror!void {
@@ -253,9 +302,9 @@ fn print_incl_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]c
     try list.append(mod.clean_path);
     for (mod.c_include_dirs) |it| {
         if (!local) {
-            try w.print("    cache ++ \"/{}/{}\",\n", .{mod.clean_path, it});
+            try w.print("    cache ++ _paths[{}] ++ \"{Z}\",\n", .{list.items.len-1, it});
         } else {
-            try w.print("    \".{}/{}\",\n", .{mod.clean_path, it});
+            // try w.print("    ,\n", .{mod.clean_path, it});
         }
     }
     for (mod.deps) |d| {
@@ -271,9 +320,9 @@ fn print_csrc_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]c
     try list.append(mod.clean_path);
     for (mod.c_source_files) |it| {
         if (!local) {
-            try w.print("    {}comptime get_flags({}), cache ++ \"/{}/{}\"{},\n", .{"[_][]const u8{", list.items.len-1, mod.clean_path, it, "}"});
+            try w.print("    {}_ids[{}], cache ++ _paths[{}] ++ \"{}\"{},\n", .{"[_][]const u8{", list.items.len-1, list.items.len-1, it, "}"});
         } else {
-            try w.print("    {}comptime get_flags({}), \".{}/{}\"{},\n", .{"[_][]const u8{", list.items.len-1, mod.clean_path, it, "}"});
+            try w.print("    {}\"{}\", \".{}/{}\"{},\n", .{"[_][]const u8{", mod.clean_path, mod.clean_path, it, "}"});
         }
     }
     for (mod.deps) |d| {
@@ -291,7 +340,7 @@ fn print_csrc_flags_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]
         try w.print("    pub const @\"{}\" = {};\n", .{"", "&[_][]const u8{}"});
     }
     else {
-        try w.print("    pub const @\"{}\" = {}", .{mod.clean_path, "&[_][]const u8{"});
+        try w.print("    pub const @\"{}\" = {}", .{mod.id, "&[_][]const u8{"});
         for (mod.c_source_flags) |it| {
             try w.print("\"{Z}\",", .{it});
         }

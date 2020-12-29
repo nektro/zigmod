@@ -13,6 +13,7 @@ pub const Dep = struct {
     type: u.DepType,
     path: []const u8,
 
+    id: []const u8,
     name: []const u8,
     main: []const u8,
     version: []const u8,

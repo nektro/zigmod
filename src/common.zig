@@ -24,6 +24,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
             .system_lib => {
                 if (d.is_for_this()) try moduledeps.append(u.Module{
                     .is_sys_lib = true,
+                    .id = d.id,
                     .name = d.path,
                     .only_os = d.only_os,
                     .except_os = d.except_os,
@@ -40,6 +41,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                     error.FileNotFound => {
                         if (d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                             var mod_from = try u.Module.from(d);
+                            mod_from.id = try u.random_string(48);
                             mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
                             if (mod_from.is_for_this()) try moduledeps.append(mod_from);
                         }
@@ -49,6 +51,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                 };
                 dd.clean_path = u.trim_prefix(moddir, dir)[1..];
 
+                if (dd.id.len == 0) dd.id = try u.random_string(48);
                 if (d.name.len > 0) dd.name = d.name;
                 if (d.main.len > 0) dd.main = d.main;
                 if (d.c_include_dirs.len > 0) dd.c_include_dirs = d.c_include_dirs;
@@ -63,6 +66,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     }
     return u.Module{
         .is_sys_lib = false,
+        .id = m.id,
         .name = m.name,
         .main = m.main,
         .c_include_dirs = m.c_include_dirs,

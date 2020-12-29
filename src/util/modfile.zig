@@ -14,6 +14,7 @@ pub const ModFile = struct {
     const Self = @This();
 
     alloc: *std.mem.Allocator,
+    id: []const u8,
     name: []const u8,
     main: []const u8,
     c_include_dirs: [][]const u8,
@@ -29,6 +30,7 @@ pub const ModFile = struct {
         const input = try file.reader().readAllAlloc(alloc, mb);
         const doc = try yaml.parse(alloc, input);
 
+        const id = doc.mapping.get_string("id");
         const name = doc.mapping.get("name").?.string;
         const main = doc.mapping.get("main").?.string;
 
@@ -43,6 +45,7 @@ pub const ModFile = struct {
                     try dep_list.append(u.Dep{
                         .type = dep_type,
                         .path = path,
+                        .id = "",
                         .name = item.mapping.get_string("name"),
                         .main = item.mapping.get_string("main"),
                         .version = item.mapping.get_string("version"),
@@ -58,6 +61,7 @@ pub const ModFile = struct {
 
         return Self{
             .alloc = alloc,
+            .id = if (id.len == 0) try u.random_string(48) else id,
             .name = name,
             .main = main,
             .c_include_dirs = try doc.mapping.get_string_array(alloc, "c_include_dirs"),
