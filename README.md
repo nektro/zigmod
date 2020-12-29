@@ -136,6 +136,10 @@ dependencies:
 - https://github.com/mattnite/zkg
 - https://github.com/MasterQ32/LoLa
 
+## Contributors
+- @nektro
+- @truemedian
+
 ## Contact
 - hello@nektro.net
 - https://twitter.com/nektro
