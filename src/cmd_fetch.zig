@@ -27,6 +27,7 @@ pub fn execute(args: [][]u8) !void {
     try w.print("\n", .{});
     try w.print("{}\n", .{
         \\pub fn addAllTo(exe: *build.LibExeObjStep) void {
+        \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
         \\        exe.addPackage(pkg);
         \\    }
