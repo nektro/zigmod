@@ -135,7 +135,7 @@ pub fn list_contains(haystack: [][]const u8, needle: []const u8) bool {
 
 pub fn open_dir_absolute(dpath: []const u8) !std.fs.Dir {
     return std.fs.Dir{
-        .fd = (try std.fs.openFileAbsolute(dpath, .{})).handle,
+        .fd = (try std.fs.cwd().openFile(dpath, .{})).handle,
     };
 }
 

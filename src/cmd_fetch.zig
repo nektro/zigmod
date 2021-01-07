@@ -10,8 +10,7 @@ const u = @import("./util/index.zig");
 
 pub fn execute(args: [][]u8) !void {
     //
-    const home = try known_folders.getPath(gpa, .home);
-    const dir = try fs.path.join(gpa, &[_][]const u8{home.?, ".cache", "zigmod", "deps"});
+    const dir = try fs.path.join(gpa, &[_][]const u8{".zigmod", "deps"});
 
     const top_module = try fetch_deps(dir, "zig.mod");
 
