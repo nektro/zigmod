@@ -1,6 +1,8 @@
 const std = @import("std");
 
-const c = @import("./c.zig");
+const c = @cImport({
+    @cInclude("yaml.h");
+});
 const u = @import("./index.zig");
 
 //
