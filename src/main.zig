@@ -21,7 +21,12 @@ pub fn main() !void {
     const args = proc_args[1..];
 
     if (args.len == 0) {
-        u.print("zigmod-{}-{}-{}", .{@tagName(builtin.os.tag), @tagName(builtin.arch), @tagName(builtin.abi)});
+        u.print("zigmod {} {} {} {}", .{
+            @import("build_options").version,
+            @tagName(builtin.os.tag),
+            @tagName(builtin.arch),
+            @tagName(builtin.abi)
+        });
         return;
     }
 
@@ -32,6 +37,5 @@ pub fn main() !void {
             return;
         }
     }
-
     std.debug.panic("Error: unknown command \"{}\" for \"zigmod\"", .{args[0]});
 }

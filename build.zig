@@ -10,8 +10,7 @@ pub fn build(b: *Builder) void {
 
     const use_full_name = b.option(bool, "use-full-name", "") orelse false;
     const with_arch_os = b.fmt("-{}-{}", .{@tagName(target.cpu_arch orelse builtin.arch), @tagName(target.os_tag orelse builtin.os.tag)});
-    const version_tag = if (b.option([]const u8, "tag", "")) |vt| b.fmt("-{}", .{vt}) else "";
-    const exe_name = b.fmt("{}{}{}", .{ "zigmod", version_tag, if (use_full_name) with_arch_os else "" });
+    const exe_name = b.fmt("{}{}", .{ "zigmod", if (use_full_name) with_arch_os else "" });
 
     const exe = b.addExecutable(exe_name, "src/main.zig");
     exe.setTarget(target);
@@ -19,6 +18,7 @@ pub fn build(b: *Builder) void {
     if (mode != .Debug) {
         exe.strip = true;
     }
+    exe.addBuildOption([]const u8, "version", b.option([]const u8, "tag", "") orelse "");
 
     exe.linkLibC();
 
