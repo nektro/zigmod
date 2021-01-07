@@ -138,8 +138,8 @@ dependencies:
 - https://github.com/MasterQ32/LoLa
 
 ## Contributors
-- @nektro
-- @truemedian
+- https://github.com/nektro
+- https://github.com/truemedian
 
 ## Contact
 - hello@nektro.net
