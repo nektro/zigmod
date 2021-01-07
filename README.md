@@ -76,7 +76,8 @@ zigmod sum
 
 ### Adding `deps.zig` to `build.zig`
 ```diff
-const Builder = @import("std").build.Builder;
+const std = @import("std");
+const Builder = std.build.Builder;
 +const deps = @import("./deps.zig");
 
 pub fn build(b: *Builder) void {
