@@ -126,7 +126,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                     try d.type.pull(d.path, pv);
                     _ = try u.run_cmd(pv, &[_][]const u8{"git", "checkout", vers.string});
                     if (vers.id != .branch) {
-                        const pvd = try u.open_dir_absolute(pv);
+                        const pvd = try std.fs.cwd().openDir(pv, .{});
                         try pvd.deleteTree(".git");
                     }
                     moddir = pv;

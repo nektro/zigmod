@@ -133,12 +133,6 @@ pub fn list_contains(haystack: [][]const u8, needle: []const u8) bool {
     return false;
 }
 
-pub fn open_dir_absolute(dpath: []const u8) !std.fs.Dir {
-    return std.fs.Dir{
-        .fd = (try std.fs.cwd().openFile(dpath, .{})).handle,
-    };
-}
-
 pub fn list_contains_gen(comptime T: type, haystack: *std.ArrayList(T), needle: T) bool {
     for (haystack.items) |item| {
         if (item.eql(needle)) {
