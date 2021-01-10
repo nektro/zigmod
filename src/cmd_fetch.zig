@@ -19,11 +19,11 @@ pub fn execute(args: [][]u8) !void {
     defer f.close();
 
     const w = f.writer();
-    try w.print("const std = @import(\"std\");\n", .{});
-    try w.print("const build = std.build;\n", .{});
-    try w.print("\n", .{});
+    try w.writeAll("const std = @import(\"std\");\n");
+    try w.writeAll("const build = std.build;\n");
+    try w.writeAll("\n");
     try w.print("const cache = \"{Z}\";\n", .{dir});
-    try w.print("\n", .{});
+    try w.writeAll("\n");
     try w.print("{}\n", .{
         \\pub fn addAllTo(exe: *build.LibExeObjStep) void {
         \\    @setEvalBranchQuota(1_000_000);
@@ -48,38 +48,38 @@ pub fn execute(args: [][]u8) !void {
         \\    return @field(c_source_flags, _paths[index]);
         \\}
     });
-    try w.print("\n", .{});
-    try w.print("pub const _ids = {}\n", .{".{"});
+    try w.writeAll("\n");
+    try w.writeAll("pub const _ids = .{\n");
     try print_ids(w, top_module, &std.ArrayList([]const u8).init(gpa));
-    try w.print("{}\n", .{"};"});
-    try w.print("\n", .{});
+    try w.writeAll("};\n");
+    try w.writeAll("\n");
     try w.print("pub const _paths = {}\n", .{".{"});
     try print_paths(w, top_module, &std.ArrayList([]const u8).init(gpa));
-    try w.print("{}\n", .{"};"});
-    try w.print("\n", .{});
-    try w.print("pub const packages = ", .{});
+    try w.writeAll("};\n");
+    try w.writeAll("\n");
+    try w.writeAll("pub const packages = ");
     try print_deps(w, dir, top_module, 0, true);
-    try w.print(";\n", .{});
-    try w.print("\n", .{});
-    try w.print("pub const pkgs = ", .{});
+    try w.writeAll(";\n");
+    try w.writeAll("\n");
+    try w.writeAll("pub const pkgs = ");
     try print_deps(w, dir, top_module, 0, false);
-    try w.print(";\n", .{});
-    try w.print("\n", .{});
-    try w.print("{}\n", .{"pub const c_include_dirs = &[_][]const u8{"});
+    try w.writeAll(";\n");
+    try w.writeAll("\n");
+    try w.writeAll("pub const c_include_dirs = &[_][]const u8{\n");
     try print_incl_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
-    try w.print("{};\n", .{"}"});
-    try w.print("\n", .{});
-    try w.print("{}\n", .{"pub const c_source_flags = struct {"});
+    try w.writeAll("};\n");
+    try w.writeAll("\n");
+    try w.writeAll("pub const c_source_flags = struct {\n");
     try print_csrc_flags_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
-    try w.print("{};\n", .{"}"});
-    try w.print("\n", .{});
-    try w.print("{}\n", .{"pub const c_source_files = &[_][2][]const u8{"});
+    try w.writeAll("};\n");
+    try w.writeAll("\n");
+    try w.writeAll("pub const c_source_files = &[_][2][]const u8{\n");
     try print_csrc_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
-    try w.print("{};\n", .{"}"});
-    try w.print("\n", .{});
-    try w.print("{}\n", .{"pub const system_libs = &[_][]const u8{"});
+    try w.writeAll("};\n");
+    try w.writeAll("\n");
+    try w.writeAll("pub const system_libs = &[_][]const u8{\n");
     try print_sys_libs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), &std.ArrayList([]const u8).init(gpa));
-    try w.print("{};\n", .{"}"});
+    try w.writeAll("};\n");
 }
 
 fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
