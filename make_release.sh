@@ -4,7 +4,7 @@ set -e
 
 date=$(date +'%Y.%m.%d')
 version=${CIRCLE_BUILD_NUM-$date}
-tag=v$version-$(git log --format=%h -1)
+tag=v$version
 go get github.com/tcnksm/ghr
 $GOPATH/bin/ghr \
     -t ${GITHUB_TOKEN} \
