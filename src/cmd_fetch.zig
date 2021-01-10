@@ -47,14 +47,21 @@ pub fn execute(args: [][]u8) !void {
         \\fn get_flags(comptime index: usize) []const u8 {
         \\    return @field(c_source_flags, _paths[index]);
         \\}
+        \\
     });
-    try w.writeAll("\n");
+
+    const list = &std.ArrayList(u.Module).init(gpa);
+    try collect_pkgs(top_module, list);
+    for (list.items) |m, i| {
+        std.debug.print("module: {} {}\n", .{i, m.clean_path});
+    }
+
     try w.writeAll("pub const _ids = .{\n");
-    try print_ids(w, top_module, &std.ArrayList([]const u8).init(gpa));
+    try print_ids(w, list.items);
     try w.writeAll("};\n");
     try w.writeAll("\n");
     try w.print("pub const _paths = {}\n", .{".{"});
-    try print_paths(w, top_module, &std.ArrayList([]const u8).init(gpa));
+    try print_paths(w, list.items);
     try w.writeAll("};\n");
     try w.writeAll("\n");
     try w.writeAll("pub const packages = ");
@@ -66,19 +73,20 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll(";\n");
     try w.writeAll("\n");
     try w.writeAll("pub const c_include_dirs = &[_][]const u8{\n");
-    try print_incl_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
+    try print_incl_dirs_to(w, list.items);
     try w.writeAll("};\n");
     try w.writeAll("\n");
     try w.writeAll("pub const c_source_flags = struct {\n");
-    try print_csrc_flags_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
+    try print_csrc_flags_to(w, list.items);
     try w.writeAll("};\n");
     try w.writeAll("\n");
     try w.writeAll("pub const c_source_files = &[_][2][]const u8{\n");
-    try print_csrc_dirs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), true);
+    try print_csrc_dirs_to(w, list.items);
     try w.writeAll("};\n");
     try w.writeAll("\n");
     try w.writeAll("pub const system_libs = &[_][]const u8{\n");
-    try print_sys_libs_to(w, top_module, &std.ArrayList([]const u8).init(gpa), &std.ArrayList([]const u8).init(gpa));
+    try print_sys_libs_to(w, list.items, &std.ArrayList([]const u8).init(gpa));
+    try w.writeAll("};\n");
     try w.writeAll("};\n");
 }
 
@@ -225,40 +233,30 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     };
 }
 
-fn print_ids(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8)) anyerror!void {
-    if (u.list_contains(list.items, mod.clean_path)) {
-        return;
-    }
-    try list.append(mod.clean_path);
-    //
-    if (mod.clean_path.len == 0) {
-        try w.print("    \"\",\n", .{});
-    } else {
-        try w.print("    \"{}\",\n", .{mod.id});
-    }
-    //
-    for (mod.deps) |d| {
-        if (d.is_sys_lib) continue;
-        try print_ids(w, d, list);
+fn print_ids(w: fs.File.Writer, list: []u.Module) !void {
+    for (list) |mod| {
+        if (mod.is_sys_lib) {
+            continue;
+        }
+        if (mod.clean_path.len == 0) {
+            try w.print("    \"\",\n", .{});
+        } else {
+            try w.print("    \"{}\",\n", .{mod.id});
+        }
     }
 }
 
-fn print_paths(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8)) anyerror!void {
-    if (u.list_contains(list.items, mod.clean_path)) {
-        return;
-    }
-    try list.append(mod.clean_path);
-    //
-    if (mod.clean_path.len == 0) {
-        try w.print("    \"\",\n", .{});
-    } else {
-        const s = std.fs.path.sep_str;
-        try w.print("    \"{Z}{Z}{Z}\",\n", .{s, mod.clean_path, s});
-    }
-    //
-    for (mod.deps) |d| {
-        if (d.is_sys_lib) continue;
-        try print_paths(w, d, list);
+fn print_paths(w: fs.File.Writer, list: []u.Module) !void {
+    for (list) |mod| {
+        if (mod.is_sys_lib) {
+            continue;
+        }
+        if (mod.clean_path.len == 0) {
+            try w.print("    \"\",\n", .{});
+        } else {
+            const s = std.fs.path.sep_str;
+            try w.print("    \"{Z}{Z}{Z}\",\n", .{s, mod.clean_path, s});
+        }
     }
 }
 
@@ -295,77 +293,69 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
     try w.print("{}", .{try u.concat(&[_][]const u8{r,"}"})});
 }
 
-fn print_incl_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
-    if (u.list_contains(list.items, mod.clean_path)) {
-        return;
+fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
+    for (list) |mod, i| {
+        if (mod.is_sys_lib) {
+            continue;
+        }
+        for (mod.c_include_dirs) |it| {
+            if (i > 0) {
+                try w.print("    cache ++ _paths[{}] ++ \"{Z}\",\n", .{i, it});
+            } else {
+                try w.print("    \"\",\n", .{});
+            }
+        }
     }
-    try list.append(mod.clean_path);
-    for (mod.c_include_dirs) |it| {
-        if (!local) {
-            try w.print("    cache ++ _paths[{}] ++ \"{Z}\",\n", .{list.items.len-1, it});
+}
+
+fn print_csrc_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
+    for (list) |mod, i| {
+        if (mod.is_sys_lib) {
+            continue;
+        }
+        for (mod.c_source_files) |it| {
+            if (i > 0) {
+                try w.print("    {}_ids[{}], cache ++ _paths[{}] ++ \"{}\"{},\n", .{"[_][]const u8{", i, i, it, "}"});
+            } else {
+                try w.print("    {}\"{}\", \".{}/{}\"{},\n", .{"[_][]const u8{", mod.clean_path, mod.clean_path, it, "}"});
+            }
+        }
+    }
+}
+
+fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
+    for (list) |mod, i| {
+        if (mod.is_sys_lib) {
+            continue;
+        }
+        if (i == 0) {
+            try w.print("    pub const @\"{}\" = {};\n", .{"", "&[_][]const u8{}"});
         } else {
-            try w.print("    \"\",\n", .{});
+            try w.print("    pub const @\"{}\" = {}", .{mod.id, "&[_][]const u8{"});
+            for (mod.c_source_flags) |it| {
+                try w.print("\"{Z}\",", .{it});
+            }
+            try w.print("{};\n", .{"}"});
         }
-    }
-    for (mod.deps) |d| {
-        if (d.is_sys_lib) continue;
-        try print_incl_dirs_to(w, d, list, false);
     }
 }
 
-fn print_csrc_dirs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
-    if (u.list_contains(list.items, mod.clean_path)) {
-        return;
-    }
-    try list.append(mod.clean_path);
-    for (mod.c_source_files) |it| {
-        if (!local) {
-            try w.print("    {}_ids[{}], cache ++ _paths[{}] ++ \"{}\"{},\n", .{"[_][]const u8{", list.items.len-1, list.items.len-1, it, "}"});
-        } else {
-            try w.print("    {}\"{}\", \".{}/{}\"{},\n", .{"[_][]const u8{", mod.clean_path, mod.clean_path, it, "}"});
+fn print_sys_libs_to(w: fs.File.Writer, list: []u.Module, list2: *std.ArrayList([]const u8)) !void {
+    for (list) |mod| {
+        if (!mod.is_sys_lib) {
+            continue;
         }
-    }
-    for (mod.deps) |d| {
-        if (d.is_sys_lib) continue;
-        try print_csrc_dirs_to(w, d, list, false);
+        try w.print("    \"{}\",\n", .{mod.name});
     }
 }
 
-fn print_csrc_flags_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), local: bool) anyerror!void {
-    if (u.list_contains(list.items, mod.clean_path)) {
-        return;
-    }
-    try list.append(mod.clean_path);
-    if (local) {
-        try w.print("    pub const @\"{}\" = {};\n", .{"", "&[_][]const u8{}"});
-    }
-    else {
-        try w.print("    pub const @\"{}\" = {}", .{mod.id, "&[_][]const u8{"});
-        for (mod.c_source_flags) |it| {
-            try w.print("\"{Z}\",", .{it});
-        }
-        try w.print("{};\n", .{"}"});
-    }
-    for (mod.deps) |d| {
-        if (d.is_sys_lib) continue;
-        try print_csrc_flags_to(w, d, list, false);
-    }
-}
-
-fn print_sys_libs_to(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8), list2: *std.ArrayList([]const u8)) anyerror!void {
-    if (u.list_contains(list.items, mod.clean_path)) {
-        return;
-    }
-    try list.append(mod.clean_path);
+fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void {
     //
+    if (u.list_contains_gen(u.Module, list, mod)) {
+        return;
+    }
+    try list.append(mod);
     for (mod.deps) |d| {
-        if (!d.is_sys_lib) continue;
-        //
-        if (!u.list_contains(list2.items, d.name)) {
-            try w.print("    \"{}\",\n", .{d.name});
-            try list2.append(d.name);
-        }
-        //
-        try print_sys_libs_to(w, d, list, list2);
+        try collect_pkgs(d, list);
     }
 }
