@@ -83,4 +83,13 @@ pub const Module = struct {
         }
         return true;
     }
+
+    pub fn has_no_zig_deps(self: Module) bool {
+        for (self.deps) |d| {
+            if (d.main.len > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 };

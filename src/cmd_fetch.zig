@@ -263,7 +263,7 @@ fn print_paths(w: fs.File.Writer, mod: u.Module, list: *std.ArrayList([]const u8
 }
 
 fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array: bool) anyerror!void {
-    if (m.deps.len == 0 and tabs > 0) {
+    if (m.has_no_zig_deps() and tabs > 0) {
         try w.print("null", .{});
         return;
     }
