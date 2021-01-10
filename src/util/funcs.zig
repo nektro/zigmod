@@ -261,27 +261,20 @@ pub fn validate_hash(input: []const u8, file_path: []const u8) !bool {
     const file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
     const data = try file.reader().readAllAlloc(gpa, gb);
-    return std.mem.eql(u8, hash.string, switch (hash.id) {
-        .blake3 => blk: {
-            const h = &std.crypto.hash.Blake3.init(.{});
-            var out: [32]u8 = undefined;
-            h.update(data);
-            h.final(&out);
-            break :blk try std.fmt.allocPrint(gpa, "{x}", .{out});
-        },
-        .sha256 => blk: {
-            const h = &std.crypto.hash.sha2.Sha256.init(.{});
-            var out: [32]u8 = undefined;
-            h.update(data);
-            h.final(&out);
-            break :blk try std.fmt.allocPrint(gpa, "{x}", .{out});
-        },
-        .sha512 => blk: {
-            const h = &std.crypto.hash.sha2.Sha512.init(.{});
-            var out: [64]u8 = undefined;
-            h.update(data);
-            h.final(&out);
-            break :blk try std.fmt.allocPrint(gpa, "{x}", .{out});
-        },
-    });
+    const expected = hash.string;
+    const actual = switch (hash.id) {
+        .blake3 => try do_hash(std.crypto.hash.Blake3, data),
+        .sha256 => try do_hash(std.crypto.hash.sha2.Sha256, data),
+        .sha512 => try do_hash(std.crypto.hash.sha2.Sha512, data),
+    };
+    return std.mem.eql(u8, expected, actual);
+}
+
+pub fn do_hash(comptime algo: type, data: []const u8) ![]const u8 {
+    const h = &algo.init(.{});
+    var out: [algo.digest_length]u8 = undefined;
+    h.update(data);
+    h.final(&out);
+    const hex = try std.fmt.allocPrint(gpa, "{x}", .{out});
+    return hex;
 }
