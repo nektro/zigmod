@@ -98,10 +98,8 @@ id: t5ch3nfmdaa25ndlch7ucz7yztq8n1iaanv2d7iwiw4q5n65
 name: my_app
 main: src/main.zig
 dependencies:
-- type: git
-  path: https://github.com/Hejsil/zig-clap
-- type: git
-  path: https://github.com/alexnask/ctregex.zig
+- src: git https://github.com/Hejsil/zig-clap
+- src: git https://github.com/alexnask/ctregex.zig
   # ctregex.zig doesn't have a zig.mod file so we can manually
   # define its entry point. this can also be used generally to
   # override any attribute we want in this dependency.
@@ -124,6 +122,7 @@ dependencies:
 |------|------|------|-------------|
 | `type` | `string` | required, enum | One of `system_lib`, `git`, `hg`, `http` |
 | `path` | `string` | required | URL/path to this dependency. depends on the type |
+| `src` | `string` | Shorthand for the format `type path`. |
 | `version` | `string` | only on some types | pin this dependency at a specific version |
 | `only_os` | `string` | | comma separated list of OS names to add this Dep to |
 | `except_os` | `string` | | comma separated list of OS names to exclude this Dep from |

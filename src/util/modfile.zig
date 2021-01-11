@@ -38,8 +38,16 @@ pub const ModFile = struct {
         if (doc.mapping.get("dependencies")) |dep_seq| {
             if (dep_seq == .sequence) {
                 for (dep_seq.sequence) |item| {
-                    const dtype = item.mapping.get("type").?.string;
-                    const path = item.mapping.get("path").?.string;
+                    var dtype: []const u8 = undefined;
+                    var path: []const u8 = undefined;
+                    if (item.mapping.get("src")) |val| {
+                        var src_iter = std.mem.split(val.string, " ");
+                        dtype = src_iter.next().?;
+                        path = src_iter.next().?;
+                    } else {
+                        dtype = item.mapping.get("type").?.string;
+                        path = item.mapping.get("path").?.string;
+                    }
                     const dep_type = std.meta.stringToEnum(u.DepType, dtype).?;
 
                     try dep_list.append(u.Dep{
