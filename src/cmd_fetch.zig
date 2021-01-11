@@ -52,9 +52,6 @@ pub fn execute(args: [][]u8) !void {
 
     const list = &std.ArrayList(u.Module).init(gpa);
     try collect_pkgs(top_module, list);
-    for (list.items) |m, i| {
-        std.debug.print("module: {} {}\n", .{i, m.clean_path});
-    }
 
     try w.writeAll("pub const _ids = .{\n");
     try print_ids(w, list.items);
@@ -86,7 +83,6 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("\n");
     try w.writeAll("pub const system_libs = &[_][]const u8{\n");
     try print_sys_libs_to(w, list.items, &std.ArrayList([]const u8).init(gpa));
-    try w.writeAll("};\n");
     try w.writeAll("};\n");
 }
 
