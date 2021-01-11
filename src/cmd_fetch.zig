@@ -61,6 +61,16 @@ pub fn execute(args: [][]u8) !void {
     try print_paths(w, list.items);
     try w.writeAll("};\n");
     try w.writeAll("\n");
+    try w.writeAll("pub const package_data = struct {\n");
+    const duped = &std.ArrayList(u.Module).init(gpa);
+    for (list.items) |mod| {
+        if (mod.main.len > 0 and mod.clean_path.len > 0) {
+            try duped.append(mod);
+        }
+    }
+    try print_pkg_data_to(w, duped, &std.ArrayList(u.Module).init(gpa));
+    try w.writeAll("};\n");
+    try w.writeAll("\n");
     try w.writeAll("pub const packages = ");
     try print_deps(w, dir, top_module, 0, true);
     try w.writeAll(";\n");
@@ -268,23 +278,16 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
     }
     const t = "    ";
     const r = try u.repeat(t, tabs);
-    var c: usize = 0;
-    for (m.deps) |d| {
+    for (m.deps) |d, i| {
         if (d.main.len == 0) {
             continue;
         }
-        c += 1;
         if (!array) {
-            try w.print("    pub const {} = packages[{}];\n", .{d.name, c-1});
-            continue;
+            try w.print("    pub const {} = packages[{}];\n", .{d.name, i});
         }
-        try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,"build.Pkg{"})});
-        try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,t,".name = \"",d.name,"\","})});
-        try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,t,".path = cache ++ \"/",d.clean_path,"/",d.main,"\","})});
-        try w.print("{}", .{try u.concat(&[_][]const u8{r,t,t,".dependencies = "})});
-        try print_deps(w, dir, d, tabs+2, array);
-        try w.print("{}\n", .{","});
-        try w.print("{}\n", .{try u.concat(&[_][]const u8{r,t,"},"})});
+        else {
+            try w.print("    package_data._{},\n", .{d.id});
+        }
     }
     try w.print("{}", .{try u.concat(&[_][]const u8{r,"}"})});
 }
@@ -354,4 +357,37 @@ fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void {
     for (mod.deps) |d| {
         try collect_pkgs(d, list);
     }
+}
+
+fn print_pkg_data_to(w: fs.File.Writer, list: *std.ArrayList(u.Module), list2: *std.ArrayList(u.Module)) anyerror!void {
+    var i: usize = 0;
+    while (i < list.items.len) : (i += 1) {
+        const mod = list.items[i];
+        if (contains_all(mod.deps, list2)) {
+            try w.print("    pub const _{} = build.Pkg{{ .name = \"{}\", .path = cache ++ \"/{Z}/{}\", .dependencies = &[_]build.Pkg{{", .{mod.id, mod.name, mod.clean_path, mod.main});
+            for (mod.deps) |d| {
+                if (d.main.len > 0) {
+                    try w.print(" _{},", .{d.id});
+                }
+            }
+            try w.print(" }} }};\n", .{});
+
+            try list2.append(mod);
+            _ = list.orderedRemove(i);
+            break;
+        }
+    }
+    if (list.items.len > 0) {
+        try print_pkg_data_to(w, list, list2);
+    }
+}
+
+/// returns if all of the zig modules in needles are in haystack
+fn contains_all(needles: []u.Module, haystack: *std.ArrayList(u.Module)) bool {
+    for (needles) |item| {
+        if (item.main.len > 0 and !u.list_contains_gen(u.Module, haystack, item)) {
+            return false;
+        }
+    }
+    return true;
 }
