@@ -17,7 +17,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
         if (try u.does_file_exist(pv)) {
             moddir = pv;
         } else {
-            u.assert(try u.does_file_exist(p), "unable to find dep: {} {}, please run zigmod fetch", .{d.path, d.version});
+            u.assert(try u.does_file_exist(p), "unable to find dep: {s} {s}, please run zigmod fetch", .{d.path, d.version});
             moddir = p;
         }
         switch (d.type) {

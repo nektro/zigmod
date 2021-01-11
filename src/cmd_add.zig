@@ -15,7 +15,7 @@ pub fn execute(args: [][]u8) !void {
     const path = args[1];
 
     const dep_type = std.meta.stringToEnum(u.DepType, dept);
-    u.assert(dep_type != null, "provided <type> parameter \"{}\" is not a valid dependency type", .{dept});
+    u.assert(dep_type != null, "provided <type> parameter \"{s}\" is not a valid dependency type", .{dept});
 
     const m = try u.ModFile.init(gpa, "zig.mod");
     for (m.deps) |d| {

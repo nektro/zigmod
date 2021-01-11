@@ -98,7 +98,7 @@ pub fn repeat(s: []const u8, times: i32) ![]const u8 {
 pub fn join(xs: [][]const u8, delim: []const u8) ![]const u8 {
     var res: []const u8 = "";
     for (xs) |x, i| {
-        res = try std.fmt.allocPrint(gpa, "{}{}{}", .{res, x, if (i < xs.len-1) delim else ""});
+        res = try std.fmt.allocPrint(gpa, "{s}{s}{s}", .{res, x, if (i < xs.len-1) delim else ""});
     }
     return res;
 }
@@ -106,7 +106,7 @@ pub fn join(xs: [][]const u8, delim: []const u8) ![]const u8 {
 pub fn concat(items: [][]const u8) ![]const u8 {
     var buf: []const u8 = "";
     for (items) |x| {
-        buf = try std.fmt.allocPrint(gpa, "{}{}", .{buf, x});
+        buf = try std.fmt.allocPrint(gpa, "{s}{s}", .{buf, x});
     }
     return buf;
 }
@@ -160,7 +160,7 @@ pub fn file_list(dpath: []const u8, list: *std.ArrayList([]const u8)) !void {
 pub fn run_cmd(dir: ?[]const u8, args: []const []const u8) !u32 {
     const result = std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, }) catch |e| switch(e) {
         error.FileNotFound => {
-            u.assert(false, "\"{}\" command not found", .{args[0]});
+            u.assert(false, "\"{s}\" command not found", .{args[0]});
             unreachable;
         },
         else => return e,

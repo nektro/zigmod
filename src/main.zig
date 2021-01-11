@@ -21,7 +21,7 @@ pub fn main() !void {
     const args = proc_args[1..];
 
     if (args.len == 0) {
-        u.print("zigmod {} {} {} {}", .{
+        u.print("zigmod {s} {s} {s} {s}", .{
             @import("build_options").version,
             @tagName(builtin.os.tag),
             @tagName(builtin.arch),

@@ -103,7 +103,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     for (m.deps) |d| {
         const p = try fs.path.join(gpa, &[_][]const u8{dir, try d.clean_path()});
         const pv = try fs.path.join(gpa, &[_][]const u8{dir, try d.clean_path_v()});
-        u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
+        u.print("fetch: {s}: {s}: {s}", .{m.name, @tagName(d.type), d.path});
         moddir = p;
         switch (d.type) {
             .system_lib => {
@@ -121,7 +121,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         error.IterEmpty => unreachable,
                         error.NoMemberFound => {
                             const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];
-                            u.assert(false, "fetch: git: version type '{}' is invalid.", .{vtype});
+                            u.assert(false, "fetch: git: version type '{s}' is invalid.", .{vtype});
                             unreachable;
                         },
                     };
@@ -133,7 +133,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         break :blk;
                     }
                     if ((try u.run_cmd(p, &[_][]const u8{"git", "checkout", vers.string})) > 0) {
-                        u.assert(false, "fetch: git: {}: {} {} does not exist", .{d.path, @tagName(vers.id), vers.string});
+                        u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{d.path, @tagName(vers.id), vers.string});
                     } else {
                         _ = try u.run_cmd(p, &[_][]const u8{"git", "checkout", "-"});
                     }
@@ -169,7 +169,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         break :blk;
                     }
                     try u.rm_recv(pv);
-                    u.assert(false, "{} does not match hash {}", .{d.path, d.version});
+                    u.assert(false, "{s} does not match hash {s}", .{d.path, d.version});
                     break :blk;
                 }
                 if (try u.does_folder_exist(p)) {
@@ -286,7 +286,7 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
             try w.print("    pub const {} = packages[{}];\n", .{zig.fmtId(d.name), i});
         }
         else {
-            try w.print("    package_data._{},\n", .{d.id});
+            try w.print("    package_data._{s},\n", .{d.id});
         }
     }
     try w.writeAll(r);
@@ -300,7 +300,7 @@ fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
         }
         for (mod.c_include_dirs) |it| {
             if (i > 0) {
-                try w.print("    cache ++ _paths[{}] ++ \"{Z}\",\n", .{i, zig.fmtEscapes(it)});
+                try w.print("    cache ++ _paths[{}] ++ \"{}\",\n", .{i, zig.fmtEscapes(it)});
             } else {
                 try w.writeAll("    \"\",\n");
             }
@@ -337,7 +337,7 @@ fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
             try w.print("    pub const {} = ", .{zig.fmtId(mod.id)});
             try w.writeAll("&[_][]const u8{");
             for (mod.c_source_flags) |it| {
-                try w.print("\"{Z}\",", .{zig.fmtEscapes(it)});
+                try w.print("\"{}\",", .{zig.fmtEscapes(it)});
             }
             try w.writeAll("};\n");
         }
