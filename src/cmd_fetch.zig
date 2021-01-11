@@ -1,6 +1,7 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 const fs = std.fs;
+const zig = std.zig;
 
 const known_folders = @import("known-folders");
 const u = @import("./util/index.zig");
@@ -20,11 +21,9 @@ pub fn execute(args: [][]u8) !void {
 
     const w = f.writer();
     try w.writeAll("const std = @import(\"std\");\n");
-    try w.writeAll("const build = std.build;\n");
-    try w.writeAll("\n");
-    try w.print("const cache = \"{Z}\";\n", .{dir});
-    try w.writeAll("\n");
-    try w.print("{}\n", .{
+    try w.writeAll("const build = std.build;\n\n");
+    try w.print("const cache = \"{}\";\n\n", .{zig.fmtEscapes(dir)});
+    try w.writeAll(
         \\pub fn addAllTo(exe: *build.LibExeObjStep) void {
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
@@ -48,7 +47,8 @@ pub fn execute(args: [][]u8) !void {
         \\    return @field(c_source_flags, _paths[index]);
         \\}
         \\
-    });
+        \\
+    );
 
     const list = &std.ArrayList(u.Module).init(gpa);
     try collect_pkgs(top_module, list);
@@ -57,7 +57,7 @@ pub fn execute(args: [][]u8) !void {
     try print_ids(w, list.items);
     try w.writeAll("};\n\n");
 
-    try w.print("pub const _paths = {}\n", .{".{"});
+    try w.writeAll("pub const _paths = .{\n");
     try print_paths(w, list.items);
     try w.writeAll("};\n\n");
 
@@ -247,7 +247,7 @@ fn print_ids(w: fs.File.Writer, list: []u.Module) !void {
         if (mod.clean_path.len == 0) {
             try w.print("    \"\",\n", .{});
         } else {
-            try w.print("    \"{}\",\n", .{mod.id});
+            try w.print("    \"{}\",\n", .{zig.fmtEscapes(mod.id)});
         }
     }
 }
@@ -260,8 +260,8 @@ fn print_paths(w: fs.File.Writer, list: []u.Module) !void {
         if (mod.clean_path.len == 0) {
             try w.print("    \"\",\n", .{});
         } else {
-            const s = std.fs.path.sep_str;
-            try w.print("    \"{Z}{Z}{Z}\",\n", .{s, mod.clean_path, s});
+            const s = fs.path.sep_str;
+            try w.print("    \"{}{}{}\",\n", .{zig.fmtEscapes(s), zig.fmtEscapes(mod.clean_path), zig.fmtEscapes(s)});
         }
     }
 }
@@ -283,13 +283,14 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
             continue;
         }
         if (!array) {
-            try w.print("    pub const {} = packages[{}];\n", .{d.name, i});
+            try w.print("    pub const {} = packages[{}];\n", .{zig.fmtId(d.name), i});
         }
         else {
             try w.print("    package_data._{},\n", .{d.id});
         }
     }
-    try w.print("{}", .{try u.concat(&[_][]const u8{r,"}"})});
+    try w.writeAll(r);
+    try w.writeAll("}");
 }
 
 fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
@@ -299,9 +300,9 @@ fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
         }
         for (mod.c_include_dirs) |it| {
             if (i > 0) {
-                try w.print("    cache ++ _paths[{}] ++ \"{Z}\",\n", .{i, it});
+                try w.print("    cache ++ _paths[{}] ++ \"{Z}\",\n", .{i, zig.fmtEscapes(it)});
             } else {
-                try w.print("    \"\",\n", .{});
+                try w.writeAll("    \"\",\n");
             }
         }
     }
@@ -313,11 +314,13 @@ fn print_csrc_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
             continue;
         }
         for (mod.c_source_files) |it| {
+            try w.writeAll("    [_][]const u8{");
             if (i > 0) {
-                try w.print("    {}_ids[{}], cache ++ _paths[{}] ++ \"{}\"{},\n", .{"[_][]const u8{", i, i, it, "}"});
+                try w.print("_ids[{}], cache ++ _paths[{}] ++ \"{}\"", .{i, i, zig.fmtEscapes(it)});
             } else {
-                try w.print("    {}\"{}\", \".{}/{}\"{},\n", .{"[_][]const u8{", mod.clean_path, mod.clean_path, it, "}"});
+                try w.print("\"{}\", \".{}/{}\"", .{zig.fmtEscapes(mod.clean_path), zig.fmtEscapes(mod.clean_path), zig.fmtEscapes(it)});
             }
+            try w.writeAll("},\n");
         }
     }
 }
@@ -328,13 +331,15 @@ fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
             continue;
         }
         if (i == 0) {
-            try w.print("    pub const @\"{}\" = {};\n", .{"", "&[_][]const u8{}"});
+            try w.writeAll("    pub const @\"\" = ");
+            try w.writeAll("&[_][]const u8{};\n");
         } else {
-            try w.print("    pub const @\"{}\" = {}", .{mod.id, "&[_][]const u8{"});
+            try w.print("    pub const {} = ", .{zig.fmtId(mod.id)});
+            try w.writeAll("&[_][]const u8{");
             for (mod.c_source_flags) |it| {
-                try w.print("\"{Z}\",", .{it});
+                try w.print("\"{Z}\",", .{zig.fmtEscapes(it)});
             }
-            try w.print("{};\n", .{"}"});
+            try w.writeAll("};\n");
         }
     }
 }
@@ -344,7 +349,7 @@ fn print_sys_libs_to(w: fs.File.Writer, list: []u.Module, list2: *std.ArrayList(
         if (!mod.is_sys_lib) {
             continue;
         }
-        try w.print("    \"{}\",\n", .{mod.name});
+        try w.print("    \"{}\",\n", .{zig.fmtEscapes(mod.name)});
     }
 }
 
@@ -364,13 +369,13 @@ fn print_pkg_data_to(w: fs.File.Writer, list: *std.ArrayList(u.Module), list2: *
     while (i < list.items.len) : (i += 1) {
         const mod = list.items[i];
         if (contains_all(mod.deps, list2)) {
-            try w.print("    pub const _{} = build.Pkg{{ .name = \"{}\", .path = cache ++ \"/{Z}/{}\", .dependencies = &[_]build.Pkg{{", .{mod.id, mod.name, mod.clean_path, mod.main});
+            try w.print("    pub const _{} = build.Pkg{{ .name = \"{}\", .path = cache ++ \"/{}/{}\", .dependencies = &[_]build.Pkg{{", .{mod.id, zig.fmtEscapes(mod.name), zig.fmtEscapes(mod.clean_path), zig.fmtEscapes(mod.main)});
             for (mod.deps) |d| {
                 if (d.main.len > 0) {
                     try w.print(" _{},", .{d.id});
                 }
             }
-            try w.print(" }} }};\n", .{});
+            try w.writeAll(" } };\n");
 
             try list2.append(mod);
             _ = list.orderedRemove(i);
