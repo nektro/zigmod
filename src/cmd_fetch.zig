@@ -55,12 +55,12 @@ pub fn execute(args: [][]u8) !void {
 
     try w.writeAll("pub const _ids = .{\n");
     try print_ids(w, list.items);
-    try w.writeAll("};\n");
-    try w.writeAll("\n");
+    try w.writeAll("};\n\n");
+
     try w.print("pub const _paths = {}\n", .{".{"});
     try print_paths(w, list.items);
-    try w.writeAll("};\n");
-    try w.writeAll("\n");
+    try w.writeAll("};\n\n");
+
     try w.writeAll("pub const package_data = struct {\n");
     const duped = &std.ArrayList(u.Module).init(gpa);
     for (list.items) |mod| {
@@ -69,31 +69,31 @@ pub fn execute(args: [][]u8) !void {
         }
     }
     try print_pkg_data_to(w, duped, &std.ArrayList(u.Module).init(gpa));
-    try w.writeAll("};\n");
-    try w.writeAll("\n");
+    try w.writeAll("};\n\n");
+
     try w.writeAll("pub const packages = ");
     try print_deps(w, dir, top_module, 0, true);
-    try w.writeAll(";\n");
-    try w.writeAll("\n");
+    try w.writeAll(";\n\n");
+
     try w.writeAll("pub const pkgs = ");
     try print_deps(w, dir, top_module, 0, false);
-    try w.writeAll(";\n");
-    try w.writeAll("\n");
+    try w.writeAll(";\n\n");
+
     try w.writeAll("pub const c_include_dirs = &[_][]const u8{\n");
     try print_incl_dirs_to(w, list.items);
-    try w.writeAll("};\n");
-    try w.writeAll("\n");
+    try w.writeAll("};\n\n");
+
     try w.writeAll("pub const c_source_flags = struct {\n");
     try print_csrc_flags_to(w, list.items);
-    try w.writeAll("};\n");
-    try w.writeAll("\n");
+    try w.writeAll("};\n\n");
+
     try w.writeAll("pub const c_source_files = &[_][2][]const u8{\n");
     try print_csrc_dirs_to(w, list.items);
-    try w.writeAll("};\n");
-    try w.writeAll("\n");
+    try w.writeAll("};\n\n");
+
     try w.writeAll("pub const system_libs = &[_][]const u8{\n");
     try print_sys_libs_to(w, list.items, &std.ArrayList([]const u8).init(gpa));
-    try w.writeAll("};\n");
+    try w.writeAll("};\n\n");
 }
 
 fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
