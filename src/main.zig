@@ -37,5 +37,19 @@ pub fn main() !void {
             return;
         }
     }
-    std.debug.panic("Error: unknown command \"{}\" for \"zigmod\"", .{args[0]});
+
+    var sub_cmd_args = &std.ArrayList([]const u8).init(gpa);
+    try sub_cmd_args.append(try std.fmt.allocPrint(gpa, "zigmod-{}", .{args[0]}));
+    for (args[1..]) |item| {
+        try sub_cmd_args.append(item);
+    }
+    const result = std.ChildProcess.exec(.{ .allocator = gpa, .argv = sub_cmd_args.items, }) catch |e| switch(e) {
+        else => return e,
+        error.FileNotFound => {
+            u.assert(false, "unknown command \"{}\" for \"zigmod\"", .{args[0]});
+            unreachable;
+        },
+    };
+    try std.io.getStdOut().writeAll(result.stdout);
+    try std.io.getStdErr().writeAll(result.stderr);
 }
