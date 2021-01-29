@@ -193,7 +193,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                     .c_source_flags = &[_][]const u8{},
                     .c_source_files = &[_][]const u8{},
                     .deps = &[_]u.Module{},
-                    .clean_path = "",
+                    .clean_path = d.path,
                 });
             },
             else => blk: {
@@ -244,11 +244,7 @@ fn print_ids(w: fs.File.Writer, list: []u.Module) !void {
         if (mod.is_sys_lib) {
             continue;
         }
-        if (mod.clean_path.len == 0) {
-            try w.print("    \"\",\n", .{});
-        } else {
-            try w.print("    \"{}\",\n", .{mod.id});
-        }
+        try w.print("    \"{}\",\n", .{mod.id});
     }
 }
 
@@ -283,7 +279,7 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
             continue;
         }
         if (!array) {
-            try w.print("    pub const {} = packages[{}];\n", .{d.name, i});
+            try w.print("    pub const {} = packages[{}];\n", .{std.mem.replaceOwned(u8, gpa, d.name, "-", "_"), i});
         }
         else {
             try w.print("    package_data._{},\n", .{d.id});
@@ -301,7 +297,7 @@ fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
             if (i > 0) {
                 try w.print("    cache ++ _paths[{}] ++ \"{Z}\",\n", .{i, it});
             } else {
-                try w.print("    \"\",\n", .{});
+                try w.print("    \"{Z}\",\n", .{it});
             }
         }
     }
@@ -316,7 +312,7 @@ fn print_csrc_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
             if (i > 0) {
                 try w.print("    {}_ids[{}], cache ++ _paths[{}] ++ \"{}\"{},\n", .{"[_][]const u8{", i, i, it, "}"});
             } else {
-                try w.print("    {}\"{}\", \".{}/{}\"{},\n", .{"[_][]const u8{", mod.clean_path, mod.clean_path, it, "}"});
+                try w.print("    {}_ids[{}], \".{}/{}\"{},\n", .{"[_][]const u8{", i, mod.clean_path, it, "}"});
             }
         }
     }
@@ -327,15 +323,12 @@ fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
         if (mod.is_sys_lib) {
             continue;
         }
-        if (i == 0) {
-            try w.print("    pub const @\"{}\" = {};\n", .{"", "&[_][]const u8{}"});
-        } else {
-            try w.print("    pub const @\"{}\" = {}", .{mod.id, "&[_][]const u8{"});
-            for (mod.c_source_flags) |it| {
-                try w.print("\"{Z}\",", .{it});
-            }
-            try w.print("{};\n", .{"}"});
+        try w.print("    pub const @\"{}\" = {}", .{mod.id, "&[_][]const u8{"});
+        for (mod.c_source_flags) |it| {
+            try w.print("\"{Z}\",", .{it});
         }
+        try w.print("{};\n", .{"}"});
+
     }
 }
 
