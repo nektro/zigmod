@@ -32,7 +32,7 @@ pub const ModFile = struct {
 
         const id = doc.mapping.get_string("id");
         const name = doc.mapping.get("name").?.string;
-        const main = doc.mapping.get("main").?.string;
+        const main = doc.mapping.get_string("main");
 
         const dep_list = &std.ArrayList(u.Dep).init(alloc);
         if (doc.mapping.get("dependencies")) |dep_seq| {
