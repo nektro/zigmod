@@ -15,7 +15,7 @@ pub fn build(b: *Builder) void {
     const exe = b.addExecutable(exe_name, "src/main.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
-    exe.addBuildOption([]const u8, "version", b.option([]const u8, "tag", "") orelse "");
+    exe.addBuildOption([]const u8, "version", b.option([]const u8, "tag", "") orelse "dev");
 
     exe.linkLibC();
 
