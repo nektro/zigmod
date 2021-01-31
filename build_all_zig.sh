@@ -19,5 +19,5 @@ x86_64-macos-gnu
 for item in $targets
 do
     echo "$tag-$item"
-    zig build -Dtarget=$item -Drelease -Duse-full-name -Dtag=$tag
+    zig build -Dtarget=$item -Duse-full-name -Dtag=$tag
 done

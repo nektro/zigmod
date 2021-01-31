@@ -25,7 +25,7 @@ pub fn execute(args: [][]u8) !void {
 
     for (module_list.items) |m| {
         const hash = try m.get_hash(dir);
-        try w.print("{} {}\n", .{hash, m.clean_path});
+        try w.print("{s} {s}\n", .{hash, m.clean_path});
     }
 }
 

@@ -14,12 +14,12 @@ pub fn execute(args: [][]u8) !void {
     defer file.close();
 
     const fwriter = file.writer();
-    try fwriter.print("id: {}\n", .{u.random_string(48)});
-    try fwriter.print("name: {}\n", .{name});
-    try fwriter.print("main: {}\n", .{mainf});
+    try fwriter.print("id: {s}\n", .{u.random_string(48)});
+    try fwriter.print("name: {s}\n", .{name});
+    try fwriter.print("main: {s}\n", .{mainf});
     try fwriter.print("dependencies:\n", .{});
 
-    u.print("Initialized a new package named {} with entry point {}", .{name, mainf});
+    u.print("Initialized a new package named {s} with entry point {s}", .{name, mainf});
 }
 
 fn detect_pkgname(def: []const u8) ![]const u8 {

@@ -21,7 +21,7 @@ pub fn main() !void {
     const args = proc_args[1..];
 
     if (args.len == 0) {
-        u.print("zigmod {} {} {} {}", .{
+        u.print("zigmod {s} {s} {s} {s}", .{
             @import("build_options").version,
             @tagName(builtin.os.tag),
             @tagName(builtin.arch),
@@ -39,14 +39,14 @@ pub fn main() !void {
     }
 
     var sub_cmd_args = &std.ArrayList([]const u8).init(gpa);
-    try sub_cmd_args.append(try std.fmt.allocPrint(gpa, "zigmod-{}", .{args[0]}));
+    try sub_cmd_args.append(try std.fmt.allocPrint(gpa, "zigmod-{s}", .{args[0]}));
     for (args[1..]) |item| {
         try sub_cmd_args.append(item);
     }
     const result = std.ChildProcess.exec(.{ .allocator = gpa, .argv = sub_cmd_args.items, }) catch |e| switch(e) {
         else => return e,
         error.FileNotFound => {
-            u.assert(false, "unknown command \"{}\" for \"zigmod\"", .{args[0]});
+            u.assert(false, "unknown command \"{s}\" for \"zigmod\"", .{args[0]});
             unreachable;
         },
     };

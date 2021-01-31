@@ -22,9 +22,9 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("const std = @import(\"std\");\n");
     try w.writeAll("const build = std.build;\n");
     try w.writeAll("\n");
-    try w.print("const cache = \"{Z}\";\n", .{dir});
+    try w.print("const cache = \"{s}\";\n", .{std.zig.fmtEscapes(dir)});
     try w.writeAll("\n");
-    try w.print("{}\n", .{
+    try w.print("{s}\n", .{
         \\pub fn addAllTo(exe: *build.LibExeObjStep) void {
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
@@ -57,7 +57,7 @@ pub fn execute(args: [][]u8) !void {
     try print_ids(w, list.items);
     try w.writeAll("};\n\n");
 
-    try w.print("pub const _paths = {}\n", .{".{"});
+    try w.print("pub const _paths = {s}\n", .{".{"});
     try print_paths(w, list.items);
     try w.writeAll("};\n\n");
 
@@ -103,7 +103,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
     for (m.deps) |d| {
         const p = try fs.path.join(gpa, &[_][]const u8{dir, try d.clean_path()});
         const pv = try fs.path.join(gpa, &[_][]const u8{dir, try d.clean_path_v()});
-        u.print("fetch: {}: {}: {}", .{m.name, @tagName(d.type), d.path});
+        u.print("fetch: {s}: {s}: {s}", .{m.name, @tagName(d.type), d.path});
         moddir = p;
         switch (d.type) {
             .system_lib => {
@@ -121,7 +121,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         error.IterEmpty => unreachable,
                         error.NoMemberFound => {
                             const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];
-                            u.assert(false, "fetch: git: version type '{}' is invalid.", .{vtype});
+                            u.assert(false, "fetch: git: version type '{s}' is invalid.", .{vtype});
                             unreachable;
                         },
                     };
@@ -133,7 +133,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         break :blk;
                     }
                     if ((try u.run_cmd(p, &[_][]const u8{"git", "checkout", vers.string})) > 0) {
-                        u.assert(false, "fetch: git: {}: {} {} does not exist", .{d.path, @tagName(vers.id), vers.string});
+                        u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{d.path, @tagName(vers.id), vers.string});
                     } else {
                         _ = try u.run_cmd(p, &[_][]const u8{"git", "checkout", "-"});
                     }
@@ -169,7 +169,7 @@ fn fetch_deps(dir: []const u8, mpath: []const u8) anyerror!u.Module {
                         break :blk;
                     }
                     try u.rm_recv(pv);
-                    u.assert(false, "{} does not match hash {}", .{d.path, d.version});
+                    u.assert(false, "{s} does not match hash {s}", .{d.path, d.version});
                     break :blk;
                 }
                 if (try u.does_folder_exist(p)) {
@@ -244,7 +244,7 @@ fn print_ids(w: fs.File.Writer, list: []u.Module) !void {
         if (mod.is_sys_lib) {
             continue;
         }
-        try w.print("    \"{}\",\n", .{mod.id});
+        try w.print("    \"{s}\",\n", .{mod.id});
     }
 }
 
@@ -257,7 +257,7 @@ fn print_paths(w: fs.File.Writer, list: []u.Module) !void {
             try w.print("    \"\",\n", .{});
         } else {
             const s = std.fs.path.sep_str;
-            try w.print("    \"{Z}{Z}{Z}\",\n", .{s, mod.clean_path, s});
+            try w.print("    \"{s}{s}{s}\",\n", .{std.zig.fmtEscapes(s), std.zig.fmtEscapes(mod.clean_path), std.zig.fmtEscapes(s)});
         }
     }
 }
@@ -279,13 +279,13 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
             continue;
         }
         if (!array) {
-            try w.print("    pub const {} = packages[{}];\n", .{std.mem.replaceOwned(u8, gpa, d.name, "-", "_"), i});
+            try w.print("    pub const {s} = packages[{}];\n", .{std.mem.replaceOwned(u8, gpa, d.name, "-", "_"), i});
         }
         else {
-            try w.print("    package_data._{},\n", .{d.id});
+            try w.print("    package_data._{s},\n", .{d.id});
         }
     }
-    try w.print("{}", .{try u.concat(&[_][]const u8{r,"}"})});
+    try w.print("{s}", .{try u.concat(&[_][]const u8{r,"}"})});
 }
 
 fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
@@ -295,9 +295,9 @@ fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
         }
         for (mod.c_include_dirs) |it| {
             if (i > 0) {
-                try w.print("    cache ++ _paths[{}] ++ \"{Z}\",\n", .{i, it});
+                try w.print("    cache ++ _paths[{}] ++ \"{s}\",\n", .{i, std.zig.fmtEscapes(it)});
             } else {
-                try w.print("    \"{Z}\",\n", .{it});
+                try w.print("    \"{s}\",\n", .{std.zig.fmtEscapes(it)});
             }
         }
     }
@@ -310,9 +310,9 @@ fn print_csrc_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
         }
         for (mod.c_source_files) |it| {
             if (i > 0) {
-                try w.print("    {}_ids[{}], cache ++ _paths[{}] ++ \"{}\"{},\n", .{"[_][]const u8{", i, i, it, "}"});
+                try w.print("    {s}_ids[{}], cache ++ _paths[{}] ++ \"{s}\"{s},\n", .{"[_][]const u8{", i, i, it, "}"});
             } else {
-                try w.print("    {}_ids[{}], \".{}/{}\"{},\n", .{"[_][]const u8{", i, mod.clean_path, it, "}"});
+                try w.print("    {s}_ids[{}], \".{s}/{s}\"{s},\n", .{"[_][]const u8{", i, std.zig.fmtEscapes(mod.clean_path), it, "}"});
             }
         }
     }
@@ -323,11 +323,11 @@ fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
         if (mod.is_sys_lib) {
             continue;
         }
-        try w.print("    pub const @\"{}\" = {}", .{mod.id, "&[_][]const u8{"});
+        try w.print("    pub const @\"{s}\" = {s}", .{mod.id, "&[_][]const u8{"});
         for (mod.c_source_flags) |it| {
-            try w.print("\"{Z}\",", .{it});
+            try w.print("\"{s}\",", .{std.zig.fmtEscapes(it)});
         }
-        try w.print("{};\n", .{"}"});
+        try w.print("{s};\n", .{"}"});
 
     }
 }
@@ -337,7 +337,7 @@ fn print_sys_libs_to(w: fs.File.Writer, list: []u.Module, list2: *std.ArrayList(
         if (!mod.is_sys_lib) {
             continue;
         }
-        try w.print("    \"{}\",\n", .{mod.name});
+        try w.print("    \"{s}\",\n", .{mod.name});
     }
 }
 
@@ -357,10 +357,10 @@ fn print_pkg_data_to(w: fs.File.Writer, list: *std.ArrayList(u.Module), list2: *
     while (i < list.items.len) : (i += 1) {
         const mod = list.items[i];
         if (contains_all(mod.deps, list2)) {
-            try w.print("    pub const _{} = build.Pkg{{ .name = \"{}\", .path = cache ++ \"/{Z}/{}\", .dependencies = &[_]build.Pkg{{", .{mod.id, mod.name, mod.clean_path, mod.main});
+            try w.print("    pub const _{s} = build.Pkg{{ .name = \"{s}\", .path = cache ++ \"/{s}/{s}\", .dependencies = &[_]build.Pkg{{", .{mod.id, mod.name, std.zig.fmtEscapes(mod.clean_path), mod.main});
             for (mod.deps) |d| {
                 if (d.main.len > 0) {
-                    try w.print(" _{},", .{d.id});
+                    try w.print(" _{s},", .{d.id});
                 }
             }
             try w.print(" }} }};\n", .{});

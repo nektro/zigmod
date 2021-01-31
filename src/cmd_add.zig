@@ -51,5 +51,5 @@ pub fn execute(args: [][]u8) !void {
         try w.print("  path: {}\n", .{d.path});
     }
 
-    u.print("Successfully added {}", .{path});
+    u.print("Successfully added {s}", .{path});
 }
