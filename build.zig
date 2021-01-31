@@ -38,6 +38,8 @@ pub fn build(b: *Builder) void {
 
     exe.addPackagePath("known-folders", "./libs/zig-known-folders/known-folders.zig");
     exe.addPackagePath("ansi", "./libs/zig-ansi/src/lib.zig");
+    exe.addPackagePath("zuri", "./libs/zuri/src/zuri.zig");
+    exe.addPackagePath("iguanatls", "./libs/iguanatls/src/main.zig");
 
     exe.install();
 
