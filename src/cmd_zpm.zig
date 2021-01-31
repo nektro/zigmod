@@ -7,6 +7,7 @@ const u = @import("./util/index.zig");
 //
 
 const commands = struct {
+    const add = @import("./cmd_zpm_add.zig");
 };
 
 pub fn execute(args: [][]u8) !void {
@@ -17,6 +18,7 @@ pub fn execute(args: [][]u8) !void {
             \\The default remote is https://zpm.random-projects.net/.
             \\
             \\The subcommands available are:
+            \\  - add       Append this package to your dependencies
         });
         return;
     }
