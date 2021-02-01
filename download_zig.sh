@@ -11,8 +11,6 @@ dir="zig-$os-$arch-$version"
 file="$dir.tar.xz"
 
 cd /
-tar -xf $file
-ln -s /$dir/zig /usr/local/bin
 
 if [[ $1 == *"dev"* ]]; then
     wget https://ziglang.org/builds/$file
@@ -20,3 +18,5 @@ else
     wget https://ziglang.org/download/$version/$file
 fi
 
+tar -xf $file -C /zig
+ln -s /zig/zig /usr/local/bin
