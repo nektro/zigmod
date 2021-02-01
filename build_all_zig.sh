@@ -8,6 +8,7 @@ tag=v$version.$(git log --format=%h -1)
 
 targets="
 aarch64-linux-musl
+aarch64-macos-gnu
 i386-windows-gnu
 i386-linux-musl
 riscv64-linux-musl
