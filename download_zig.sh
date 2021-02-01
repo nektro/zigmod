@@ -18,6 +18,5 @@ else
     wget https://ziglang.org/download/$version/$file
 fi
 
-mkdir /zig
-tar -xf $file -C /zig
-ln -s /zig/zig /usr/local/bin
+tar -xf $file
+ln -s /$dir/zig /usr/local/bin
