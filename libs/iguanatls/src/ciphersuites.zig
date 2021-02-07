@@ -4,7 +4,11 @@ const mem = std.mem;
 usingnamespace @import("crypto.zig");
 const Chacha20Poly1305 = std.crypto.aead.chacha_poly.ChaCha20Poly1305;
 const Aes128Gcm = std.crypto.aead.aes_gcm.Aes128Gcm;
-const record_length = @import("main.zig").record_length;
+
+const main = @import("main.zig");
+const alert_byte_to_error = main.alert_byte_to_error;
+const record_tag_length = main.record_tag_length;
+const record_length = main.record_length;
 
 pub const suites = struct {
     pub const ECDHE_RSA_Chacha20_Poly1305 = struct {
@@ -106,22 +110,30 @@ pub const suites = struct {
         ) !usize {
             switch (state.*) {
                 .none => {
-                    const len = (record_length(0x17, reader) catch |err| switch (err) {
+                    const tag_length = record_tag_length(reader) catch |err| switch (err) {
                         error.EndOfStream => return 0,
                         else => |e| return e,
-                    }) - 16;
+                    };
+                    if (tag_length.length < 16)
+                        return error.ServerMalformedResponse;
+                    const len = tag_length.length - 16;
 
-                    const curr_bytes = std.math.min(std.math.min(len, buf_size), buffer.len);
+                    if ((tag_length.tag != 0x17 and tag_length.tag != 0x15) or
+                        (tag_length.tag == 0x15 and len != 2))
+                    {
+                        return error.ServerMalformedResponse;
+                    }
+
+                    const curr_bytes = if (tag_length.tag == 0x15)
+                        2
+                    else
+                        std.math.min(std.math.min(len, buf_size), buffer.len);
 
                     var nonce: [12]u8 = ([1]u8{0} ** 4) ++ ([1]u8{undefined} ** 8);
                     mem.writeIntBig(u64, nonce[4..12], server_seq.*);
                     for (nonce) |*n, i| {
                         n.* ^= key_data.server_iv(@This())[i];
                     }
-
-                    // Partially decrypt the data.
-                    var encrypted: [buf_size]u8 = undefined;
-                    const actually_read = try reader.read(encrypted[0..curr_bytes]);
 
                     var c: [4]u32 = undefined;
                     c[0] = 1;
@@ -132,32 +144,63 @@ pub const suites = struct {
                     var context = ChaCha20Stream.initContext(server_key, c);
                     var idx: usize = 0;
                     var buf: [64]u8 = undefined;
-                    ChaCha20Stream.chacha20Xor(
-                        buffer[0..actually_read],
-                        encrypted[0..actually_read],
-                        server_key,
-                        &context,
-                        &idx,
-                        &buf,
-                    );
-                    if (actually_read < len) {
-                        state.* = .{
-                            .in_record = .{
-                                .left = len - actually_read,
-                                .context = context,
-                                .idx = idx,
-                                .buf = buf,
-                            },
+
+                    if (tag_length.tag == 0x15) {
+                        var encrypted: [2]u8 = undefined;
+                        reader.readNoEof(&encrypted) catch |err| switch (err) {
+                            error.EndOfStream => return error.ServerMalformedResponse,
+                            else => |e| return e,
                         };
-                    } else {
-                        // @TODO Verify Poly1305.
+                        var result: [2] u8 = undefined;
+                        ChaCha20Stream.chacha20Xor(
+                            &result,
+                            &encrypted,
+                            server_key,
+                            &context,
+                            &idx,
+                            &buf,
+                        );
                         reader.skipBytes(16, .{}) catch |err| switch (err) {
-                            error.EndOfStream => return 0,
+                            error.EndOfStream => return error.ServerMalformedResponse,
                             else => |e| return e,
                         };
                         server_seq.* += 1;
-                    }
-                    return actually_read;
+                        // CloseNotify
+                        if (result[1] == 0)
+                            return 0;
+                        return alert_byte_to_error(result[1]);
+                    } else if (tag_length.tag == 0x17) {
+                        // Partially decrypt the data.
+                        var encrypted: [buf_size]u8 = undefined;
+                        const actually_read = try reader.read(encrypted[0..curr_bytes]);
+
+                        ChaCha20Stream.chacha20Xor(
+                            buffer[0..actually_read],
+                            encrypted[0..actually_read],
+                            server_key,
+                            &context,
+                            &idx,
+                            &buf,
+                        );
+                        if (actually_read < len) {
+                            state.* = .{
+                                .in_record = .{
+                                    .left = len - actually_read,
+                                    .context = context,
+                                    .idx = idx,
+                                    .buf = buf,
+                                },
+                            };
+                        } else {
+                            // @TODO Verify Poly1305.
+                            reader.skipBytes(16, .{}) catch |err| switch (err) {
+                                error.EndOfStream => return error.ServerMalformedResponse,
+                                else => |e| return e,
+                            };
+                            server_seq.* += 1;
+                        }
+                        return actually_read;
+                    } else unreachable;
                 },
                 .in_record => |*record_info| {
                     const curr_bytes = std.math.min(std.math.min(buf_size, buffer.len), record_info.left);
@@ -177,7 +220,7 @@ pub const suites = struct {
                     if (record_info.left == 0) {
                         // @TODO Verify Poly1305.
                         reader.skipBytes(16, .{}) catch |err| switch (err) {
-                            error.EndOfStream => return 0,
+                            error.EndOfStream => return error.ServerMalformedResponse,
                             else => |e| return e,
                         };
                         state.* = .none;
@@ -293,12 +336,24 @@ pub const suites = struct {
         ) !usize {
             switch (state.*) {
                 .none => {
-                    const len = (record_length(0x17, reader) catch |err| switch (err) {
+                    const tag_length = record_tag_length(reader) catch |err| switch (err) {
                         error.EndOfStream => return 0,
                         else => |e| return e,
-                    }) - 24;
+                    };
+                    if (tag_length.length < 24)
+                        return error.ServerMalformedResponse;
+                    const len = tag_length.length - 24;
 
-                    const curr_bytes = std.math.min(std.math.min(len, buf_size), buffer.len);
+                    if ((tag_length.tag != 0x17 and tag_length.tag != 0x15) or
+                        (tag_length.tag == 0x15 and len != 2))
+                    {
+                        return error.ServerMalformedResponse;
+                    }
+
+                    const curr_bytes = if (tag_length.tag == 0x15)
+                        2
+                    else
+                        std.math.min(std.math.min(len, buf_size), buffer.len);
 
                     var iv: [12]u8 = undefined;
                     iv[0..4].* = key_data.server_iv(@This()).*;
@@ -306,10 +361,6 @@ pub const suites = struct {
                         error.EndOfStream => return 0,
                         else => |e| return e,
                     };
-
-                    // Partially decrypt the data.
-                    var encrypted: [buf_size]u8 = undefined;
-                    const actually_read = try reader.read(encrypted[0..curr_bytes]);
 
                     const aes = Aes.initEnc(key_data.server_key(@This()).*);
 
@@ -320,34 +371,66 @@ pub const suites = struct {
                     var counterInt = mem.readInt(u128, &j, .Big);
                     var idx: usize = 0;
 
-                    ctr(
-                        @TypeOf(aes),
-                        aes,
-                        buffer[0..actually_read],
-                        encrypted[0..actually_read],
-                        &counterInt,
-                        &idx,
-                        .Big,
-                    );
-
-                    if (actually_read < len) {
-                        state.* = .{
-                            .in_record = .{
-                                .left = len - actually_read,
-                                .aes = aes,
-                                .counterInt = counterInt,
-                                .idx = idx,
-                            },
+                    if (tag_length.tag == 0x15) {
+                        var encrypted: [2]u8 = undefined;
+                        reader.readNoEof(&encrypted) catch |err| switch (err) {
+                            error.EndOfStream => return error.ServerMalformedResponse,
+                            else => |e| return e,
                         };
-                    } else {
-                        // @TODO Verify the message
+
+                        var result: [2]u8 = undefined;
+                        ctr(
+                            @TypeOf(aes),
+                            aes,
+                            &result,
+                            &encrypted,
+                            &counterInt,
+                            &idx,
+                            .Big,
+                        );
                         reader.skipBytes(16, .{}) catch |err| switch (err) {
-                            error.EndOfStream => return 0,
+                            error.EndOfStream => return error.ServerMalformedResponse,
                             else => |e| return e,
                         };
                         server_seq.* += 1;
-                    }
-                    return actually_read;
+                        // CloseNotify
+                        if (result[1] == 0)
+                            return 0;
+                        return alert_byte_to_error(result[1]);
+                    } else if (tag_length.tag == 0x17) {
+                        // Partially decrypt the data.
+                        var encrypted: [buf_size]u8 = undefined;
+                        const actually_read = try reader.read(encrypted[0..curr_bytes]);
+
+                        ctr(
+                            @TypeOf(aes),
+                            aes,
+                            buffer[0..actually_read],
+                            encrypted[0..actually_read],
+                            &counterInt,
+                            &idx,
+                            .Big,
+                        );
+
+                        if (actually_read < len) {
+                            state.* = .{
+                                .in_record = .{
+                                    .left = len - actually_read,
+                                    .aes = aes,
+                                    .counterInt = counterInt,
+                                    .idx = idx,
+                                },
+                            };
+                        } else {
+                            // @TODO Verify the message
+                            reader.skipBytes(16, .{}) catch |err| switch (err) {
+                                error.EndOfStream => return error.ServerMalformedResponse,
+                                else => |e| return e,
+                            };
+                            server_seq.* += 1;
+                        }
+                        return actually_read;
+                    } else unreachable;
                 },
                 .in_record => |*record_info| {
                     const curr_bytes = std.math.min(std.math.min(buf_size, buffer.len), record_info.left);
@@ -368,7 +451,7 @@ pub const suites = struct {
                     if (record_info.left == 0) {
                         // @TODO Verify Poly1305.
                         reader.skipBytes(16, .{}) catch |err| switch (err) {
-                            error.EndOfStream => return 0,
+                            error.EndOfStream => return error.ServerMalformedResponse,
                             else => |e| return e,
                         };
                         state.* = .none;
@@ -394,7 +477,7 @@ fn key_field_width(comptime T: type, comptime field: anytype) ?usize {
     return @typeInfo(field_info.field_type).Array.len;
 }
 
-pub fn key_data_size(comptime ciphersuites: []const type) usize {
+pub fn key_data_size(comptime ciphersuites: anytype) usize {
     var max: usize = 0;
     for (ciphersuites) |cs| {
         const curr = (key_field_width(cs.Keys, .client_mac) orelse 0) +
@@ -409,7 +492,7 @@ pub fn key_data_size(comptime ciphersuites: []const type) usize {
     return max;
 }
 
-pub fn KeyData(comptime ciphersuites: []const type) type {
+pub fn KeyData(comptime ciphersuites: anytype) type {
     return struct {
         data: [key_data_size(ciphersuites)]u8,
 
@@ -455,7 +538,7 @@ pub fn KeyData(comptime ciphersuites: []const type) type {
 }
 
 pub fn key_expansion(
-    comptime ciphersuites: []const type,
+    comptime ciphersuites: anytype,
     tag: u16,
     context: anytype,
     comptime next_32_bytes: anytype,
@@ -505,7 +588,7 @@ pub fn key_expansion(
     unreachable;
 }
 
-pub fn ClientState(comptime ciphersuites: []const type) type {
+pub fn ClientState(comptime ciphersuites: anytype) type {
     var fields: [ciphersuites.len]std.builtin.TypeInfo.UnionField = undefined;
     for (ciphersuites) |cs, i| {
         fields[i] = .{
@@ -524,7 +607,7 @@ pub fn ClientState(comptime ciphersuites: []const type) type {
     });
 }
 
-pub fn client_state_default(comptime ciphersuites: []const type, tag: u16) ClientState(ciphersuites) {
+pub fn client_state_default(comptime ciphersuites: anytype, tag: u16) ClientState(ciphersuites) {
     inline for (ciphersuites) |cs| {
         if (cs.tag == tag) {
             return @unionInit(ClientState(ciphersuites), cs.name, cs.default_state);
