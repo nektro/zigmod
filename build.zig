@@ -1,6 +1,6 @@
 const std = @import("std");
 const Builder = std.build.Builder;
-const builtin = @import("builtin");
+const builtin = std.builtin;
 
 pub fn build(b: *Builder) void {
     const target = b.standardTargetOptions(.{});
