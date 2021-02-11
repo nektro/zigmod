@@ -26,7 +26,7 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("const std = @import(\"std\");\n");
     try w.writeAll("const build = std.build;\n");
     try w.writeAll("\n");
-    try w.print("const cache = \"{s}\";\n", .{std.zig.fmtEscapes(dir)});
+    try w.print("pub const cache = \"{s}\";\n", .{std.zig.fmtEscapes(dir)});
     try w.writeAll("\n");
     try w.print("{s}\n", .{
         \\pub fn addAllTo(exe: *build.LibExeObjStep) void {

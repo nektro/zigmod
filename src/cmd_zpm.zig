@@ -6,7 +6,7 @@ const u = @import("./util/index.zig");
 //
 //
 
-const commands = struct {
+pub const commands = struct {
     const add = @import("./cmd_zpm_add.zig");
 };
 
