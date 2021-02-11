@@ -64,7 +64,7 @@ pub const Module = struct {
             const abs_path = try u.concat(&[_][]const u8{cdpath, "/", self.clean_path, "/", item});
             const file = try std.fs.cwd().openFile(abs_path, .{});
             defer file.close();
-            const input = try file.reader().readAllAlloc(gpa, u.mb);
+            const input = try file.reader().readAllAlloc(gpa, u.mb*100);
             h.update(input);
         }
         var out: [32]u8 = undefined;
