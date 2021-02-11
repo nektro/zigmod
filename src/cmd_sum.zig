@@ -10,10 +10,13 @@ const common = @import("./common.zig");
 
 pub fn execute(args: [][]u8) !void {
     //
-    const home = try known_folders.getPath(gpa, .home);
-    const dir = try std.fs.path.join(gpa, &[_][]const u8{home.?, ".cache", "zigmod", "deps"});
-    const top_module = try common.collect_deps(dir, "zig.mod");
-    
+    const dir = try std.fs.path.join(gpa, &[_][]const u8{".zigmod", "deps"});
+
+    const top_module = try common.collect_deps(dir, "zig.mod", .{
+        .log = false,
+        .update = false,
+    });
+
     //
     const f = try std.fs.cwd().createFile("zig.sum", .{});
     defer f.close();
