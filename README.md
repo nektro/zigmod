@@ -45,22 +45,6 @@ zigmod init [name] [entry_file]
 - `[entry_file]` defaults to `src/main.zig`
 - This command will create a `zig.mod` file in the root of your project. It is in yaml syntax.
 
-<!--
-### `add` command
-```
-zigmod add <type> <path>
-```
-
-- `<type>` is the type of package we're adding.
-- `<path>` is the URL to the package you'd like to include.
-
-#### Available types
-- `system_lib`
-- `git`
-- `hg`
-- `http`
--->
-
 ### `fetch` command
 ```
 zigmod fetch
