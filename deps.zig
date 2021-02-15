@@ -33,6 +33,7 @@ pub const _ids = .{
     "2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf",
     "2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o",
     "csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe",
+    "0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r",
 };
 
 pub const _paths = .{
@@ -42,6 +43,7 @@ pub const _paths = .{
     "/v/git/github.com/ziglibs/known-folders/commit-f0f4188/",
     "/v/git/github.com/Vexu/zuri/commit-0f9cec8/",
     "/v/git/github.com/alexnask/iguanaTLS/commit-58f72f6/",
+    "/v/git/github.com/nektro/zig-licenses/commit-a15ef9b/",
 };
 
 pub const package_data = struct {
@@ -49,6 +51,7 @@ pub const package_data = struct {
     pub const _2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf = build.Pkg{ .name = "known-folders", .path = cache ++ "/v/git/github.com/ziglibs/known-folders/commit-f0f4188/known-folders.zig", .dependencies = &[_]build.Pkg{ } };
     pub const _2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o = build.Pkg{ .name = "zuri", .path = cache ++ "/v/git/github.com/Vexu/zuri/commit-0f9cec8/src/zuri.zig", .dependencies = &[_]build.Pkg{ } };
     pub const _csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe = build.Pkg{ .name = "iguanatls", .path = cache ++ "/v/git/github.com/alexnask/iguanaTLS/commit-58f72f6/src/main.zig", .dependencies = &[_]build.Pkg{ } };
+    pub const _0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r = build.Pkg{ .name = "licenses", .path = cache ++ "/v/git/github.com/nektro/zig-licenses/commit-a15ef9b/src/lib.zig", .dependencies = &[_]build.Pkg{ } };
 };
 
 pub const packages = &[_]build.Pkg{
@@ -56,6 +59,7 @@ pub const packages = &[_]build.Pkg{
     package_data._2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf,
     package_data._2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o,
     package_data._csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe,
+    package_data._0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r,
 };
 
 pub const pkgs = struct {
@@ -63,6 +67,7 @@ pub const pkgs = struct {
     pub const known_folders = packages[2];
     pub const zuri = packages[3];
     pub const iguanatls = packages[4];
+    pub const licenses = packages[5];
 };
 
 pub const c_include_dirs = &[_][]const u8{
@@ -76,6 +81,7 @@ pub const c_source_flags = struct {
     pub const @"2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf" = &[_][]const u8{};
     pub const @"2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o" = &[_][]const u8{};
     pub const @"csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe" = &[_][]const u8{};
+    pub const @"0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r" = &[_][]const u8{};
 };
 
 pub const c_source_files = &[_][2][]const u8{

@@ -102,6 +102,7 @@ dependencies:
 | `c_include_dirs` | `[]string` | | A list of relative paths to directories with `.h` files |
 | `c_source_flags` | `[]string` | | A list of clang flags to pass to each of the `.c` files in `c_source_files` |
 | `c_source_files` | `[]string` | | A list of relative paths to `.c` files to compile along with project |
+| `license` | `string` | | A SPDX License Identifier specifying the license covering the code in this package. |
 | `dependencies` | `[]Dep` | | An array of dependency objects |
 
 #### Dep object
