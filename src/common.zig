@@ -154,3 +154,13 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
         .except_os = &[_][]const u8{},
     };
 }
+
+pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void {
+    if (u.list_contains_gen(u.Module, list, mod)) {
+        return;
+    }
+    try list.append(mod);
+    for (mod.deps) |d| {
+        try collect_pkgs(d, list);
+    }
+}

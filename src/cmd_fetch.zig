@@ -55,7 +55,7 @@ pub fn execute(args: [][]u8) !void {
     });
 
     const list = &std.ArrayList(u.Module).init(gpa);
-    try collect_pkgs(top_module, list);
+    try common.collect_pkgs(top_module, list);
 
     try w.writeAll("pub const _ids = .{\n");
     try print_ids(w, list.items);
@@ -199,17 +199,6 @@ fn print_sys_libs_to(w: fs.File.Writer, list: []u.Module, list2: *std.ArrayList(
             continue;
         }
         try w.print("    \"{s}\",\n", .{mod.name});
-    }
-}
-
-fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void {
-    //
-    if (u.list_contains_gen(u.Module, list, mod)) {
-        return;
-    }
-    try list.append(mod);
-    for (mod.deps) |d| {
-        try collect_pkgs(d, list);
     }
 }
 
