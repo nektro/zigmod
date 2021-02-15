@@ -110,6 +110,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
                     .c_source_files = &[_][]const u8{},
                     .deps = &[_]u.Module{},
                     .clean_path = d.path,
+                    .yaml = null,
                 });
             },
             else => blk: {
@@ -152,6 +153,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
         .clean_path = "",
         .only_os = &[_][]const u8{},
         .except_os = &[_][]const u8{},
+        .yaml = m.yaml,
     };
 }
 

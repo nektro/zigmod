@@ -21,6 +21,7 @@ pub const ModFile = struct {
     c_source_flags: [][]const u8,
     c_source_files: [][]const u8,
     deps: []u.Dep,
+    yaml: yaml.Mapping,
 
     pub fn init(alloc: *std.mem.Allocator, fpath: []const u8) !Self {
         //
@@ -76,6 +77,7 @@ pub const ModFile = struct {
             .c_source_flags = try doc.mapping.get_string_array(alloc, "c_source_flags"),
             .c_source_files = try doc.mapping.get_string_array(alloc, "c_source_files"),
             .deps = dep_list.items,
+            .yaml = doc.mapping,
         };
     }
 };

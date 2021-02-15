@@ -3,6 +3,7 @@ const gpa = std.heap.c_allocator;
 const builtin = @import("builtin");
 
 const u = @import("index.zig");
+const yaml = @import("./yaml.zig");
 
 //
 //
@@ -17,6 +18,7 @@ pub const Module = struct {
     c_source_files: [][]const u8,
     only_os: [][]const u8,
     except_os: [][]const u8,
+    yaml: ?yaml.Mapping,
 
     deps: []Module,
     clean_path: []const u8,
@@ -34,6 +36,7 @@ pub const Module = struct {
             .clean_path = try dep.clean_path(),
             .only_os = dep.only_os,
             .except_os = dep.except_os,
+            .yaml = null,
         };
     }
 
