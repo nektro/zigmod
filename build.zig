@@ -1,6 +1,7 @@
 const std = @import("std");
 const Builder = std.build.Builder;
 const builtin = std.builtin;
+const deps = @import("./deps.zig");
 
 pub fn build(b: *Builder) void {
     const target = b.standardTargetOptions(.{});
@@ -16,30 +17,34 @@ pub fn build(b: *Builder) void {
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.addBuildOption([]const u8, "version", b.option([]const u8, "tag", "") orelse "dev");
+    const bootstrap = b.option(bool, "bootstrap", "bootstrapping with just the zig compiler");
+    exe.addBuildOption(bool, "bootstrap", bootstrap != null);
 
-    exe.linkLibC();
+    if (bootstrap != null) {
+        exe.linkLibC();
 
-    exe.addIncludeDir("./libs/yaml/include");
-    exe.addCSourceFile("./libs/yaml/src/api.c", &[_][]const u8{
-        // taken from https://github.com/yaml/libyaml/blob/0.2.5/CMakeLists.txt#L5-L8
-        "-DYAML_VERSION_MAJOR=0",
-        "-DYAML_VERSION_MINOR=2",
-        "-DYAML_VERSION_PATCH=5",
-        "-DYAML_VERSION_STRING=\"0.2.5\"",
-        "-DYAML_DECLARE_STATIC=1",
-    });
-    exe.addCSourceFile("./libs/yaml/src/dumper.c", &[_][]const u8{});
-    exe.addCSourceFile("./libs/yaml/src/emitter.c", &[_][]const u8{});
-    exe.addCSourceFile("./libs/yaml/src/loader.c", &[_][]const u8{});
-    exe.addCSourceFile("./libs/yaml/src/parser.c", &[_][]const u8{});
-    exe.addCSourceFile("./libs/yaml/src/reader.c", &[_][]const u8{});
-    exe.addCSourceFile("./libs/yaml/src/scanner.c", &[_][]const u8{});
-    exe.addCSourceFile("./libs/yaml/src/writer.c", &[_][]const u8{});
+        exe.addIncludeDir("./libs/yaml/include");
+        exe.addCSourceFile("./libs/yaml/src/api.c", &[_][]const u8{
+            // taken from https://github.com/yaml/libyaml/blob/0.2.5/CMakeLists.txt#L5-L8
+            "-DYAML_VERSION_MAJOR=0",
+            "-DYAML_VERSION_MINOR=2",
+            "-DYAML_VERSION_PATCH=5",
+            "-DYAML_VERSION_STRING=\"0.2.5\"",
+            "-DYAML_DECLARE_STATIC=1",
+        });
+        exe.addCSourceFile("./libs/yaml/src/dumper.c", &[_][]const u8{});
+        exe.addCSourceFile("./libs/yaml/src/emitter.c", &[_][]const u8{});
+        exe.addCSourceFile("./libs/yaml/src/loader.c", &[_][]const u8{});
+        exe.addCSourceFile("./libs/yaml/src/parser.c", &[_][]const u8{});
+        exe.addCSourceFile("./libs/yaml/src/reader.c", &[_][]const u8{});
+        exe.addCSourceFile("./libs/yaml/src/scanner.c", &[_][]const u8{});
+        exe.addCSourceFile("./libs/yaml/src/writer.c", &[_][]const u8{});
 
-    exe.addPackagePath("known-folders", "./libs/zig-known-folders/known-folders.zig");
-    exe.addPackagePath("ansi", "./libs/zig-ansi/src/lib.zig");
-    exe.addPackagePath("zuri", "./libs/zuri/src/zuri.zig");
-    exe.addPackagePath("iguanatls", "./libs/iguanatls/src/main.zig");
+        exe.addPackagePath("ansi", "./libs/zig-ansi/src/lib.zig");
+    }
+    else {
+        deps.addAllTo(exe);
+    }
 
     exe.install();
 

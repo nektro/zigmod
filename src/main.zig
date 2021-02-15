@@ -1,11 +1,16 @@
 const std = @import("std");
 const builtin = @import("builtin");
+const build_options = @import("build_options");
 
 pub const u = @import("./util/index.zig");
 pub const common = @import("./common.zig");
 
 //
 //
+
+pub const commands_to_bootstrap = struct {
+    const fetch = @import("./cmd_fetch.zig");
+};
 
 pub const commands = struct {
     const init = @import("./cmd_init.zig");
@@ -31,9 +36,11 @@ pub fn main() !void {
         return;
     }
 
-    inline for (std.meta.declarations(commands)) |decl| {
+    const available = if (build_options.bootstrap) commands_to_bootstrap else commands;
+
+    inline for (std.meta.declarations(available)) |decl| {
         if (std.mem.eql(u8, args[0], decl.name)) {
-            const cmd = @field(commands, decl.name);
+            const cmd = @field(available, decl.name);
             try cmd.execute(args[1..]);
             return;
         }

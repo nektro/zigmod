@@ -24,6 +24,8 @@ A package manager for the Zig programming language.
 Initially,
 ```
 $ git clone https://github.com/nektro/zigmod --recursive
+$ zig build -Dbootstrap
+$ ./zig-cache/bin/zigmod fetch
 ```
 
 To build,
