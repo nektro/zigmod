@@ -18,6 +18,8 @@ jobs:
       - run: ./download_zig.sh 0.8.0-dev.1127+6a5a6386c
       - run: zig version
       - run: zig env
+      - run: zig build -Dbootstrap
+      - run: ./zig-cache/bin/zigmod fetch
       - run: ./build_all_zig.sh
       - store_artifacts:
           path: ./zig-cache/bin/
