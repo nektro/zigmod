@@ -82,8 +82,6 @@ pub const c_source_flags = struct {
     pub const @"2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o" = &.{};
     pub const @"csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe" = &.{};
     pub const @"0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r" = &.{};
-    pub const @"aoe2l16htluewam6bfwvv0khsbbno8g8jd7suonifg74u7kd" = &.{};
-    pub const @"i1z0p8v0459f4paad9vphk5osu8cwvnnv1kesqencbpbl6u3" = &.{};
 };
 
 pub const c_source_files = &[_][2][]const u8{
