@@ -33,7 +33,10 @@ pub fn execute(args: [][]u8) !void {
     const unspecified_list = &List.init(gpa);
 
     for (master_list.items) |item| {
-        if (item.yaml == null) continue;
+        if (item.yaml == null) {
+            try unspecified_list.append(item);
+            continue;
+        }
         const license_code = item.yaml.?.get_string("license");
         if (license_code.len == 0) {
             try unspecified_list.append(item);
