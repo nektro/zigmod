@@ -17,6 +17,7 @@ pub const commands = struct {
     const fetch = @import("./cmd_fetch.zig");
     const sum = @import("./cmd_sum.zig");
     const zpm = @import("./cmd_zpm.zig");
+    const license = @import("./cmd/license.zig");
 };
 
 pub fn main() !void {
