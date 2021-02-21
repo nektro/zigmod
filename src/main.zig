@@ -9,15 +9,15 @@ pub const common = @import("./common.zig");
 //
 
 pub const commands_to_bootstrap = struct {
-    const fetch = @import("./cmd_fetch.zig");
+    pub const fetch = @import("./cmd_fetch.zig");
 };
 
 pub const commands = struct {
-    const init = @import("./cmd_init.zig");
-    const fetch = @import("./cmd_fetch.zig");
-    const sum = @import("./cmd_sum.zig");
-    const zpm = @import("./cmd_zpm.zig");
-    const license = @import("./cmd/license.zig");
+    pub const init = @import("./cmd_init.zig");
+    pub const fetch = @import("./cmd_fetch.zig");
+    pub const sum = @import("./cmd_sum.zig");
+    pub const zpm = @import("./cmd_zpm.zig");
+    pub const license = @import("./cmd/license.zig");
 };
 
 pub fn main() !void {

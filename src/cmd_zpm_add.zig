@@ -8,7 +8,7 @@ const u = @import("./util/index.zig");
 //
 //
 
-const Zpm = struct {
+pub const Zpm = struct {
     pub const Package = struct {
         author: []const u8,
         name: []const u8,

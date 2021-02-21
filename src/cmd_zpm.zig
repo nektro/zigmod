@@ -7,7 +7,7 @@ const u = @import("./util/index.zig");
 //
 
 pub const commands = struct {
-    const add = @import("./cmd_zpm_add.zig");
+    pub const add = @import("./cmd_zpm_add.zig");
 };
 
 pub fn execute(args: [][]u8) !void {
