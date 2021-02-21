@@ -16,17 +16,17 @@ pub const DepType = enum {
         switch (self) {
             .system_lib => {},
             .git => {
-                _ = try u.run_cmd(null, &[_][]const u8{"git", "clone", "--recurse-submodules", rpath, dpath});
+                _ = try u.run_cmd(null, &.{"git", "clone", "--recurse-submodules", rpath, dpath});
             },
             .hg => {
-                _ = try u.run_cmd(null, &[_][]const u8{"hg", "clone", rpath, dpath});
+                _ = try u.run_cmd(null, &.{"hg", "clone", rpath, dpath});
             },
             .http => {
                 try u.mkdir_all(dpath);
-                _ = try u.run_cmd(dpath, &[_][]const u8{"wget", rpath});
+                _ = try u.run_cmd(dpath, &.{"wget", rpath});
                 const f = rpath[std.mem.lastIndexOf(u8, rpath, "/").?+1..];
                 if (std.mem.endsWith(u8, f, ".zip")) {
-                    _ = try u.run_cmd(dpath, &[_][]const u8{"unzip", f, "-d", "."});
+                    _ = try u.run_cmd(dpath, &.{"unzip", f, "-d", "."});
                 }
                 if (
                     std.mem.endsWith(u8, f, ".tar")
@@ -34,7 +34,7 @@ pub const DepType = enum {
                     or std.mem.endsWith(u8, f, ".tar.xz")
                     or std.mem.endsWith(u8, f, ".tar.zst")
                 ) {
-                    _ = try u.run_cmd(dpath, &[_][]const u8{"tar", "-xf", f, "-C", "."});
+                    _ = try u.run_cmd(dpath, &.{"tar", "-xf", f, "-C", "."});
                 }
             },
         }
@@ -44,11 +44,11 @@ pub const DepType = enum {
         switch (self) {
             .system_lib => {},
             .git => {
-                _ = try u.run_cmd(dpath, &[_][]const u8{"git", "fetch"});
-                _ = try u.run_cmd(dpath, &[_][]const u8{"git", "pull"});
+                _ = try u.run_cmd(dpath, &.{"git", "fetch"});
+                _ = try u.run_cmd(dpath, &.{"git", "pull"});
             },
             .hg => {
-                _ = try u.run_cmd(dpath, &[_][]const u8{"hg", "pull"});
+                _ = try u.run_cmd(dpath, &.{"hg", "pull"});
             },
             .http => {
                 //

@@ -42,10 +42,10 @@ fn detct_mainfile(def: []const u8) ![]const u8 {
             }
         }
     }
-    if (try u.does_file_exist(try std.fs.path.join(gpa, &[_][]const u8{"src", "lib.zig"}))) {
+    if (try u.does_file_exist(try std.fs.path.join(gpa, &.{"src", "lib.zig"}))) {
         return "src/lib.zig";
     }
-    if (try u.does_file_exist(try std.fs.path.join(gpa, &[_][]const u8{"src", "main.zig"}))) {
+    if (try u.does_file_exist(try std.fs.path.join(gpa, &.{"src", "main.zig"}))) {
         return "src/main.zig";
     }
     u.assert(false, "unable to detect package entry point", .{});

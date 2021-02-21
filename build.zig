@@ -24,7 +24,7 @@ pub fn build(b: *Builder) void {
         exe.linkLibC();
 
         exe.addIncludeDir("./libs/yaml/include");
-        exe.addCSourceFile("./libs/yaml/src/api.c", &[_][]const u8{
+        exe.addCSourceFile("./libs/yaml/src/api.c", &.{
             // taken from https://github.com/yaml/libyaml/blob/0.2.5/CMakeLists.txt#L5-L8
             "-DYAML_VERSION_MAJOR=0",
             "-DYAML_VERSION_MINOR=2",
@@ -32,13 +32,13 @@ pub fn build(b: *Builder) void {
             "-DYAML_VERSION_STRING=\"0.2.5\"",
             "-DYAML_DECLARE_STATIC=1",
         });
-        exe.addCSourceFile("./libs/yaml/src/dumper.c", &[_][]const u8{});
-        exe.addCSourceFile("./libs/yaml/src/emitter.c", &[_][]const u8{});
-        exe.addCSourceFile("./libs/yaml/src/loader.c", &[_][]const u8{});
-        exe.addCSourceFile("./libs/yaml/src/parser.c", &[_][]const u8{});
-        exe.addCSourceFile("./libs/yaml/src/reader.c", &[_][]const u8{});
-        exe.addCSourceFile("./libs/yaml/src/scanner.c", &[_][]const u8{});
-        exe.addCSourceFile("./libs/yaml/src/writer.c", &[_][]const u8{});
+        exe.addCSourceFile("./libs/yaml/src/dumper.c", &.{});
+        exe.addCSourceFile("./libs/yaml/src/emitter.c", &.{});
+        exe.addCSourceFile("./libs/yaml/src/loader.c", &.{});
+        exe.addCSourceFile("./libs/yaml/src/parser.c", &.{});
+        exe.addCSourceFile("./libs/yaml/src/reader.c", &.{});
+        exe.addCSourceFile("./libs/yaml/src/scanner.c", &.{});
+        exe.addCSourceFile("./libs/yaml/src/writer.c", &.{});
 
         exe.addPackagePath("ansi", "./libs/zig-ansi/src/lib.zig");
     }

@@ -11,7 +11,7 @@ const common = @import("./common.zig");
 
 pub fn execute(args: [][]u8) !void {
     //
-    const dir = try fs.path.join(gpa, &[_][]const u8{".zigmod", "deps"});
+    const dir = try fs.path.join(gpa, &.{".zigmod", "deps"});
 
     const top_module = try common.collect_deps(dir, "zig.mod", .{
         .log = true,
@@ -146,7 +146,7 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
             try w.print("    package_data._{s},\n", .{d.id});
         }
     }
-    try w.print("{s}", .{try u.concat(&[_][]const u8{r,"}"})});
+    try w.print("{s}", .{try u.concat(&.{r,"}"})});
 }
 
 fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
@@ -184,7 +184,7 @@ fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
         if (mod.is_sys_lib) {
             continue;
         }
-        try w.print("    pub const @\"{s}\" = {s}", .{mod.id, "&[_][]const u8{"});
+        try w.print("    pub const @\"{s}\" = {s}", .{mod.id, "&.{"});
         for (mod.c_source_flags) |it| {
             try w.print("\"{s}\",", .{std.zig.fmtEscapes(it)});
         }

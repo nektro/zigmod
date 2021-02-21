@@ -17,8 +17,8 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     var moddir: []const u8 = undefined;
     for (m.deps) |d| {
-        const p = try fs.path.join(gpa, &[_][]const u8{dir, try d.clean_path()});
-        const pv = try fs.path.join(gpa, &[_][]const u8{dir, try d.clean_path_v()});
+        const p = try fs.path.join(gpa, &.{dir, try d.clean_path()});
+        const pv = try fs.path.join(gpa, &.{dir, try d.clean_path_v()});
         if (options.log) { u.print("fetch: {s}: {s}: {s}", .{m.name, @tagName(d.type), d.path}); }
         moddir = p;
         switch (d.type) {
@@ -48,13 +48,13 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
                         moddir = pv;
                         break :blk;
                     }
-                    if ((try u.run_cmd(p, &[_][]const u8{"git", "checkout", vers.string})) > 0) {
+                    if ((try u.run_cmd(p, &.{"git", "checkout", vers.string})) > 0) {
                         u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{d.path, @tagName(vers.id), vers.string});
                     } else {
-                        _ = try u.run_cmd(p, &[_][]const u8{"git", "checkout", "-"});
+                        _ = try u.run_cmd(p, &.{"git", "checkout", "-"});
                     }
                     try d.type.pull(d.path, pv);
-                    _ = try u.run_cmd(pv, &[_][]const u8{"git", "checkout", vers.string});
+                    _ = try u.run_cmd(pv, &.{"git", "checkout", vers.string});
                     if (vers.id != .branch) {
                         const pvd = try std.fs.cwd().openDir(pv, .{});
                         try pvd.deleteTree(".git");
@@ -77,7 +77,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
                 }
                 const file_name = try u.last(try u.split(d.path, "/"));
                 if (d.version.len > 0) {
-                    const file_path = try std.fs.path.join(gpa, &[_][]const u8{pv, file_name});
+                    const file_path = try std.fs.path.join(gpa, &.{pv, file_name});
                     try d.type.pull(d.path, pv);
                     if (try u.validate_hash(try u.last(try u.split(pv, "/")), file_path)) {
                         try std.fs.deleteFileAbsolute(file_path);
@@ -91,7 +91,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
                 if (try u.does_folder_exist(p)) {
                     try u.rm_recv(p);
                 }
-                const file_path = try std.fs.path.join(gpa, &[_][]const u8{p, file_name});
+                const file_path = try std.fs.path.join(gpa, &.{p, file_name});
                 try d.type.pull(d.path, p);
                 try std.fs.deleteFileAbsolute(file_path);
             },
@@ -105,16 +105,16 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
                     .only_os = d.only_os,
                     .except_os = d.except_os,
                     .main = "",
-                    .c_include_dirs = &[_][]const u8{},
-                    .c_source_flags = &[_][]const u8{},
-                    .c_source_files = &[_][]const u8{},
+                    .c_include_dirs = &.{},
+                    .c_source_flags = &.{},
+                    .c_source_files = &.{},
                     .deps = &[_]u.Module{},
                     .clean_path = d.path,
                     .yaml = null,
                 });
             },
             else => blk: {
-                var dd = try collect_deps(dir, try u.concat(&[_][]const u8{moddir, "/zig.mod"}), options) catch |e| switch (e) {
+                var dd = try collect_deps(dir, try u.concat(&.{moddir, "/zig.mod"}), options) catch |e| switch (e) {
                     error.FileNotFound => {
                         if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                             var mod_from = try u.Module.from(d);
@@ -151,8 +151,8 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
         .c_source_files = m.c_source_files,
         .deps = moduledeps.items,
         .clean_path = "",
-        .only_os = &[_][]const u8{},
-        .except_os = &[_][]const u8{},
+        .only_os = &.{},
+        .except_os = &.{},
         .yaml = m.yaml,
     };
 }

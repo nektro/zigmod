@@ -210,7 +210,7 @@ pub fn rm_recv(path: []const u8) anyerror!void {
         const dir = std.fs.cwd().openDir(abs_path, .{ .iterate=true, }) catch unreachable;
         var iter = dir.iterate();
         while (try iter.next()) |item| {
-            try rm_recv(try std.fs.path.join(gpa, &[_][]const u8{abs_path, item.name}));
+            try rm_recv(try std.fs.path.join(gpa, &.{abs_path, item.name}));
         }
         try std.fs.deleteDirAbsolute(abs_path);
     }
