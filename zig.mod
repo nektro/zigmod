@@ -34,7 +34,7 @@ dependencies:
     version: commit-f0f4188
 
   - src: git https://github.com/Vexu/zuri
-    version: commit-0f9cec8
+    version: commit-41bcd78
 
   - src: git https://github.com/alexnask/iguanaTLS
     version: commit-58f72f6
