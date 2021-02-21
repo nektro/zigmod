@@ -38,7 +38,7 @@ pub fn execute(args: [][]u8) !void {
     try w.print("GET {s} HTTP/1.1\r\n", .{url.path});
     try w.print("Host: {s}:{}\r\n", .{url.host.name, url.port.?});
     try w.writeAll("Accept: application/json; charset=UTF-8\r\n");
-    try w.writeAll("Connection: Close\r\n");
+    try w.writeAll("Connection: close\r\n");
     try w.writeAll("\r\n");
 
     const r = client.reader();
