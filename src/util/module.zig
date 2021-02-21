@@ -36,7 +36,7 @@ pub const Module = struct {
             .clean_path = try dep.clean_path(),
             .only_os = dep.only_os,
             .except_os = dep.except_os,
-            .yaml = null,
+            .yaml = dep.yaml,
         };
     }
 
