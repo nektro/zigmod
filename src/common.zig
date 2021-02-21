@@ -118,7 +118,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
                     error.FileNotFound => {
                         if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                             var mod_from = try u.Module.from(d);
-                            mod_from.id = try u.random_string(48);
+                            if (mod_from.id.len == 0) mod_from.id = try u.random_string(48);
                             mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
                             if (mod_from.is_for_this()) try moduledeps.append(mod_from);
                         }

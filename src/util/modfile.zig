@@ -54,7 +54,7 @@ pub const ModFile = struct {
                     try dep_list.append(u.Dep{
                         .type = dep_type,
                         .path = path,
-                        .id = "",
+                        .id = item.mapping.get_string("id"),
                         .name = item.mapping.get_string("name"),
                         .main = item.mapping.get_string("main"),
                         .version = item.mapping.get_string("version"),
