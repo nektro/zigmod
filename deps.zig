@@ -75,13 +75,7 @@ pub const c_include_dirs = &[_][]const u8{
 };
 
 pub const c_source_flags = struct {
-    pub const @"89ujp8gq842x6mzok8feypwze138n2d96zpugw44hcq7406r" = &.{};
     pub const @"8mdbh0zuneb0i3hs5jby5je0heem1i6yxusl7c8y8qx68hqc" = &.{"-DYAML_VERSION_MAJOR=0","-DYAML_VERSION_MINOR=2","-DYAML_VERSION_PATCH=5","-DYAML_VERSION_STRING=\"0.2.5\"","-DYAML_DECLARE_STATIC=1",};
-    pub const @"s84v9o48ucb0xq0cmzq0cn433hgw0iaqztugja16h8bzxu3h" = &.{};
-    pub const @"2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf" = &.{};
-    pub const @"2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o" = &.{};
-    pub const @"csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe" = &.{};
-    pub const @"0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r" = &.{};
 };
 
 pub const c_source_files = &[_][2][]const u8{
