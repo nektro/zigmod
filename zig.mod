@@ -5,6 +5,8 @@ license: MIT
 dependencies:
   - src: git https://github.com/yaml/libyaml
     version: tag-0.2.5
+    id: 8mdbh0zuneb0i3hs5jby5je0heem1i6yxusl7c8y8qx68hqc
+    license: MIT
     c_include_dirs:
       - include
     c_source_flags:
