@@ -1,15 +1,6 @@
 [submodule "libs/yaml"]
 	path = libs/yaml
 	url = https://github.com/yaml/libyaml
-[submodule "libs/zig-known-folders"]
-	path = libs/zig-known-folders
-	url = https://github.com/ziglibs/known-folders
 [submodule "libs/zig-ansi"]
 	path = libs/zig-ansi
 	url = https://github.com/nektro/zig-ansi
-[submodule "libs/zuri"]
-	path = libs/zuri
-	url = https://github.com/Vexu/zuri
-[submodule "libs/iguanatls"]
-	path = libs/iguanatls
-	url = https://github.com/alexnask/iguanaTLS
