@@ -28,7 +28,9 @@ dependencies:
   - src: git https://github.com/nektro/zig-ansi
     version: commit-25039ca
 
-  #
+  # Entries above this line are needed to bootstrap and kept as git submodules
+  # --------
+  # Entries below this line are only fetched with zigmod itself 
 
   - src: git https://github.com/ziglibs/known-folders
     version: commit-f0f4188
