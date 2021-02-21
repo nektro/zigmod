@@ -42,19 +42,13 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("\r\n");
 
     const r = client.reader();
-    const stdout = std.io.getStdOut();
     var buf: [1]u8 = undefined;
     const data = &std.ArrayList(u8).init(gpa);
     while (true) {
-        // const len = try r.read(&buf);
-        // if (len == 0) {
-        //     break;
-        // }
-        // TODO: workaround for https://github.com/alexnask/iguanaTLS/issues/7
-        const len = r.read(&buf) catch |err| switch (err) {
-            error.ServerMalformedResponse => break,
-            else => 0,
-        };
+        const len = try r.read(&buf);
+        if (len == 0) {
+            break;
+        }
         try data.appendSlice(buf[0..len]);
     }
 
