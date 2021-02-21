@@ -81,6 +81,7 @@ pub fn execute(args: [][]u8) !void {
     try file.seekTo(try file.getEndPos());
     
     const file_w = file.writer();
+    try file_w.print("\n", .{});
     try file_w.print("  - src: git {s}\n", .{found.git});
     try file_w.print("    name: {s}\n", .{found.name});
     try file_w.print("    main: {s}\n", .{found.root_file.?[1..]});
