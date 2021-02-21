@@ -27,6 +27,7 @@ pub fn execute(args: [][]u8) !void {
     try dedupe_mod_list(module_list, top_module);
 
     for (module_list.items) |m| {
+        if (m.clean_path.len == 0) { continue; }
         const hash = try m.get_hash(dir);
         try w.print("{s} {s}\n", .{hash, m.clean_path});
     }
