@@ -42,7 +42,7 @@ pub const _paths = .{
     "/v/git/github.com/nektro/zig-ansi/commit-25039ca/",
     "/v/git/github.com/ziglibs/known-folders/commit-f0f4188/",
     "/v/git/github.com/Vexu/zuri/commit-41bcd78/",
-    "/v/git/github.com/alexnask/iguanaTLS/commit-58f72f6/",
+    "/v/git/github.com/alexnask/iguanaTLS/commit-2c21764/",
     "/v/git/github.com/nektro/zig-licenses/commit-a15ef9b/",
 };
 
@@ -50,7 +50,7 @@ pub const package_data = struct {
     pub const _s84v9o48ucb0xq0cmzq0cn433hgw0iaqztugja16h8bzxu3h = build.Pkg{ .name = "ansi", .path = cache ++ "/v/git/github.com/nektro/zig-ansi/commit-25039ca/src/lib.zig", .dependencies = &[_]build.Pkg{ } };
     pub const _2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf = build.Pkg{ .name = "known-folders", .path = cache ++ "/v/git/github.com/ziglibs/known-folders/commit-f0f4188/known-folders.zig", .dependencies = &[_]build.Pkg{ } };
     pub const _2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o = build.Pkg{ .name = "zuri", .path = cache ++ "/v/git/github.com/Vexu/zuri/commit-41bcd78/src/zuri.zig", .dependencies = &[_]build.Pkg{ } };
-    pub const _csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe = build.Pkg{ .name = "iguanatls", .path = cache ++ "/v/git/github.com/alexnask/iguanaTLS/commit-58f72f6/src/main.zig", .dependencies = &[_]build.Pkg{ } };
+    pub const _csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe = build.Pkg{ .name = "iguanatls", .path = cache ++ "/v/git/github.com/alexnask/iguanaTLS/commit-2c21764/src/main.zig", .dependencies = &[_]build.Pkg{ } };
     pub const _0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r = build.Pkg{ .name = "licenses", .path = cache ++ "/v/git/github.com/nektro/zig-licenses/commit-a15ef9b/src/lib.zig", .dependencies = &[_]build.Pkg{ } };
 };
 

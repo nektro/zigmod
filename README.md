@@ -18,7 +18,7 @@ A package manager for the Zig programming language.
 
 ## Built With
 - Zig master
-- 0.8.0-dev.1127+6a5a6386c
+- `0.8.0-dev.1158+0aef1faa8`
 
 ### Build from Source
 Initially,

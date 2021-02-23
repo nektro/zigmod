@@ -8,13 +8,13 @@ You can learn more about Zig here:
 
 The rest of this documentation will assume you already have Zig installed.
 
-As Zig is still in development itself, if you plan to contribute to Zigmod you will need a master download of Zig. Those can be obtained from https://ziglang.org/download/#release-master. The most recent release Zigmod was verified to work with is `0.8.0-dev.1127+6a5a6386c`.
+As Zig is still in development itself, if you plan to contribute to Zigmod you will need a master download of Zig. Those can be obtained from https://ziglang.org/download/#release-master. The most recent release Zigmod was verified to work with is `0.8.0-dev.1158+0aef1faa8`.
 
 ## Download
 You may download a precompiled binary from https://github.com/nektro/zigmod/releases or build the project from source.
 
 ### Build Zigmod from source
-Assuming you have Zig master `0.8.0-dev.1127+6a5a6386c` installed,
+Assuming you have Zig master installed,
 ```
 $ git clone https://github.com/nektro/zigmod --recursive
 $ cd zigmod

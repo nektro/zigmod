@@ -39,7 +39,7 @@ dependencies:
     version: commit-41bcd78
 
   - src: git https://github.com/alexnask/iguanaTLS
-    version: commit-58f72f6
+    version: commit-2c21764
   
   - src: git https://github.com/nektro/zig-licenses
     version: commit-a15ef9b
