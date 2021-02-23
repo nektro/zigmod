@@ -42,4 +42,4 @@ dependencies:
     version: commit-2c21764
   
   - src: git https://github.com/nektro/zig-licenses
-    version: commit-a15ef9b
+    version: commit-73bc493
