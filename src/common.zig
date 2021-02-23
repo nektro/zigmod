@@ -15,6 +15,7 @@ pub const CollectOptions = struct {
 pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: CollectOptions) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
+    const tempdir = try fs.path.join(gpa, &.{dir, "temp"});
     var moddir: []const u8 = undefined;
     for (m.deps) |d| {
         const p = try fs.path.join(gpa, &.{dir, try d.clean_path()});
@@ -26,12 +27,6 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
                 // no op
             },
             .git => blk: {
-                if (!try u.does_folder_exist(p)) {
-                    try d.type.pull(d.path, p);
-                }
-                else {
-                    if (options.update) { try d.type.update(p, d.path); }
-                }
                 if (d.version.len > 0) {
                     const vers = u.parse_split(u.GitVersionType, "-").do(d.version) catch |e| switch (e) {
                         error.IterEmpty => unreachable,
@@ -43,23 +38,30 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
                     };
                     if (try u.does_folder_exist(pv)) {
                         if (vers.id == .branch) {
-                            if (options.update) { try d.type.update(p, d.path); }
+                            if (options.update) { try d.type.update(pv, d.path); }
                         }
                         moddir = pv;
                         break :blk;
                     }
-                    if ((try u.run_cmd(p, &.{"git", "checkout", vers.string})) > 0) {
+                    try d.type.pull(d.path, tempdir);
+                    if ((try u.run_cmd(tempdir, &.{"git", "checkout", vers.string})) > 0) {
                         u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{d.path, @tagName(vers.id), vers.string});
-                    } else {
-                        _ = try u.run_cmd(p, &.{"git", "checkout", "-"});
                     }
-                    try d.type.pull(d.path, pv);
-                    _ = try u.run_cmd(pv, &.{"git", "checkout", vers.string});
+                    const td_fd = try fs.cwd().openDir(dir, .{});
+                    try u.mkdir_all(pv);
+                    try td_fd.rename("temp", try d.clean_path_v());
                     if (vers.id != .branch) {
                         const pvd = try std.fs.cwd().openDir(pv, .{});
                         try pvd.deleteTree(".git");
                     }
                     moddir = pv;
+                    break :blk;
+                }
+                if (!try u.does_folder_exist(p)) {
+                    try d.type.pull(d.path, p);
+                }
+                else {
+                    if (options.update) { try d.type.update(p, d.path); }
                 }
             },
             .hg => {
