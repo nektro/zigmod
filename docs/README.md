@@ -37,7 +37,7 @@ $ zigmod init
 ```
 
 ## Principles
-Zigmod is but a prototype and not the official Zig package manager. As such I wanted to lay out some of the guiding principles learned/used when making the project. You can find that documen [here](./principles.md).
+Zigmod is but a prototype and not the official Zig package manager. As such I wanted to lay out some of the guiding principles learned/used when making the project. You can find that document [here](./principles.md).
 
 ## Contact
 - https://github.com/nektro/zigmod/issues
