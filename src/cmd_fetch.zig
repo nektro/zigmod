@@ -184,7 +184,7 @@ fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
         if (mod.is_sys_lib) {
             continue;
         }
-        if (mod.c_source_flags.len == 0) {
+        if (mod.c_source_flags.len == 0 and mod.c_source_files.len == 0) {
             continue;
         }
         try w.print("    pub const @\"{s}\" = {s}", .{mod.id, "&.{"});
