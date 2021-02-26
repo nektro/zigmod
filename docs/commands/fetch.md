@@ -6,6 +6,8 @@ zigmod fetch
 - This command takes no parameters and will generate a `deps.zig` in the root of your project.
 - `deps.zig` is not typically checked into your source control.
 
+For a full reference on the fields available in `deps.zig` you can check [here](../deps.zig.md).
+
 ### Adding `deps.zig` to your `build.zig`
 ```diff
  const std = @import("std");
