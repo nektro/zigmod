@@ -3,7 +3,7 @@ const gpa = std.heap.c_allocator;
 
 const zuri = @import("zuri");
 const iguanatls = @import("iguanatls");
-const u = @import("./util/index.zig");
+const u = @import("./../util/index.zig");
 
 //
 //

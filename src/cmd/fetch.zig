@@ -3,8 +3,8 @@ const gpa = std.heap.c_allocator;
 const fs = std.fs;
 
 const known_folders = @import("known-folders");
-const u = @import("./util/index.zig");
-const common = @import("./common.zig");
+const u = @import("./../util/index.zig");
+const common = @import("./../common.zig");
 
 //
 //
