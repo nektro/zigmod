@@ -1,27 +1,88 @@
 ## `zig.mod` Reference
-| Name | Type | Note | Description |
-|------|------|------|-------------|
-| `name` | `string` | required | The value users will put into `@import` |
-| `main` | `string` | required | The `.zig` entry point into your package |
-| `c_include_dirs` | `[]string` | | A list of relative paths to directories with `.h` files |
-| `c_source_flags` | `[]string` | | A list of clang flags to pass to each of the `.c` files in `c_source_files` |
-| `c_source_files` | `[]string` | | A list of relative paths to `.c` files to compile along with project |
-| `license` | `string` | | A SPDX License Identifier specifying the license covering the code in this package. |
-| `dependencies` | `[]Dep` | | An array of dependency objects |
 
-### Dep object
-| Name | Type | Note | Description |
-|------|------|------|-------------|
-| `type` | `string` | required, enum | One of `system_lib`, `git`, `hg`, `http` |
-| `path` | `string` | required | URL/path to this dependency. depends on the type |
-| `src` | `string` | Shorthand for the format `type path`. |
-| `version` | `string` | only on some types | pin this dependency at a specific version |
-| `only_os` | `string` | | comma separated list of OS names to add this Dep to |
-| `except_os` | `string` | | comma separated list of OS names to exclude this Dep from |
+### `id`
+- Type: `string`
+- Required
+`id` is a randomly generated string used to identify your package coming from multiple sources. Sources here meaning various git repositories, http archive downloads, etc.
 
-Note:
-- `name`, `main`, `c_include_dirs`, `c_source_flags`, `c_source_files`, can be overwritten as well.
+### `name`
+- Type: `string`
+- Required
+This is the value that users of your package will [`@import`](https://ziglang.org/documentation/master/#import) you by.
 
-### Versioning
-- `type.git` supports version pinning by `branch-XX`, `tag-XX`, and `commit-XX`.
-- `type.http` supports version checking by `blake3-XX`, `sha256-XX`, and `sha512-XX`.
+### `main`
+- Type: `string`
+The is the local path to the entry point of your package and the file that will be returned when users run [`@import`](https://ziglang.org/documentation/master/#import) on your package.
+
+### `license`
+- Type: `string`
+This is an optional field that may be set to specify the license that your package code is covered by. This field is read by the [`zigmod license`](commands/license.md) command to show the licenses used by all of a project's dependencies. If the value of `license` is set to a [SPDX Identifier](https://spdx.org/licenses/) then a link to the license will also be printed for the user to learn more about it. Check the command reference for more info.
+
+### `c_include_dirs`
+- Type: `[]string`
+This is a list of relative paths to folders which are a root search path for `.h` files when compiling C code in a project.
+
+### `c_source_flags`
+- Type: `[]string`
+This is a list of [`clang`](https://clang.llvm.org/docs/UsersManual.html#command-line-options) C source flags that will be passed to all of the C files listed under the `c_source_files` for this project.
+
+### `c_source_files`
+- Type: `[]string`
+This is a list of relative paths to C source files to compile along with this project. This will be required if you use Zig's [`@cImport`](https://ziglang.org/documentation/master/#cImport), `extern`, etc.
+
+### `dependencies`
+- Type: `[]Dep`
+This is a list of `Dep` objects. `Dep` objects are how you include the other people's code in your project. See the `Dep` documentation below to learn more about the attributes available here.
+
+----
+
+### Dep Object
+This is the object used in the top-level `dependencies` attribute and used to add external code to your project.
+
+#### Dep `src`
+- Type: `type path`
+- Example: `git https://github.com/Hejsil/zig-clap`
+- Required
+This is the base attribute used to reference external code for use in your project. `type` is an enum and only allows certain values. `path` is the URL or other identifier used to locate the contents of this package based on the `type`.
+
+The available `type`s are:
+- `system_lib`
+- `git`
+- `hg`
+- `http`
+
+For the full details on `Dep` types, you can check out the source where the enum is defined: https://github.com/nektro/zigmod/blob/master/src/util/dep_type.zig.
+
+#### Dep `version`
+- Type: `string-string`
+- Example: `commit-2c21764`
+- Example: `sha256-8ff0b79fd9118af7a760f1f6a98cac3e69daed325c8f9f0a581ecb62f797fd64`
+This attribute is used to reference the `type`/`path` combo by a specific revision, specific to the `type`. Specifying a `version` is ideal when possible because it ensures the immutability of the package contents being referenced, and thus Zigmod can skip going to the network if the package is already located on disk.
+
+Version types available to each Dep type:
+- `system_lib`
+    - Not affected by `version`.
+- `git`
+    - `commit`
+    - `tag`
+    - `branch`
+- `hg`
+    - Not currently affected by `version`.
+- `http`
+    - `blake3`
+    - `sha256`
+    - `sha512`
+
+#### Dep `only_os`
+- Type: `comma-split string[]`
+- Example: `windows`
+- Example: `macos,tvos,ios`
+This attribute specifies a way to filter when the dependency will be generated into the contents of `deps.zig`. `only_os` is an inclusive filter in which the dependency will only be in the output if the host target operating system is in the list specified or if this field is ommitted.
+
+#### Dep `except_os`
+- Type: `comma-split string[]`
+- Example: `linux`
+This attribute specifies a way to filter when the dependency will be generated into the contents of `deps.zig`. `except_os` is an exlusive filter in which the dependency will only be in the output if the host target operating is \*not\* in the list specified or if the field is ommitted.
+
+#### Dep Overrides
+There are a number of fields you can add to a `Dep` object that will override it's top-level value. This is most useful in the case where a project you want to use does not have a `zig.mod` manifest. You can then use overrides to define the values for them. The only top-level value you can not override is `dependencies`.
