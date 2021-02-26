@@ -1,4 +1,4 @@
-# `zigmod` Documentation
+# Zigmod Documentation
 
 Zigmod is a prototype package manager for the Zig programming language.
 
