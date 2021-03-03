@@ -186,13 +186,14 @@ pub fn last(in: [][]const u8) ![]const u8 {
 }
 
 pub fn mkdir_all(dpath: []const u8) anyerror!void {
-    const d = if (dpath[dpath.len-1] == std.fs.path.sep) dpath[0..dpath.len-1] else dpath;
-    const ps = std.fs.path.sep_str;
-    const e = dpath[0..std.mem.lastIndexOf(u8, dpath, ps).?];
-    if (std.mem.indexOf(u8, e, ps)) |_| {} else {
+    if (dpath.len == 0) {
         return;
     }
-    try mkdir_all(e);
+    const d = if (dpath[dpath.len-1] == std.fs.path.sep) dpath[0..dpath.len-1] else dpath;
+    const ps = std.fs.path.sep_str;
+    if (std.mem.lastIndexOf(u8, d, ps)) |index| {
+        try mkdir_all(d[0..index]);
+    }
     if (!try does_folder_exist(d)) {
         try std.fs.cwd().makeDir(d);
     }
