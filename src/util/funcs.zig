@@ -275,6 +275,6 @@ pub fn do_hash(comptime algo: type, data: []const u8) ![]const u8 {
     var out: [algo.digest_length]u8 = undefined;
     h.update(data);
     h.final(&out);
-    const hex = try std.fmt.allocPrint(gpa, "{x}", .{out});
+    const hex = try std.fmt.allocPrint(gpa, "{x}", .{std.fmt.fmtSliceHexLower(out[0..])});
     return hex;
 }

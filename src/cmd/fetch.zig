@@ -26,7 +26,7 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("const std = @import(\"std\");\n");
     try w.writeAll("const build = std.build;\n");
     try w.writeAll("\n");
-    try w.print("pub const cache = \"{s}\";\n", .{std.zig.fmtEscapes(dir)});
+    try w.print("pub const cache = \"{}\";\n", .{std.zig.fmtEscapes(dir)});
     try w.writeAll("\n");
     try w.print("{s}\n", .{
         \\pub fn addAllTo(exe: *build.LibExeObjStep) void {
@@ -118,7 +118,7 @@ fn print_paths(w: fs.File.Writer, list: []u.Module) !void {
             try w.print("    \"\",\n", .{});
         } else {
             const s = std.fs.path.sep_str;
-            try w.print("    \"{s}{s}{s}\",\n", .{std.zig.fmtEscapes(s), std.zig.fmtEscapes(mod.clean_path), std.zig.fmtEscapes(s)});
+            try w.print("    \"{}{}{}\",\n", .{std.zig.fmtEscapes(s), std.zig.fmtEscapes(mod.clean_path), std.zig.fmtEscapes(s)});
         }
     }
 }
@@ -156,9 +156,9 @@ fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
         }
         for (mod.c_include_dirs) |it| {
             if (i > 0) {
-                try w.print("    cache ++ _paths[{}] ++ \"{s}\",\n", .{i, std.zig.fmtEscapes(it)});
+                try w.print("    cache ++ _paths[{}] ++ \"{}\",\n", .{i, std.zig.fmtEscapes(it)});
             } else {
-                try w.print("    \"{s}\",\n", .{std.zig.fmtEscapes(it)});
+                try w.print("    \"{}\",\n", .{std.zig.fmtEscapes(it)});
             }
         }
     }
@@ -173,7 +173,7 @@ fn print_csrc_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
             if (i > 0) {
                 try w.print("    {s}_ids[{}], cache ++ _paths[{}] ++ \"{s}\"{s},\n", .{"[_][]const u8{", i, i, it, "}"});
             } else {
-                try w.print("    {s}_ids[{}], \".{s}/{s}\"{s},\n", .{"[_][]const u8{", i, std.zig.fmtEscapes(mod.clean_path), it, "}"});
+                try w.print("    {s}_ids[{}], \".{}/{s}\"{s},\n", .{"[_][]const u8{", i, std.zig.fmtEscapes(mod.clean_path), it, "}"});
             }
         }
     }
@@ -189,7 +189,7 @@ fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
         }
         try w.print("    pub const @\"{s}\" = {s}", .{mod.id, "&.{"});
         for (mod.c_source_flags) |it| {
-            try w.print("\"{s}\",", .{std.zig.fmtEscapes(it)});
+            try w.print("\"{}\",", .{std.zig.fmtEscapes(it)});
         }
         try w.print("{s};\n", .{"}"});
 
@@ -210,7 +210,7 @@ fn print_pkg_data_to(w: fs.File.Writer, list: *std.ArrayList(u.Module), list2: *
     while (i < list.items.len) : (i += 1) {
         const mod = list.items[i];
         if (contains_all(mod.deps, list2)) {
-            try w.print("    pub const _{s} = build.Pkg{{ .name = \"{s}\", .path = cache ++ \"/{s}/{s}\", .dependencies = &[_]build.Pkg{{", .{mod.id, mod.name, std.zig.fmtEscapes(mod.clean_path), mod.main});
+            try w.print("    pub const _{s} = build.Pkg{{ .name = \"{s}\", .path = cache ++ \"/{}/{s}\", .dependencies = &[_]build.Pkg{{", .{mod.id, mod.name, std.zig.fmtEscapes(mod.clean_path), mod.main});
             for (mod.deps) |d| {
                 if (d.main.len > 0) {
                     try w.print(" _{s},", .{d.id});
