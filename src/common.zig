@@ -79,10 +79,14 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
                 }
                 const file_name = try u.last(try u.split(d.path, "/"));
                 if (d.version.len > 0) {
+                    if (try u.does_folder_exist(pv)) {
+                        moddir = pv;
+                        break :blk;
+                    }
                     const file_path = try std.fs.path.join(gpa, &.{pv, file_name});
                     try d.type.pull(d.path, pv);
                     if (try u.validate_hash(try u.last(try u.split(pv, "/")), file_path)) {
-                        try std.fs.deleteFileAbsolute(file_path);
+                        try std.fs.cwd().deleteFile(file_path);
                         moddir = pv;
                         break :blk;
                     }
