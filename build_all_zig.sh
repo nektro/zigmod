@@ -18,8 +18,11 @@ x86_64-windows-gnu
 x86_64-macos-gnu
 "
 
+export ZIG_SYSTEM_LINKER_HACK=1
+
 for item in $targets
 do
     echo "$tag-$item"
     zig build -Dtarget=$item -Duse-full-name -Dtag=$tag
+    echo
 done
