@@ -30,13 +30,16 @@ pub const ModFile = struct {
         defer file.close();
         const input = try file.reader().readAllAlloc(alloc, mb);
         const doc = try yaml.parse(alloc, input);
+        return from_mapping(alloc, doc.mapping);
+    }
 
-        const id = doc.mapping.get_string("id");
-        const name = doc.mapping.get("name").?.string;
-        const main = doc.mapping.get_string("main");
+    pub fn from_mapping(alloc: *std.mem.Allocator, mapping: yaml.Mapping) anyerror!Self {
+        const id = mapping.get_string("id");
+        const name = mapping.get("name").?.string;
+        const main = mapping.get_string("main");
 
         const dep_list = &std.ArrayList(u.Dep).init(alloc);
-        if (doc.mapping.get("dependencies")) |dep_seq| {
+        if (mapping.get("dependencies")) |dep_seq| {
             if (dep_seq == .sequence) {
                 for (dep_seq.sequence) |item| {
                     var dtype: []const u8 = undefined;
@@ -74,11 +77,11 @@ pub const ModFile = struct {
             .id = if (id.len == 0) try u.random_string(48) else id,
             .name = name,
             .main = main,
-            .c_include_dirs = try doc.mapping.get_string_array(alloc, "c_include_dirs"),
-            .c_source_flags = try doc.mapping.get_string_array(alloc, "c_source_flags"),
-            .c_source_files = try doc.mapping.get_string_array(alloc, "c_source_files"),
+            .c_include_dirs = try mapping.get_string_array(alloc, "c_include_dirs"),
+            .c_source_flags = try mapping.get_string_array(alloc, "c_source_flags"),
+            .c_source_files = try mapping.get_string_array(alloc, "c_source_files"),
             .deps = dep_list.items,
-            .yaml = doc.mapping,
+            .yaml = mapping,
         };
     }
 };
