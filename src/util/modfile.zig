@@ -44,13 +44,20 @@ pub const ModFile = struct {
                 for (dep_seq.sequence) |item| {
                     var dtype: []const u8 = undefined;
                     var path: []const u8 = undefined;
+                    var version: []const u8 = undefined;
                     if (item.mapping.get("src")) |val| {
-                        var src_iter = std.mem.split(val.string, " ");
+                        var src_iter = std.mem.tokenize(val.string, " ");
                         dtype = src_iter.next().?;
                         path = src_iter.next().?;
+                        if (src_iter.next()) |dver| {
+                            version = dver;
+                        }
                     } else {
                         dtype = item.mapping.get("type").?.string;
                         path = item.mapping.get("path").?.string;
+                    }
+                    if (item.mapping.get("version")) |verv| {
+                        version = verv.string;
                     }
                     const dep_type = std.meta.stringToEnum(u.DepType, dtype).?;
 
@@ -60,7 +67,7 @@ pub const ModFile = struct {
                         .id = item.mapping.get_string("id"),
                         .name = item.mapping.get_string("name"),
                         .main = item.mapping.get_string("main"),
-                        .version = item.mapping.get_string("version"),
+                        .version = version,
                         .c_include_dirs = try item.mapping.get_string_array(alloc, "c_include_dirs"),
                         .c_source_flags = try item.mapping.get_string_array(alloc, "c_source_flags"),
                         .c_source_files = try item.mapping.get_string_array(alloc, "c_source_files"),

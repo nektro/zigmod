@@ -3,8 +3,7 @@ name: zigmod
 main: src/main.zig
 license: MIT
 dependencies:
-  - src: git https://github.com/yaml/libyaml
-    version: tag-0.2.5
+  - src: git https://github.com/yaml/libyaml tag-0.2.5
     id: 8mdbh0zuneb0i3hs5jby5je0heem1i6yxusl7c8y8qx68hqc
     license: MIT
     c_include_dirs:
@@ -25,21 +24,16 @@ dependencies:
       - src/scanner.c
       - src/writer.c
 
-  - src: git https://github.com/nektro/zig-ansi
-    version: commit-25039ca
+  - src: git https://github.com/nektro/zig-ansi commit-25039ca
 
   # Entries above this line are needed to bootstrap and kept as git submodules
   # --------
   # Entries below this line are only fetched with zigmod itself 
 
-  - src: git https://github.com/ziglibs/known-folders
-    version: commit-f0f4188
+  - src: git https://github.com/ziglibs/known-folders commit-f0f4188
 
-  - src: git https://github.com/Vexu/zuri
-    version: commit-41bcd78
+  - src: git https://github.com/Vexu/zuri commit-41bcd78
 
-  - src: git https://github.com/alexnask/iguanaTLS
-    version: commit-2c21764
-  
-  - src: git https://github.com/nektro/zig-licenses
-    version: commit-73bc493
+  - src: git https://github.com/alexnask/iguanaTLS commit-2c21764
+
+  - src: git https://github.com/nektro/zig-licenses commit-73bc493
