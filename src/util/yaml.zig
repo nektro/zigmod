@@ -171,6 +171,15 @@ fn condense_event_list_key(from: []Item, at: usize, to: *std.ArrayList(Item), li
         });
         return 0+2-1;
     }
+    if (n == .mapping) {
+        try to.append(Item{
+            .kv = Key{
+                .key = get_event_string(t.event, lines),
+                .value = Value{ .mapping = n.mapping },
+            },
+        });
+        return 0+2-1;
+    }
     return null;
 }
 
