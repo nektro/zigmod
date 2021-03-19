@@ -64,7 +64,7 @@ pub fn execute(args: [][]u8) !void {
         }
         std.debug.print("\n", .{});
     }
-    {
+    if (unspecified_list.items.len > 0) {
         std.debug.print(style.Bold ++ "Unspecified:\n", .{});
         std.debug.print(style.ResetIntensity, .{});
         for (unspecified_list.items) |item| {
