@@ -11,6 +11,23 @@ pub const DepType = enum {
     git,        // https://git-scm.com/
     hg,         // https://www.mercurial-scm.org/
     http,       // https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
+    // svn,        // https://subversion.apache.org/
+    // fossil,     // https://fossil-scm.org/
+    // cvs,        // https://nongnu.org/cvs/
+    // darcs,      // http://darcs.net/
+    // //
+    // bazaar,     // https://bazaar.canonical.com/en/
+    // pijul,      // https://pijul.org/
+    // //
+    // ftp,        // https://en.wikipedia.org/wiki/File_Transfer_Protocol
+    // ssh,        // https://www.ssh.com/ssh/
+    // onion,      // https://www.torproject.org/
+    // i2p,        // https://geti2p.net/en/
+    // torrent,    // https://en.wikipedia.org/wiki/BitTorrent
+    // magnet,     // https://en.wikipedia.org/wiki/BitTorrent
+    // dat,        // https://www.datprotocol.com/
+    // ipfs,       // https://www.ipfs.com/
+    // hypercore,  // https://hypercore-protocol.org/
 
     pub fn pull(self: DepType, rpath: []const u8, dpath: []const u8) !void {
         switch (self) {
