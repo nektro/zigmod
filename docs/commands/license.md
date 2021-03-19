@@ -16,6 +16,6 @@ MIT:
 - v/git/github.com/nektro/zig-ansi/commit-25039ca
 - v/git/github.com/ziglibs/known-folders/commit-f0f4188
 - v/git/github.com/Vexu/zuri/commit-41bcd78
-- v/git/github.com/alexnask/iguanaTLS/commit-58f72f6
-- v/git/github.com/nektro/zig-licenses/commit-a15ef9b
+- v/git/github.com/alexnask/iguanaTLS/commit-1767e48
+- v/git/github.com/nektro/zig-licenses/commit-1a19e4b
 ```

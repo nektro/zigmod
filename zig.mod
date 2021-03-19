@@ -34,6 +34,6 @@ dependencies:
 
   - src: git https://github.com/Vexu/zuri commit-41bcd78
 
-  - src: git https://github.com/alexnask/iguanaTLS commit-2c21764
+  - src: git https://github.com/alexnask/iguanaTLS commit-1767e48
 
-  - src: git https://github.com/nektro/zig-licenses commit-73bc493
+  - src: git https://github.com/nektro/zig-licenses commit-1a19e4b
