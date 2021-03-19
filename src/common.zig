@@ -85,7 +85,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
                     }
                     const file_path = try std.fs.path.join(gpa, &.{pv, file_name});
                     try d.type.pull(d.path, pv);
-                    if (try u.validate_hash(try u.last(try u.split(pv, "/")), file_path)) {
+                    if (try u.validate_hash(d.version, file_path)) {
                         try std.fs.cwd().deleteFile(file_path);
                         moddir = pv;
                         break :blk;

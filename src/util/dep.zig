@@ -37,7 +37,7 @@ pub const Dep = struct {
 
     pub fn clean_path_v(self: Dep) ![]const u8 {
         if (self.type == .http and self.version.len > 0) {
-            return std.mem.join(gpa, "/", &.{"v", @tagName(self.type), self.version});
+            return std.mem.join(gpa, "/", &.{"v", @tagName(self.type), self.version[0..20]});
         }
         return std.mem.join(gpa, "/", &.{"v", try self.clean_path(), self.version});
     }
