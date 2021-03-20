@@ -11,10 +11,9 @@ For a full reference on the fields available in `deps.zig` you can check [here](
 ### Adding `deps.zig` to your `build.zig`
 ```diff
  const std = @import("std");
- const Builder = std.build.Builder;
 +const deps = @import("./deps.zig");
  
- pub fn build(b: *Builder) void {
+ pub fn build(b: *std.build.Builder) void {
      const target = b.standardTargetOptions(.{});
  
      const mode = b.standardReleaseOptions();
