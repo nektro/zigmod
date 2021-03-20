@@ -1,5 +1,5 @@
 const std = @import("std");
-const builtin = @import("builtin");
+const builtin = std.builtin;
 const build_options = @import("build_options");
 
 pub const u = @import("./util/index.zig");
