@@ -1,9 +1,8 @@
 const std = @import("std");
-const build = std.build;
 
 pub const cache = ".zigmod/deps";
 
-pub fn addAllTo(exe: *build.LibExeObjStep) void {
+pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
     @setEvalBranchQuota(1_000_000);
     for (packages) |pkg| {
         exe.addPackage(pkg);
@@ -47,14 +46,14 @@ pub const _paths = .{
 };
 
 pub const package_data = struct {
-    pub const _s84v9o48ucb0xq0cmzq0cn433hgw0iaqztugja16h8bzxu3h = build.Pkg{ .name = "ansi", .path = cache ++ "/v/git/github.com/nektro/zig-ansi/commit-25039ca/src/lib.zig", .dependencies = &[_]build.Pkg{ } };
-    pub const _2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf = build.Pkg{ .name = "known-folders", .path = cache ++ "/v/git/github.com/ziglibs/known-folders/commit-f0f4188/known-folders.zig", .dependencies = &[_]build.Pkg{ } };
-    pub const _2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o = build.Pkg{ .name = "zuri", .path = cache ++ "/v/git/github.com/Vexu/zuri/commit-41bcd78/src/zuri.zig", .dependencies = &[_]build.Pkg{ } };
-    pub const _csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe = build.Pkg{ .name = "iguanatls", .path = cache ++ "/v/git/github.com/alexnask/iguanaTLS/commit-1767e48/src/main.zig", .dependencies = &[_]build.Pkg{ } };
-    pub const _0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r = build.Pkg{ .name = "licenses", .path = cache ++ "/v/git/github.com/nektro/zig-licenses/commit-1a19e4b/src/lib.zig", .dependencies = &[_]build.Pkg{ } };
+    pub const _s84v9o48ucb0xq0cmzq0cn433hgw0iaqztugja16h8bzxu3h = std.build.Pkg{ .name = "ansi", .path = cache ++ "/v/git/github.com/nektro/zig-ansi/commit-25039ca/src/lib.zig", .dependencies = &[_]std.build.Pkg{ } };
+    pub const _2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf = std.build.Pkg{ .name = "known-folders", .path = cache ++ "/v/git/github.com/ziglibs/known-folders/commit-f0f4188/known-folders.zig", .dependencies = &[_]std.build.Pkg{ } };
+    pub const _2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o = std.build.Pkg{ .name = "zuri", .path = cache ++ "/v/git/github.com/Vexu/zuri/commit-41bcd78/src/zuri.zig", .dependencies = &[_]std.build.Pkg{ } };
+    pub const _csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe = std.build.Pkg{ .name = "iguanatls", .path = cache ++ "/v/git/github.com/alexnask/iguanaTLS/commit-1767e48/src/main.zig", .dependencies = &[_]std.build.Pkg{ } };
+    pub const _0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r = std.build.Pkg{ .name = "licenses", .path = cache ++ "/v/git/github.com/nektro/zig-licenses/commit-1a19e4b/src/lib.zig", .dependencies = &[_]std.build.Pkg{ } };
 };
 
-pub const packages = &[_]build.Pkg{
+pub const packages = &[_]std.build.Pkg{
     package_data._s84v9o48ucb0xq0cmzq0cn433hgw0iaqztugja16h8bzxu3h,
     package_data._2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf,
     package_data._2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o,
