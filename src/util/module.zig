@@ -10,6 +10,7 @@ const yaml = @import("./yaml.zig");
 
 pub const Module = struct {
     is_sys_lib: bool,
+    is_framework: bool,
     id: []const u8,
     name: []const u8,
     main: []const u8,
@@ -26,6 +27,7 @@ pub const Module = struct {
     pub fn from(dep: u.Dep) !Module {
         return Module{
             .is_sys_lib = false,
+            .is_framework = false,
             .id = dep.id,
             .name = dep.name,
             .main = dep.main,
@@ -46,7 +48,7 @@ pub const Module = struct {
 
     pub fn get_hash(self: Module, cdpath: []const u8) ![]const u8 {
         const file_list_1 = &std.ArrayList([]const u8).init(gpa);
-        try u.file_list(try u.concat(&.{cdpath, "/", self.clean_path}), file_list_1);
+        try u.file_list(try u.concat(&.{ cdpath, "/", self.clean_path }), file_list_1);
 
         const file_list_2 = &std.ArrayList([]const u8).init(gpa);
         for (file_list_1.items) |item| {
@@ -64,10 +66,10 @@ pub const Module = struct {
 
         const h = &std.crypto.hash.Blake3.init(.{});
         for (file_list_2.items) |item| {
-            const abs_path = try u.concat(&.{cdpath, "/", self.clean_path, "/", item});
+            const abs_path = try u.concat(&.{ cdpath, "/", self.clean_path, "/", item });
             const file = try std.fs.cwd().openFile(abs_path, .{});
             defer file.close();
-            const input = try file.reader().readAllAlloc(gpa, u.mb*100);
+            const input = try file.reader().readAllAlloc(gpa, u.mb * 100);
             h.update(input);
         }
         var out: [32]u8 = undefined;
