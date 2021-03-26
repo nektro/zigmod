@@ -48,3 +48,7 @@ An ensembled list of all the `c_source_files` lists.
 ### `system_libs`
 - Type: `[][]const u8`
 An ensembled list of all the `system_libs` lists.
+
+### `frameworks`
+- Type: `[][]const u8`
+An ensembled list of all the `frameworks` lists.
