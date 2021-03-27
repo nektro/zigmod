@@ -8,10 +8,10 @@ const u = @import("./index.zig");
 
 pub const DepType = enum {
     system_lib, // std.build.LibExeObjStep.linkSystemLibrary
-    framework, // std.build.LibExeObjStep.linkFramework
-    git, // https://git-scm.com/
-    hg, // https://www.mercurial-scm.org/
-    http, // https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
+    framework,  // std.build.LibExeObjStep.linkFramework
+    git,        // https://git-scm.com/
+    hg,         // https://www.mercurial-scm.org/
+    http,       // https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
     // svn,        // https://subversion.apache.org/
     // fossil,     // https://fossil-scm.org/
     // cvs,        // https://nongnu.org/cvs/
@@ -34,20 +34,25 @@ pub const DepType = enum {
         switch (self) {
             .system_lib, .framework => {},
             .git => {
-                _ = try u.run_cmd(null, &.{ "git", "clone", "--recurse-submodules", rpath, dpath });
+                _ = try u.run_cmd(null, &.{"git", "clone", "--recurse-submodules", rpath, dpath});
             },
             .hg => {
-                _ = try u.run_cmd(null, &.{ "hg", "clone", rpath, dpath });
+                _ = try u.run_cmd(null, &.{"hg", "clone", rpath, dpath});
             },
             .http => {
                 try u.mkdir_all(dpath);
-                _ = try u.run_cmd(dpath, &.{ "wget", rpath });
-                const f = rpath[std.mem.lastIndexOf(u8, rpath, "/").? + 1 ..];
+                _ = try u.run_cmd(dpath, &.{"wget", rpath});
+                const f = rpath[std.mem.lastIndexOf(u8, rpath, "/").?+1..];
                 if (std.mem.endsWith(u8, f, ".zip")) {
-                    _ = try u.run_cmd(dpath, &.{ "unzip", f, "-d", "." });
+                    _ = try u.run_cmd(dpath, &.{"unzip", f, "-d", "."});
                 }
-                if (std.mem.endsWith(u8, f, ".tar") or std.mem.endsWith(u8, f, ".tar.gz") or std.mem.endsWith(u8, f, ".tar.xz") or std.mem.endsWith(u8, f, ".tar.zst")) {
-                    _ = try u.run_cmd(dpath, &.{ "tar", "-xf", f, "-C", "." });
+                if (
+                    std.mem.endsWith(u8, f, ".tar")
+                    or std.mem.endsWith(u8, f, ".tar.gz")
+                    or std.mem.endsWith(u8, f, ".tar.xz")
+                    or std.mem.endsWith(u8, f, ".tar.zst")
+                ) {
+                    _ = try u.run_cmd(dpath, &.{"tar", "-xf", f, "-C", "."});
                 }
             },
         }
@@ -57,11 +62,11 @@ pub const DepType = enum {
         switch (self) {
             .system_lib, .framework => {},
             .git => {
-                _ = try u.run_cmd(dpath, &.{ "git", "fetch" });
-                _ = try u.run_cmd(dpath, &.{ "git", "pull" });
+                _ = try u.run_cmd(dpath, &.{"git", "fetch"});
+                _ = try u.run_cmd(dpath, &.{"git", "pull"});
             },
             .hg => {
-                _ = try u.run_cmd(dpath, &.{ "hg", "pull" });
+                _ = try u.run_cmd(dpath, &.{"hg", "pull"});
             },
             .http => {
                 //
