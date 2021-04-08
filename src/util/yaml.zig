@@ -21,6 +21,29 @@ pub const Item = union(enum) {
     sequence: []Item,
     document: Document,
     string: []const u8,
+
+    pub fn format(self: Item, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
+        try writer.writeAll("Item{");
+        switch (self) {
+            .event, .kv, .document => {
+                unreachable;
+            },
+            .mapping => {
+                try std.fmt.format(writer, "{}", .{self.mapping});
+            },
+            .sequence => {
+                try writer.writeAll("[ ");
+                for (self.sequence) |it| {
+                    try std.fmt.format(writer, "{}, ", .{it});
+                }
+                try writer.writeAll("]");
+            },
+            .string => {
+                try std.fmt.format(writer, "{s}", .{self.string});
+            },
+        }
+        try writer.writeAll("}");
+    }
 };
 
 pub const Key = struct {
@@ -32,6 +55,26 @@ pub const Value = union(enum) {
     string: []const u8,
     mapping: Mapping,
     sequence: []Item,
+
+    pub fn format(self: Value, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
+        try writer.writeAll("Value{");
+        switch (self) {
+            .string => {
+                try std.fmt.format(writer, "{s}", .{self.string});
+            },
+            .mapping => {
+                try std.fmt.format(writer, "{}", .{self.mapping});
+            },
+            .sequence => {
+                try writer.writeAll("[ ");
+                for (self.sequence) |it| {
+                    try std.fmt.format(writer, "{}, ", .{it});
+                }
+                try writer.writeAll("]");
+            },
+        }
+        try writer.writeAll("}");
+    }
 };
 
 pub const Mapping = struct {
@@ -63,6 +106,15 @@ pub const Mapping = struct {
             }
         }
         return list.items;
+    }
+
+    pub fn format(self: Mapping, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
+        try writer.writeAll("{ ");
+        for (self.items) |it| {
+            try std.fmt.format(writer, "{s}: ", .{it.key});
+            try std.fmt.format(writer, "{}, ", .{it.value});
+        }
+        try writer.writeAll("}");
     }
 };
 
