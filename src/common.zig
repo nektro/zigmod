@@ -15,93 +15,8 @@ pub const CollectOptions = struct {
 pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: CollectOptions) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
-    const tempdir = try fs.path.join(gpa, &.{dir, "temp"});
-    var moddir: []const u8 = undefined;
     for (m.deps) |d| {
-        const p = try fs.path.join(gpa, &.{dir, try d.clean_path()});
-        const pv = try fs.path.join(gpa, &.{dir, try d.clean_path_v()});
-        if (options.log) { u.print("fetch: {s}: {s}: {s}", .{m.name, @tagName(d.type), d.path}); }
-        moddir = p;
-        switch (d.type) {
-            .system_lib => {
-                // no op
-            },
-            .git => blk: {
-                if (d.version.len > 0) {
-                    const vers = u.parse_split(u.GitVersionType, "-").do(d.version) catch |e| switch (e) {
-                        error.IterEmpty => unreachable,
-                        error.NoMemberFound => {
-                            const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];
-                            u.assert(false, "fetch: git: version type '{s}' is invalid.", .{vtype});
-                            unreachable;
-                        },
-                    };
-                    if (try u.does_folder_exist(pv)) {
-                        if (vers.id == .branch) {
-                            if (options.update) { try d.type.update(pv, d.path); }
-                        }
-                        moddir = pv;
-                        break :blk;
-                    }
-                    try d.type.pull(d.path, tempdir);
-                    if ((try u.run_cmd(tempdir, &.{"git", "checkout", vers.string})) > 0) {
-                        u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{d.path, @tagName(vers.id), vers.string});
-                    }
-                    const td_fd = try fs.cwd().openDir(dir, .{});
-                    try u.mkdir_all(pv);
-                    try td_fd.rename("temp", try d.clean_path_v());
-                    if (vers.id != .branch) {
-                        const pvd = try std.fs.cwd().openDir(pv, .{});
-                        try pvd.deleteTree(".git");
-                    }
-                    moddir = pv;
-                    break :blk;
-                }
-                if (!try u.does_folder_exist(p)) {
-                    try d.type.pull(d.path, p);
-                }
-                else {
-                    if (options.update) { try d.type.update(p, d.path); }
-                }
-            },
-            .hg => {
-                if (!try u.does_folder_exist(p)) {
-                    try d.type.pull(d.path, p);
-                }
-                else {
-                    if (options.update) { try d.type.update(p, d.path); }
-                }
-            },
-            .http => blk: {
-                if (try u.does_folder_exist(pv)) {
-                    moddir = pv;
-                    break :blk;
-                }
-                const file_name = try u.last(try u.split(d.path, "/"));
-                if (d.version.len > 0) {
-                    if (try u.does_folder_exist(pv)) {
-                        moddir = pv;
-                        break :blk;
-                    }
-                    const file_path = try std.fs.path.join(gpa, &.{pv, file_name});
-                    try d.type.pull(d.path, pv);
-                    if (try u.validate_hash(d.version, file_path)) {
-                        try std.fs.cwd().deleteFile(file_path);
-                        moddir = pv;
-                        break :blk;
-                    }
-                    try u.rm_recv(pv);
-                    u.assert(false, "{s} does not match hash {s}", .{d.path, d.version});
-                    break :blk;
-                }
-                if (try u.does_folder_exist(p)) {
-                    try u.rm_recv(p);
-                }
-                const file_path = try std.fs.path.join(gpa, &.{p, file_name});
-                try d.type.pull(d.path, p);
-                try std.fs.deleteFileAbsolute(file_path);
-            },
-        }
+        const moddir = try get_moddir(dir, d, m.name, options);
         switch (d.type) {
             .system_lib => {
                 if (d.is_for_this()) try moduledeps.append(u.Module{
@@ -170,5 +85,91 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
     try list.append(mod);
     for (mod.deps) |d| {
         try collect_pkgs(d, list);
+    }
+}
+
+fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime options: CollectOptions) ![]const u8 {
+    const p = try fs.path.join(gpa, &.{basedir, try d.clean_path()});
+    const pv = try fs.path.join(gpa, &.{basedir, try d.clean_path_v()});
+    const tempdir = try fs.path.join(gpa, &.{basedir, "temp"});
+    if (options.log) { u.print("fetch: {s}: {s}: {s}", .{parent_name, @tagName(d.type), d.path}); }
+    switch (d.type) {
+        .system_lib => {
+            // no op
+            return "";
+        },
+        .git => {
+            if (d.version.len > 0) {
+                const vers = u.parse_split(u.GitVersionType, "-").do(d.version) catch |e| switch (e) {
+                    error.IterEmpty => unreachable,
+                    error.NoMemberFound => {
+                        const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];
+                        u.assert(false, "fetch: git: version type '{s}' is invalid.", .{vtype});
+                        unreachable;
+                    },
+                };
+                if (try u.does_folder_exist(pv)) {
+                    if (vers.id == .branch) {
+                        if (options.update) { try d.type.update(pv, d.path); }
+                    }
+                    return pv;
+                }
+                try d.type.pull(d.path, tempdir);
+                if ((try u.run_cmd(tempdir, &.{"git", "checkout", vers.string})) > 0) {
+                    u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{d.path, @tagName(vers.id), vers.string});
+                }
+                const td_fd = try fs.cwd().openDir(basedir, .{});
+                try u.mkdir_all(pv);
+                try td_fd.rename("temp", try d.clean_path_v());
+                if (vers.id != .branch) {
+                    const pvd = try std.fs.cwd().openDir(pv, .{});
+                    try pvd.deleteTree(".git");
+                }
+                return pv;
+            }
+            if (!try u.does_folder_exist(p)) {
+                try d.type.pull(d.path, p);
+            }
+            else {
+                if (options.update) { try d.type.update(p, d.path); }
+            }
+            return p;
+        },
+        .hg => {
+            if (!try u.does_folder_exist(p)) {
+                try d.type.pull(d.path, p);
+            }
+            else {
+                if (options.update) { try d.type.update(p, d.path); }
+            }
+            return p;
+        },
+        .http => {
+            if (try u.does_folder_exist(pv)) {
+                return pv;
+            }
+            const file_name = try u.last(try u.split(d.path, "/"));
+            if (d.version.len > 0) {
+                if (try u.does_folder_exist(pv)) {
+                    return pv;
+                }
+                const file_path = try std.fs.path.join(gpa, &.{pv, file_name});
+                try d.type.pull(d.path, pv);
+                if (try u.validate_hash(d.version, file_path)) {
+                    try std.fs.cwd().deleteFile(file_path);
+                    return pv;
+                }
+                try u.rm_recv(pv);
+                u.assert(false, "{s} does not match hash {s}", .{d.path, d.version});
+                return p;
+            }
+            if (try u.does_folder_exist(p)) {
+                try u.rm_recv(p);
+            }
+            const file_path = try std.fs.path.join(gpa, &.{p, file_name});
+            try d.type.pull(d.path, p);
+            try std.fs.deleteFileAbsolute(file_path);
+            return p;
+        },
     }
 }
