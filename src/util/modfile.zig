@@ -38,8 +38,24 @@ pub const ModFile = struct {
         const name = mapping.get("name").?.string;
         const main = mapping.get_string("main");
 
+        const dep_list = try dep_list_by_name(alloc, mapping, "dependencies");
+
+        return Self{
+            .alloc = alloc,
+            .id = if (id.len == 0) try u.random_string(48) else id,
+            .name = name,
+            .main = main,
+            .c_include_dirs = try mapping.get_string_array(alloc, "c_include_dirs"),
+            .c_source_flags = try mapping.get_string_array(alloc, "c_source_flags"),
+            .c_source_files = try mapping.get_string_array(alloc, "c_source_files"),
+            .deps = dep_list.items,
+            .yaml = mapping,
+        };
+    }
+
+    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: []const u8) !*std.ArrayList(u.Dep) {
         const dep_list = &std.ArrayList(u.Dep).init(alloc);
-        if (mapping.get("dependencies")) |dep_seq| {
+        if (mapping.get(prop)) |dep_seq| {
             if (dep_seq == .sequence) {
                 for (dep_seq.sequence) |item| {
                     var dtype: []const u8 = undefined;
@@ -81,17 +97,6 @@ pub const ModFile = struct {
                 }
             }
         }
-
-        return Self{
-            .alloc = alloc,
-            .id = if (id.len == 0) try u.random_string(48) else id,
-            .name = name,
-            .main = main,
-            .c_include_dirs = try mapping.get_string_array(alloc, "c_include_dirs"),
-            .c_source_flags = try mapping.get_string_array(alloc, "c_source_flags"),
-            .c_source_files = try mapping.get_string_array(alloc, "c_source_files"),
-            .deps = dep_list.items,
-            .yaml = mapping,
-        };
+        return dep_list;
     }
 };
