@@ -70,6 +70,9 @@ pub fn execute(args: [][]u8) !void {
         if (std.mem.eql(u8, mod.id, "root")) {
             continue;
         }
+        if (mod.main.len == 0) {
+            continue;
+        }
         try duped.append(mod);
     }
     try print_pkg_data_to(w, duped, &std.ArrayList(u.Module).init(gpa));
@@ -102,6 +105,9 @@ pub fn execute(args: [][]u8) !void {
 
 fn print_ids(w: fs.File.Writer, list: []u.Module) !void {
     for (list) |mod| {
+        if (std.mem.eql(u8, mod.id, "root")) {
+            continue;
+        }
         if (mod.is_sys_lib) {
             continue;
         }
@@ -111,6 +117,9 @@ fn print_ids(w: fs.File.Writer, list: []u.Module) !void {
 
 fn print_paths(w: fs.File.Writer, list: []u.Module) !void {
     for (list) |mod| {
+        if (std.mem.eql(u8, mod.id, "root")) {
+            continue;
+        }
         if (mod.is_sys_lib) {
             continue;
         }
@@ -156,7 +165,7 @@ fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
         }
         for (mod.c_include_dirs) |it| {
             if (i > 0) {
-                try w.print("    cache ++ _paths[{}] ++ \"{}\",\n", .{i, std.zig.fmtEscapes(it)});
+                try w.print("    cache ++ _paths[{}] ++ \"{}\",\n", .{i-1, std.zig.fmtEscapes(it)});
             } else {
                 try w.print("    \"{}\",\n", .{std.zig.fmtEscapes(it)});
             }
@@ -171,9 +180,9 @@ fn print_csrc_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
         }
         for (mod.c_source_files) |it| {
             if (i > 0) {
-                try w.print("    {s}_ids[{}], cache ++ _paths[{}] ++ \"{s}\"{s},\n", .{"[_][]const u8{", i, i, it, "}"});
+                try w.print("    {s}_ids[{}], cache ++ _paths[{}] ++ \"{s}\"{s},\n", .{"[_][]const u8{", i-1, i-1, it, "}"});
             } else {
-                try w.print("    {s}_ids[{}], \".{}/{s}\"{s},\n", .{"[_][]const u8{", i, std.zig.fmtEscapes(mod.clean_path), it, "}"});
+                try w.print("    {s}_ids[{}], \".{}/{s}\"{s},\n", .{"[_][]const u8{", i-1, std.zig.fmtEscapes(mod.clean_path), it, "}"});
             }
         }
     }
