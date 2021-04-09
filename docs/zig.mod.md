@@ -16,7 +16,7 @@ The is the local path to the entry point of your package and the file that will 
 
 ### `license`
 - Type: `string`
-This is an optional field that may be set to specify the license that your package code is covered by. This field is read by the [`zigmod license`](commands/license.md) command to show the licenses used by all of a project's dependencies. If the value of `license` is set to a [SPDX Identifier](https://spdx.org/licenses/) then a link to the license will also be printed for the user to learn more about it. Check the command reference for more info.
+This is an optional field that may be set to specify the license that your package code is covered by. This field is read by the [`zigmod license`](commands/license_.md) command to show the licenses used by all of a project's dependencies. If the value of `license` is set to a [SPDX Identifier](https://spdx.org/licenses/) then a link to the license will also be printed for the user to learn more about it. Check the command reference for more info.
 
 ### `c_include_dirs`
 - Type: `[]string`
