@@ -67,9 +67,6 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("pub const package_data = struct {\n");
     const duped = &std.ArrayList(u.Module).init(gpa);
     for (list.items) |mod| {
-        if (mod.main.len > 0 and mod.clean_path.len > 0) {
-            try duped.append(mod);
-        }
     }
     try print_pkg_data_to(w, duped, &std.ArrayList(u.Module).init(gpa));
     try w.writeAll("};\n\n");
