@@ -12,6 +12,29 @@ pub const CollectOptions = struct {
     update: bool,
 };
 
+pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, comptime options: CollectOptions) !u.Module {
+    const m = try u.ModFile.init(gpa, mpath);
+    const moduledeps = &std.ArrayList(u.Module).init(gpa);
+    try moduledeps.append(try collect_deps(dir, mpath, options));
+    for (m.devdeps) |d| {
+        try get_module_from_dep(moduledeps, d, dir, m.name, options);
+    }
+    return u.Module{
+        .is_sys_lib = false,
+        .id = "root",
+        .name = "root",
+        .main = m.main,
+        .c_include_dirs = &.{},
+        .c_source_flags = &.{},
+        .c_source_files = &.{},
+        .deps = moduledeps.items,
+        .clean_path = "",
+        .only_os = &.{},
+        .except_os = &.{},
+        .yaml = m.yaml,
+    };
+}
+
 pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: CollectOptions) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
@@ -27,7 +50,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
         .c_source_flags = m.c_source_flags,
         .c_source_files = m.c_source_files,
         .deps = moduledeps.items,
-        .clean_path = "",
+        .clean_path = "../..",
         .only_os = &.{},
         .except_os = &.{},
         .yaml = m.yaml,

@@ -22,6 +22,7 @@ pub const ModFile = struct {
     c_source_files: [][]const u8,
     deps: []u.Dep,
     yaml: yaml.Mapping,
+    devdeps: []u.Dep,
 
     pub fn init(alloc: *std.mem.Allocator, fpath: []const u8) !Self {
         //
@@ -39,6 +40,7 @@ pub const ModFile = struct {
         const main = mapping.get_string("main");
 
         const dep_list = try dep_list_by_name(alloc, mapping, "dependencies");
+        const devdep_list = try dep_list_by_name(alloc, mapping, "dev_dependencies");
 
         return Self{
             .alloc = alloc,
@@ -50,6 +52,7 @@ pub const ModFile = struct {
             .c_source_files = try mapping.get_string_array(alloc, "c_source_files"),
             .deps = dep_list.items,
             .yaml = mapping,
+            .devdeps = devdep_list.items,
         };
     }
 

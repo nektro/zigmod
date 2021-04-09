@@ -13,7 +13,7 @@ pub fn execute(args: [][]u8) !void {
     //
     const dir = try fs.path.join(gpa, &.{".zigmod", "deps"});
 
-    const top_module = try common.collect_deps(dir, "zig.mod", .{
+    const top_module = try common.collect_deps_deep(dir, "zig.mod", .{
         .log = true,
         .update = true,
     });
@@ -67,6 +67,10 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("pub const package_data = struct {\n");
     const duped = &std.ArrayList(u.Module).init(gpa);
     for (list.items) |mod| {
+        if (std.mem.eql(u8, mod.id, "root")) {
+            continue;
+        }
+        try duped.append(mod);
     }
     try print_pkg_data_to(w, duped, &std.ArrayList(u.Module).init(gpa));
     try w.writeAll("};\n\n");

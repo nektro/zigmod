@@ -20,7 +20,7 @@ pub fn execute(args: [][]u8) !void {
     //
     const dir = try std.fs.path.join(gpa, &.{".zigmod", "deps"});
 
-    const top_module = try common.collect_deps(dir, "zig.mod", .{
+    const top_module = try common.collect_deps_deep(dir, "zig.mod", .{
         .log = false,
         .update = false,
     });
@@ -33,6 +33,9 @@ pub fn execute(args: [][]u8) !void {
     const unspecified_list = &List.init(gpa);
 
     for (master_list.items) |item| {
+        if (item.clean_path.len == 0) {
+            continue;
+        }
         if (item.yaml == null) {
             try unspecified_list.append(item);
             continue;
@@ -60,7 +63,7 @@ pub fn execute(args: [][]u8) !void {
         }
         std.debug.print(style.ResetIntensity, .{});
         for (entry.value.items) |item| {
-            std.debug.print("- {s}\n", .{if (item.clean_path.len > 0) item.clean_path else "This"});
+            std.debug.print("- {s}\n", .{if (!std.mem.eql(u8, item.clean_path, "../..")) item.clean_path else "This"});
         }
         std.debug.print("\n", .{});
     }
@@ -68,7 +71,7 @@ pub fn execute(args: [][]u8) !void {
         std.debug.print(style.Bold ++ "Unspecified:\n", .{});
         std.debug.print(style.ResetIntensity, .{});
         for (unspecified_list.items) |item| {
-            std.debug.print("- {s}\n", .{if (item.clean_path.len > 0) item.clean_path else "This"});
+            std.debug.print("- {s}\n", .{if (!std.mem.eql(u8, item.clean_path, "../..")) item.clean_path else "This"});
         }
     }
 }
