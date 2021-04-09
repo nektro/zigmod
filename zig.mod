@@ -1,6 +1,6 @@
 id: 89ujp8gq842x6mzok8feypwze138n2d96zpugw44hcq7406r
 name: zigmod
-main: src/main.zig
+main: src/lib.zig
 license: MIT
 dependencies:
   - src: git https://github.com/yaml/libyaml tag-0.2.5
@@ -37,3 +37,6 @@ dependencies:
   - src: git https://github.com/alexnask/iguanaTLS commit-1767e48
 
   - src: git https://github.com/nektro/zig-licenses commit-1a19e4b
+
+dev_dependencies:
+  - src: git https://github.com/nektro/zig-ansi commit-25039ca

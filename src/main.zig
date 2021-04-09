@@ -1,24 +1,13 @@
 const std = @import("std");
 const builtin = std.builtin;
 const build_options = @import("build_options");
+const zigmod = @import("zigmod");
 
 pub const u = @import("./util/index.zig");
 pub const common = @import("./common.zig");
 
 //
 //
-
-pub const commands_to_bootstrap = struct {
-    pub const fetch = @import("./cmd/fetch.zig");
-};
-
-pub const commands = struct {
-    pub const init = @import("./cmd/init.zig");
-    pub const fetch = @import("./cmd/fetch.zig");
-    pub const sum = @import("./cmd/sum.zig");
-    pub const zpm = @import("./cmd/zpm.zig");
-    pub const license = @import("./cmd/license.zig");
-};
 
 pub fn main() !void {
 
@@ -37,7 +26,7 @@ pub fn main() !void {
         return;
     }
 
-    const available = if (build_options.bootstrap) commands_to_bootstrap else commands;
+    const available = if (build_options.bootstrap) zigmod.commands_to_bootstrap else zigmod.commands;
 
     inline for (std.meta.declarations(available)) |decl| {
         if (std.mem.eql(u8, args[0], decl.name)) {

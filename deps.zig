@@ -36,7 +36,7 @@ pub const _ids = .{
 };
 
 pub const _paths = .{
-    "",
+    "/../../",
     "/v/git/github.com/yaml/libyaml/tag-0.2.5/",
     "/v/git/github.com/nektro/zig-ansi/commit-25039ca/",
     "/v/git/github.com/ziglibs/known-folders/commit-f0f4188/",
@@ -51,22 +51,17 @@ pub const package_data = struct {
     pub const _2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o = std.build.Pkg{ .name = "zuri", .path = cache ++ "/v/git/github.com/Vexu/zuri/commit-41bcd78/src/zuri.zig", .dependencies = &[_]std.build.Pkg{ } };
     pub const _csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe = std.build.Pkg{ .name = "iguanatls", .path = cache ++ "/v/git/github.com/alexnask/iguanaTLS/commit-1767e48/src/main.zig", .dependencies = &[_]std.build.Pkg{ } };
     pub const _0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r = std.build.Pkg{ .name = "licenses", .path = cache ++ "/v/git/github.com/nektro/zig-licenses/commit-1a19e4b/src/lib.zig", .dependencies = &[_]std.build.Pkg{ } };
+    pub const _89ujp8gq842x6mzok8feypwze138n2d96zpugw44hcq7406r = std.build.Pkg{ .name = "zigmod", .path = cache ++ "/../../src/lib.zig", .dependencies = &[_]std.build.Pkg{ _s84v9o48ucb0xq0cmzq0cn433hgw0iaqztugja16h8bzxu3h, _2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf, _2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o, _csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe, _0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r, } };
 };
 
 pub const packages = &[_]std.build.Pkg{
+    package_data._89ujp8gq842x6mzok8feypwze138n2d96zpugw44hcq7406r,
     package_data._s84v9o48ucb0xq0cmzq0cn433hgw0iaqztugja16h8bzxu3h,
-    package_data._2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf,
-    package_data._2b7mq571jmq31ktmpigopu29480iw245heueajgxzxn7ab8o,
-    package_data._csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe,
-    package_data._0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r,
 };
 
 pub const pkgs = struct {
+    pub const zigmod = packages[0];
     pub const ansi = packages[1];
-    pub const known_folders = packages[2];
-    pub const zuri = packages[3];
-    pub const iguanatls = packages[4];
-    pub const licenses = packages[5];
 };
 
 pub const c_include_dirs = &[_][]const u8{
