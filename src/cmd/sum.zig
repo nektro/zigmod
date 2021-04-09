@@ -24,23 +24,11 @@ pub fn execute(args: [][]u8) !void {
 
     //
     const module_list = &std.ArrayList(u.Module).init(gpa);
-    try dedupe_mod_list(module_list, top_module);
+    try common.collect_pkgs(top_module, module_list);
 
     for (module_list.items) |m| {
         if (m.clean_path.len == 0) { continue; }
         const hash = try m.get_hash(dir);
         try w.print("{s} {s}\n", .{hash, m.clean_path});
-    }
-}
-
-fn dedupe_mod_list(list: *std.ArrayList(u.Module), module: u.Module) anyerror!void {
-    if (u.list_contains_gen(u.Module, list, module)) {
-        return;
-    }
-    if (module.clean_path.len > 0) {
-        try list.append(module);
-    }
-    for (module.deps) |m| {
-        try dedupe_mod_list(list, m);
     }
 }
