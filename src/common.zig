@@ -16,51 +16,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     for (m.deps) |d| {
-        const moddir = try get_moddir(dir, d, m.name, options);
-        switch (d.type) {
-            .system_lib => {
-                if (d.is_for_this()) try moduledeps.append(u.Module{
-                    .is_sys_lib = true,
-                    .id = "",
-                    .name = d.path,
-                    .only_os = d.only_os,
-                    .except_os = d.except_os,
-                    .main = "",
-                    .c_include_dirs = &.{},
-                    .c_source_flags = &.{},
-                    .c_source_files = &.{},
-                    .deps = &[_]u.Module{},
-                    .clean_path = d.path,
-                    .yaml = null,
-                });
-            },
-            else => blk: {
-                var dd = try collect_deps(dir, try u.concat(&.{moddir, "/zig.mod"}), options) catch |e| switch (e) {
-                    error.FileNotFound => {
-                        if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
-                            var mod_from = try u.Module.from(d);
-                            if (mod_from.id.len == 0) mod_from.id = try u.random_string(48);
-                            mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
-                            if (mod_from.is_for_this()) try moduledeps.append(mod_from);
-                        }
-                        break :blk;
-                    },
-                    else => e,
-                };
-                dd.clean_path = u.trim_prefix(moddir, dir)[1..];
-
-                if (dd.id.len == 0) dd.id = try u.random_string(48);
-                if (d.name.len > 0) dd.name = d.name;
-                if (d.main.len > 0) dd.main = d.main;
-                if (d.c_include_dirs.len > 0) dd.c_include_dirs = d.c_include_dirs;
-                if (d.c_source_flags.len > 0) dd.c_source_flags = d.c_source_flags;
-                if (d.c_source_files.len > 0) dd.c_source_files = d.c_source_files;
-                if (d.only_os.len > 0) dd.only_os = d.only_os;
-                if (d.except_os.len > 0) dd.except_os = d.except_os;
-
-                if (dd.is_for_this()) try moduledeps.append(dd);
-            },
-        }
+        try get_module_from_dep(moduledeps, d, dir, m.name, options);
     }
     return u.Module{
         .is_sys_lib = false,
@@ -170,6 +126,54 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
             try d.type.pull(d.path, p);
             try std.fs.deleteFileAbsolute(file_path);
             return p;
+        },
+    }
+}
+
+fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8, parent_name: []const u8, comptime options: CollectOptions) !void {
+    const moddir = try get_moddir(dir, d, parent_name, options);
+    switch (d.type) {
+        .system_lib => {
+            if (d.is_for_this()) try list.append(u.Module{
+                .is_sys_lib = true,
+                .id = "",
+                .name = d.path,
+                .only_os = d.only_os,
+                .except_os = d.except_os,
+                .main = "",
+                .c_include_dirs = &.{},
+                .c_source_flags = &.{},
+                .c_source_files = &.{},
+                .deps = &[_]u.Module{},
+                .clean_path = d.path,
+                .yaml = null,
+            });
+        },
+        else => blk: {
+            var dd = try collect_deps(dir, try u.concat(&.{moddir, "/zig.mod"}), options) catch |e| switch (e) {
+                error.FileNotFound => {
+                    if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
+                        var mod_from = try u.Module.from(d);
+                        if (mod_from.id.len == 0) mod_from.id = try u.random_string(48);
+                        mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
+                        if (mod_from.is_for_this()) try list.append(mod_from);
+                    }
+                    break :blk;
+                },
+                else => e,
+            };
+            dd.clean_path = u.trim_prefix(moddir, dir)[1..];
+
+            if (dd.id.len == 0) dd.id = try u.random_string(48);
+            if (d.name.len > 0) dd.name = d.name;
+            if (d.main.len > 0) dd.main = d.main;
+            if (d.c_include_dirs.len > 0) dd.c_include_dirs = d.c_include_dirs;
+            if (d.c_source_flags.len > 0) dd.c_source_flags = d.c_source_flags;
+            if (d.c_source_files.len > 0) dd.c_source_files = d.c_source_files;
+            if (d.only_os.len > 0) dd.only_os = d.only_os;
+            if (d.except_os.len > 0) dd.except_os = d.except_os;
+
+            if (dd.is_for_this()) try list.append(dd);
         },
     }
 }
