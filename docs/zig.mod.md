@@ -34,6 +34,10 @@ This is a list of relative paths to C source files to compile along with this pr
 - Type: `[]Dep`
 This is a list of `Dep` objects. `Dep` objects are how you include the other people's code in your project. See the `Dep` documentation below to learn more about the attributes available here.
 
+### `dev_dependencies`
+- Type: `[]Dep`
+Similar to `dependencies` but will only get added to the project if the current `zig.mod` is the root module.
+
 ----
 
 ### Dep Object
