@@ -41,7 +41,7 @@ pub const Module = struct {
     }
 
     pub fn eql(self: Module, another: Module) bool {
-        return std.mem.eql(u8, self.clean_path, another.clean_path);
+        return std.mem.eql(u8, self.id, another.id) or std.mem.eql(u8, self.clean_path, another.clean_path);
     }
 
     pub fn get_hash(self: Module, cdpath: []const u8) ![]const u8 {
