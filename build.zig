@@ -40,6 +40,7 @@ pub fn build(b: *Builder) void {
         exe.addCSourceFile("./libs/yaml/src/scanner.c", &.{});
         exe.addCSourceFile("./libs/yaml/src/writer.c", &.{});
 
+        exe.addPackagePath("zigmod", "./src/lib.zig");
         exe.addPackagePath("ansi", "./libs/zig-ansi/src/lib.zig");
     }
     else {
