@@ -75,8 +75,12 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
     const tempdir = try fs.path.join(gpa, &.{basedir, "temp"});
     if (options.log) { u.print("fetch: {s}: {s}: {s}", .{parent_name, @tagName(d.type), d.path}); }
     switch (d.type) {
-        .system_lib, .framework => {
+        .system_lib => {
             // no op
+            return "";
+        },
+        .framework => {
+            u.assert(std.Target.current.isDarwin(), "a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{d.name});
             return "";
         },
         .git => {
