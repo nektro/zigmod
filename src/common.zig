@@ -98,7 +98,7 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
                     u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{d.path, @tagName(vers.id), vers.string});
                 }
                 const td_fd = try fs.cwd().openDir(basedir, .{});
-                try u.mkdir_all(pv);
+                try fs.cwd().makePath(pv);
                 try td_fd.rename("temp", try d.clean_path_v());
                 if (vers.id != .branch) {
                     const pvd = try std.fs.cwd().openDir(pv, .{});
