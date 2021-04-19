@@ -31,15 +31,15 @@ pub const Dep = struct {
         p = u.trim_prefix(p, "https://");
         p = u.trim_prefix(p, "git://");
         p = u.trim_suffix(u8, p, ".git");
-        p = try std.mem.join(gpa, "/", &.{@tagName(self.type), p});
+        p = try std.fs.path.join(gpa, &.{@tagName(self.type), p});
         return p;
     }
 
     pub fn clean_path_v(self: Dep) ![]const u8 {
         if (self.type == .http and self.version.len > 0) {
-            return std.mem.join(gpa, "/", &.{"v", @tagName(self.type), self.version[0..20]});
+            return std.fs.path.join(gpa, &.{"v", @tagName(self.type), self.version[0..20]});
         }
-        return std.mem.join(gpa, "/", &.{"v", try self.clean_path(), self.version});
+        return std.fs.path.join(gpa, &.{"v", try self.clean_path(), self.version});
     }
 
     pub fn is_for_this(self: Dep) bool {
