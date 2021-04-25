@@ -80,7 +80,8 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
             return "";
         },
         .framework => {
-            u.assert(std.Target.current.isDarwin(), "a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{d.name});
+            const ident = if (d.name.len != 0) d.name else d.path;
+            u.assert(std.Target.current.isDarwin(), "a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{ident});
             return "";
         },
         .git => {
