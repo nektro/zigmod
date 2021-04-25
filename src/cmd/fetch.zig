@@ -45,6 +45,9 @@ pub fn execute(args: [][]u8) !void {
         \\    for (system_libs) |lib| {
         \\        exe.linkSystemLibrary(lib);
         \\    }
+        \\    for (frameworks) |fw| {
+        \\        exe.linkFramework(fw);
+        \\    }
         \\}
         \\
         \\fn get_flags(comptime index: usize) []const u8 {
@@ -101,6 +104,10 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("pub const system_libs = &[_][]const u8{\n");
     try print_sys_libs_to(w, list.items, &std.ArrayList([]const u8).init(gpa));
     try w.writeAll("};\n\n");
+
+    try w.writeAll("pub const frameworks = &[_][]const u8{\n");
+    try print_frameworks_to(w, list.items, &std.ArrayList([]const u8).init(gpa));
+    try w.writeAll("};\n\n");
 }
 
 fn print_ids(w: fs.File.Writer, list: []u.Module) !void {
@@ -108,7 +115,7 @@ fn print_ids(w: fs.File.Writer, list: []u.Module) !void {
         if (std.mem.eql(u8, mod.id, "root")) {
             continue;
         }
-        if (mod.is_sys_lib) {
+        if (mod.is_sys_lib or mod.is_framework) {
             continue;
         }
         try w.print("    \"{s}\",\n", .{mod.id});
@@ -120,7 +127,7 @@ fn print_paths(w: fs.File.Writer, list: []u.Module) !void {
         if (std.mem.eql(u8, mod.id, "root")) {
             continue;
         }
-        if (mod.is_sys_lib) {
+        if (mod.is_sys_lib or mod.is_framework) {
             continue;
         }
         if (mod.clean_path.len == 0) {
@@ -160,7 +167,7 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
 
 fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
     for (list) |mod, i| {
-        if (mod.is_sys_lib) {
+        if (mod.is_sys_lib or mod.is_framework) {
             continue;
         }
         for (mod.c_include_dirs) |it| {
@@ -190,7 +197,7 @@ fn print_csrc_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
 
 fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
     for (list) |mod, i| {
-        if (mod.is_sys_lib) {
+        if (mod.is_sys_lib or mod.is_framework) {
             continue;
         }
         if (mod.c_source_flags.len == 0 and mod.c_source_files.len == 0) {
@@ -208,6 +215,15 @@ fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
 fn print_sys_libs_to(w: fs.File.Writer, list: []u.Module, list2: *std.ArrayList([]const u8)) !void {
     for (list) |mod| {
         if (!mod.is_sys_lib) {
+            continue;
+        }
+        try w.print("    \"{s}\",\n", .{mod.name});
+    }
+}
+
+fn print_frameworks_to(w: fs.File.Writer, list: []u.Module, list2: *std.ArrayList([]const u8)) !void {
+    for (list) |mod| {
+        if (!mod.is_framework) {
             continue;
         }
         try w.print("    \"{s}\",\n", .{mod.name});

@@ -8,6 +8,7 @@ const u = @import("./index.zig");
 
 pub const DepType = enum {
     system_lib, // std.build.LibExeObjStep.linkSystemLibrary
+    framework,  // std.build.LibExeObjStep.linkFramework
     git,        // https://git-scm.com/
     hg,         // https://www.mercurial-scm.org/
     http,       // https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
@@ -31,7 +32,7 @@ pub const DepType = enum {
 
     pub fn pull(self: DepType, rpath: []const u8, dpath: []const u8) !void {
         switch (self) {
-            .system_lib => {},
+            .system_lib, .framework => {},
             .git => {
                 _ = try u.run_cmd(null, &.{"git", "clone", "--recurse-submodules", rpath, dpath});
             },
@@ -59,7 +60,7 @@ pub const DepType = enum {
 
     pub fn update(self: DepType, dpath: []const u8, rpath: []const u8) !void {
         switch (self) {
-            .system_lib => {},
+            .system_lib, .framework => {},
             .git => {
                 _ = try u.run_cmd(dpath, &.{"git", "fetch"});
                 _ = try u.run_cmd(dpath, &.{"git", "pull"});

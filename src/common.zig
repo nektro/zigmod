@@ -21,6 +21,7 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, comptime options: C
     }
     return u.Module{
         .is_sys_lib = false,
+        .is_framework = false,
         .id = "root",
         .name = "root",
         .main = m.main,
@@ -43,6 +44,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: Collec
     }
     return u.Module{
         .is_sys_lib = false,
+        .is_framework = false,
         .id = m.id,
         .name = m.name,
         .main = m.main,
@@ -75,6 +77,11 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
     switch (d.type) {
         .system_lib => {
             // no op
+            return "";
+        },
+        .framework => {
+            const ident = if (d.name.len != 0) d.name else d.path;
+            u.assert(std.Target.current.isDarwin(), "a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{ident});
             return "";
         },
         .git => {
@@ -156,9 +163,10 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
 fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8, parent_name: []const u8, comptime options: CollectOptions) !void {
     const moddir = try get_moddir(dir, d, parent_name, options);
     switch (d.type) {
-        .system_lib => {
+        .system_lib, .framework => {
             if (d.is_for_this()) try list.append(u.Module{
-                .is_sys_lib = true,
+                .is_sys_lib = d.type == .system_lib,
+                .is_framework = d.type == .framework,
                 .id = "",
                 .name = d.path,
                 .only_os = d.only_os,

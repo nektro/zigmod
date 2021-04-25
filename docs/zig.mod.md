@@ -51,6 +51,7 @@ This is the base attribute used to reference external code for use in your proje
 
 The available `type`s are:
 - `system_lib`
+- `framework`
 - `git`
 - `hg`
 - `http`
@@ -65,6 +66,8 @@ This attribute is used to reference the `type`/`path` combo by a specific revisi
 
 Version types available to each Dep type:
 - `system_lib`
+    - Not affected by `version`.
+- `framework`
     - Not affected by `version`.
 - `git`
     - `commit`

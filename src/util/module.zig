@@ -10,6 +10,7 @@ const yaml = @import("./yaml.zig");
 
 pub const Module = struct {
     is_sys_lib: bool,
+    is_framework: bool,
     id: []const u8,
     name: []const u8,
     main: []const u8,
@@ -26,6 +27,7 @@ pub const Module = struct {
     pub fn from(dep: u.Dep) !Module {
         return Module{
             .is_sys_lib = false,
+            .is_framework = false,
             .id = dep.id,
             .name = dep.name,
             .main = dep.main,
