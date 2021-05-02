@@ -10,7 +10,7 @@ const common = @import("./../common.zig");
 
 pub fn execute(args: [][]u8) !void {
     //
-    const dir = try std.fs.path.join(gpa, &.{".zigmod", "deps"});
+    const dir = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
 
     const top_module = try common.collect_deps_deep(dir, "zig.mod", .{
         .log = false,
@@ -27,9 +27,13 @@ pub fn execute(args: [][]u8) !void {
     try common.collect_pkgs(top_module, module_list);
 
     for (module_list.items) |m| {
-        if (m.clean_path.len == 0) { continue; }
-        if (std.mem.eql(u8, m.clean_path, "../..")) { continue; }
+        if (m.clean_path.len == 0) {
+            continue;
+        }
+        if (std.mem.eql(u8, m.clean_path, "../..")) {
+            continue;
+        }
         const hash = try m.get_hash(dir);
-        try w.print("{s} {s}\n", .{hash, m.clean_path});
+        try w.print("{s} {s}\n", .{ hash, m.clean_path });
     }
 }

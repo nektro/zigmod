@@ -68,10 +68,12 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
 }
 
 fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime options: CollectOptions) ![]const u8 {
-    const p = try fs.path.join(gpa, &.{basedir, try d.clean_path()});
-    const pv = try fs.path.join(gpa, &.{basedir, try d.clean_path_v()});
-    const tempdir = try fs.path.join(gpa, &.{basedir, "temp"});
-    if (options.log) { u.print("fetch: {s}: {s}: {s}", .{parent_name, @tagName(d.type), d.path}); }
+    const p = try fs.path.join(gpa, &.{ basedir, try d.clean_path() });
+    const pv = try fs.path.join(gpa, &.{ basedir, try d.clean_path_v() });
+    const tempdir = try fs.path.join(gpa, &.{ basedir, "temp" });
+    if (options.log) {
+        u.print("fetch: {s}: {s}: {s}", .{ parent_name, @tagName(d.type), d.path });
+    }
     switch (d.type) {
         .system_lib => {
             // no op
@@ -89,13 +91,15 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
                 };
                 if (try u.does_folder_exist(pv)) {
                     if (vers.id == .branch) {
-                        if (options.update) { try d.type.update(pv, d.path); }
+                        if (options.update) {
+                            try d.type.update(pv, d.path);
+                        }
                     }
                     return pv;
                 }
                 try d.type.pull(d.path, tempdir);
-                if ((try u.run_cmd(tempdir, &.{"git", "checkout", vers.string})) > 0) {
-                    u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{d.path, @tagName(vers.id), vers.string});
+                if ((try u.run_cmd(tempdir, &.{ "git", "checkout", vers.string })) > 0) {
+                    u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
                 }
                 const td_fd = try fs.cwd().openDir(basedir, .{});
                 try u.mkdir_all(pv);
@@ -108,18 +112,20 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
             }
             if (!try u.does_folder_exist(p)) {
                 try d.type.pull(d.path, p);
-            }
-            else {
-                if (options.update) { try d.type.update(p, d.path); }
+            } else {
+                if (options.update) {
+                    try d.type.update(p, d.path);
+                }
             }
             return p;
         },
         .hg => {
             if (!try u.does_folder_exist(p)) {
                 try d.type.pull(d.path, p);
-            }
-            else {
-                if (options.update) { try d.type.update(p, d.path); }
+            } else {
+                if (options.update) {
+                    try d.type.update(p, d.path);
+                }
             }
             return p;
         },
@@ -132,20 +138,20 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
                 if (try u.does_folder_exist(pv)) {
                     return pv;
                 }
-                const file_path = try std.fs.path.join(gpa, &.{pv, file_name});
+                const file_path = try std.fs.path.join(gpa, &.{ pv, file_name });
                 try d.type.pull(d.path, pv);
                 if (try u.validate_hash(d.version, file_path)) {
                     try std.fs.cwd().deleteFile(file_path);
                     return pv;
                 }
                 try u.rm_recv(pv);
-                u.assert(false, "{s} does not match hash {s}", .{d.path, d.version});
+                u.assert(false, "{s} does not match hash {s}", .{ d.path, d.version });
                 return p;
             }
             if (try u.does_folder_exist(p)) {
                 try u.rm_recv(p);
             }
-            const file_path = try std.fs.path.join(gpa, &.{p, file_name});
+            const file_path = try std.fs.path.join(gpa, &.{ p, file_name });
             try d.type.pull(d.path, p);
             try std.fs.deleteFileAbsolute(file_path);
             return p;
@@ -173,7 +179,7 @@ fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8
             });
         },
         else => blk: {
-            var dd = try collect_deps(dir, try u.concat(&.{moddir, "/zig.mod"}), options) catch |e| switch (e) {
+            var dd = try collect_deps(dir, try u.concat(&.{ moddir, "/zig.mod" }), options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                         var mod_from = try u.Module.from(d);

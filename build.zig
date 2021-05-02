@@ -10,7 +10,7 @@ pub fn build(b: *Builder) void {
     const mode = b.standardReleaseOptions();
 
     const use_full_name = b.option(bool, "use-full-name", "") orelse false;
-    const with_arch_os = b.fmt("-{s}-{s}", .{@tagName(target.cpu_arch orelse builtin.arch), @tagName(target.os_tag orelse builtin.os.tag)});
+    const with_arch_os = b.fmt("-{s}-{s}", .{ @tagName(target.cpu_arch orelse builtin.arch), @tagName(target.os_tag orelse builtin.os.tag) });
     const exe_name = b.fmt("{s}{s}", .{ "zigmod", if (use_full_name) with_arch_os else "" });
 
     const exe = b.addExecutable(exe_name, "src/main.zig");
@@ -42,8 +42,7 @@ pub fn build(b: *Builder) void {
 
         exe.addPackagePath("zigmod", "./src/lib.zig");
         exe.addPackagePath("ansi", "./libs/zig-ansi/src/lib.zig");
-    }
-    else {
+    } else {
         deps.addAllTo(exe);
     }
 

@@ -13,7 +13,7 @@ pub const mb = kb * 1024;
 pub const gb = mb * 1024;
 
 pub fn print(comptime fmt: []const u8, args: anytype) void {
-    std.debug.print(fmt++"\n", args);
+    std.debug.print(fmt ++ "\n", args);
 }
 
 pub fn assert(ok: bool, comptime fmt: []const u8, args: anytype) void {
@@ -72,16 +72,16 @@ pub fn does_folder_exist(fpath: []const u8) !bool {
 
 pub fn _join(comptime delim: []const u8, comptime xs: [][]const u8) []const u8 {
     var buf: []const u8 = "";
-    for (xs) |x,i| {
+    for (xs) |x, i| {
         buf = buf ++ x;
-        if (i < xs.len-1) buf = buf ++ delim;
+        if (i < xs.len - 1) buf = buf ++ delim;
     }
     return buf;
 }
 
 pub fn trim_suffix(comptime T: type, in: []const T, suffix: []const T) []const T {
     if (std.mem.endsWith(T, in, suffix)) {
-        return in[0..in.len-suffix.len];
+        return in[0 .. in.len - suffix.len];
     }
     return in;
 }
@@ -98,7 +98,7 @@ pub fn repeat(s: []const u8, times: i32) ![]const u8 {
 pub fn join(xs: [][]const u8, delim: []const u8) ![]const u8 {
     var res: []const u8 = "";
     for (xs) |x, i| {
-        res = try std.fmt.allocPrint(gpa, "{s}{s}{s}", .{res, x, if (i < xs.len-1) delim else ""});
+        res = try std.fmt.allocPrint(gpa, "{s}{s}{s}", .{ res, x, if (i < xs.len - 1) delim else "" });
     }
     return res;
 }
@@ -106,7 +106,7 @@ pub fn join(xs: [][]const u8, delim: []const u8) ![]const u8 {
 pub fn concat(items: [][]const u8) ![]const u8 {
     var buf: []const u8 = "";
     for (items) |x| {
-        buf = try std.fmt.allocPrint(gpa, "{s}{s}", .{buf, x});
+        buf = try std.fmt.allocPrint(gpa, "{s}{s}", .{ buf, x });
     }
     return buf;
 }
@@ -150,15 +150,14 @@ pub fn file_list(dpath: []const u8, list: *std.ArrayList([]const u8)) !void {
                 continue;
             }
             try list.append(try gpa.dupe(u8, entry.path));
-        }
-        else {
+        } else {
             break;
         }
     }
 }
 
 pub fn run_cmd(dir: ?[]const u8, args: []const []const u8) !u32 {
-    const result = std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch(e) {
+    const result = std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
         error.FileNotFound => {
             u.assert(false, "\"{s}\" command not found", .{args[0]});
             unreachable;
@@ -191,7 +190,7 @@ pub fn mkdir_all(dpath: []const u8) anyerror!void {
     if (dpath.len == 0) {
         return;
     }
-    const d = if (dpath[dpath.len-1] == std.fs.path.sep) dpath[0..dpath.len-1] else dpath;
+    const d = if (dpath[dpath.len - 1] == std.fs.path.sep) dpath[0 .. dpath.len - 1] else dpath;
     const ps = std.fs.path.sep_str;
     if (std.mem.lastIndexOf(u8, d, ps)) |index| {
         try mkdir_all(d[0..index]);
@@ -210,14 +209,15 @@ pub fn rm_recv(path: []const u8) anyerror!void {
     defer file.close();
     const s = try file.stat();
     if (s.kind == .Directory) {
-        const dir = std.fs.cwd().openDir(abs_path, .{ .iterate=true, }) catch unreachable;
+        const dir = std.fs.cwd().openDir(abs_path, .{
+            .iterate = true,
+        }) catch unreachable;
         var iter = dir.iterate();
         while (try iter.next()) |item| {
-            try rm_recv(try std.fs.path.join(gpa, &.{abs_path, item.name}));
+            try rm_recv(try std.fs.path.join(gpa, &.{ abs_path, item.name }));
         }
         try std.fs.deleteDirAbsolute(abs_path);
-    }
-    else {
+    } else {
         try std.fs.deleteFileAbsolute(abs_path);
     }
 }
@@ -231,7 +231,7 @@ pub fn random_string(len: usize) ![]const u8 {
     var buf = try gpa.alloc(u8, len);
     var i: usize = 0;
     while (i < len) : (i += 1) {
-        buf[i] = alphabet[r.int(usize)%alphabet.len];
+        buf[i] = alphabet[r.int(usize) % alphabet.len];
     }
     return buf;
 }
@@ -272,7 +272,7 @@ pub fn validate_hash(input: []const u8, file_path: []const u8) !bool {
     };
     const result = std.mem.eql(u8, expected, actual);
     if (!result) {
-        std.log.info("expected: {s}, actual: {s}", .{expected, actual});
+        std.log.info("expected: {s}, actual: {s}", .{ expected, actual });
     }
     return result;
 }

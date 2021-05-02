@@ -36,7 +36,7 @@ pub fn execute(args: [][]u8) !void {
 
     const w = client.writer();
     try w.print("GET {s} HTTP/1.1\r\n", .{url.path});
-    try w.print("Host: {s}:{}\r\n", .{url.host.name, url.port.?});
+    try w.print("Host: {s}:{}\r\n", .{ url.host.name, url.port.? });
     try w.writeAll("Accept: application/json; charset=UTF-8\r\n");
     try w.writeAll("Connection: close\r\n");
     try w.writeAll("\r\n");
@@ -56,7 +56,7 @@ pub fn execute(args: [][]u8) !void {
     const html_contents = data.items[index..];
 
     var stream = std.json.TokenStream.init(html_contents[4..]);
-    const res = try std.json.parse([]Zpm.Package, &stream, .{ .allocator = gpa, });
+    const res = try std.json.parse([]Zpm.Package, &stream, .{ .allocator = gpa });
 
     const found = blk: {
         for (res) |pkg| {
@@ -77,14 +77,14 @@ pub fn execute(args: [][]u8) !void {
         }
     }
 
-    const file = try std.fs.cwd().openFile("zig.mod", .{ .read=true, .write=true });
+    const file = try std.fs.cwd().openFile("zig.mod", .{ .read = true, .write = true });
     try file.seekTo(try file.getEndPos());
-    
+
     const file_w = file.writer();
     try file_w.print("\n", .{});
     try file_w.print("  - src: git {s}\n", .{found.git});
     try file_w.print("    name: {s}\n", .{found.name});
     try file_w.print("    main: {s}\n", .{found.root_file.?[1..]});
 
-    std.log.info("Successfully added package {s} by {s}", .{found.name, found.author});
+    std.log.info("Successfully added package {s} by {s}", .{ found.name, found.author });
 }

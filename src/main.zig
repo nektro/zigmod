@@ -10,7 +10,6 @@ pub const common = @import("./common.zig");
 //
 
 pub fn main() !void {
-
     const gpa = std.heap.c_allocator;
 
     const proc_args = try std.process.argsAlloc(gpa);
@@ -21,7 +20,7 @@ pub fn main() !void {
             @import("build_options").version,
             @tagName(builtin.os.tag),
             @tagName(builtin.arch),
-            @tagName(builtin.abi)
+            @tagName(builtin.abi),
         });
         return;
     }
@@ -41,7 +40,7 @@ pub fn main() !void {
     for (args[1..]) |item| {
         try sub_cmd_args.append(item);
     }
-    const result = std.ChildProcess.exec(.{ .allocator = gpa, .argv = sub_cmd_args.items, }) catch |e| switch(e) {
+    const result = std.ChildProcess.exec(.{ .allocator = gpa, .argv = sub_cmd_args.items }) catch |e| switch (e) {
         else => return e,
         error.FileNotFound => {
             u.assert(false, "unknown command \"{s}\" for \"zigmod\"", .{args[0]});
