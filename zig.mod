@@ -32,11 +32,11 @@ dependencies:
 
   - src: git https://github.com/ziglibs/known-folders commit-f0f4188
 
-  - src: git https://github.com/Vexu/zuri commit-41bcd78
-
-  - src: git https://github.com/alexnask/iguanaTLS commit-1767e48
-
   - src: git https://github.com/nektro/zig-licenses commit-1a19e4b
+
+  - src: git https://github.com/truemedian/zfetch commit-5b9d6a2
+
+  - src: git https://github.com/nektro/zig-json commit-ad4232e
 
 dev_dependencies:
   - src: git https://github.com/nektro/zig-ansi commit-25039ca
