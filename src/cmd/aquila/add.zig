@@ -1,9 +1,6 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 
-const zfetch = @import("zfetch");
-const json = @import("json");
-
 const u = @import("./../../util/index.zig");
 const aq = @import("./../aq.zig");
 
@@ -14,24 +11,7 @@ pub fn execute(args: [][]u8) !void {
     const pkg_id = args[0];
 
     const url = try std.mem.join(gpa, "/", &.{ aq.server_root, pkg_id });
-
-    const req = try zfetch.Request.init(gpa, url, null);
-    defer req.deinit();
-
-    var headers = zfetch.Headers.init(gpa);
-    defer headers.deinit();
-    try headers.set("accept", "application/json");
-
-    try req.do(.GET, headers, null);
-
-    const r = req.reader();
-    const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
-    const val = try json.parse(gpa, body_content);
-
-    if (val.get("message")) |msg| {
-        std.log.err("server: {s}", .{msg.String});
-        return;
-    }
+    const val = try aq.server_fetch(url);
 
     const name = val.get(.{ "pkg", "name" }).?.String;
 
