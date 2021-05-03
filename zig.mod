@@ -2,6 +2,7 @@ id: 89ujp8gq842x6mzok8feypwze138n2d96zpugw44hcq7406r
 name: zigmod
 main: src/lib.zig
 license: MIT
+description: A package manager for the Zig programming language.
 dependencies:
   - src: git https://github.com/yaml/libyaml tag-0.2.5
     id: 8mdbh0zuneb0i3hs5jby5je0heem1i6yxusl7c8y8qx68hqc
