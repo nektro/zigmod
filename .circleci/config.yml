@@ -15,16 +15,16 @@ jobs:
       - run: git submodule update --init --recursive
 
       - run: apt -y install xz-utils jq
-      - run: ./download_zig.sh 0.8.0-dev.1767+c28d1fe17
+      - run: ./download_zig.sh 0.8.0-dev.2093+c47028cd0
       - run: zig version
       - run: zig env
       - run: zig build -Dbootstrap
-      - run: ./zig-cache/bin/zigmod fetch
+      - run: ./zig-out/bin/zigmod fetch
       - run: ./build_all_zig.sh
       - store_artifacts:
-          path: ./zig-cache/bin/
+          path: ./zig-out/bin/
           destination: /artifacts/
 
       - run: mkdir -p /artifacts/
-      - run: cp -R ./zig-cache/bin/. /artifacts/
+      - run: cp -R ./zig-out/bin/. /artifacts/
       - run: ./make_release.sh

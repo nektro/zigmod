@@ -17,20 +17,20 @@ A package manager for the Zig programming language.
 - https://github.com/nektro/zigmod/releases
 
 ## Built With
-- Zig master `0.8.0-dev.1767+c28d1fe17`
+- Zig master `0.8.0-dev.2093+c47028cd0`
 
 ### Build from Source
 Initially,
 ```
 $ git clone https://github.com/nektro/zigmod --recursive
 $ zig build -Dbootstrap
-$ ./zig-cache/bin/zigmod fetch
+$ ./zig-out/bin/zigmod fetch
 ```
 
 To build,
 ```
 $ zig build
-$ ./zig-cache/bin/zigmod
+$ ./zig-out/bin/zigmod
 ```
 
 ## Usage

@@ -8,7 +8,7 @@ You can learn more about Zig here:
 
 The rest of this documentation will assume you already have Zig installed.
 
-As Zig is still in development itself, if you plan to contribute to Zigmod you will need a master download of Zig. Those can be obtained from https://ziglang.org/download/#release-master. The most recent release Zigmod was verified to work with is `0.8.0-dev.1767+c28d1fe17`.
+As Zig is still in development itself, if you plan to contribute to Zigmod you will need a master download of Zig. Those can be obtained from https://ziglang.org/download/#release-master. The most recent release Zigmod was verified to work with is `0.8.0-dev.2093+c47028cd0`.
 
 ## Download
 You may download a precompiled binary from https://github.com/nektro/zigmod/releases or build the project from source.
@@ -19,9 +19,9 @@ Assuming you have Zig master installed,
 $ git clone https://github.com/nektro/zigmod --recursive
 $ cd zigmod
 $ zig build -Dbootstrap
-$ ./zig-cache/bin/zigmod fetch
+$ ./zig-out/bin/zigmod fetch
 $ zig build
-$ ./zig-cache/bin/zigmod
+$ ./zig-out/bin/zigmod
 ```
 
 ## Getting Started
