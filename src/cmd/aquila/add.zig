@@ -5,6 +5,7 @@ const zfetch = @import("zfetch");
 const json = @import("json");
 
 const u = @import("./../../util/index.zig");
+const aq = @import("./../aq.zig");
 
 //
 //
@@ -12,7 +13,7 @@ const u = @import("./../../util/index.zig");
 pub fn execute(args: [][]u8) !void {
     const pkg_id = args[0];
 
-    const url = try std.mem.join(gpa, "/", &.{ "https://aquila.red", pkg_id });
+    const url = try std.mem.join(gpa, "/", &.{ aq.server_root, pkg_id });
 
     const req = try zfetch.Request.init(gpa, url, null);
     defer req.deinit();
@@ -58,7 +59,7 @@ pub fn execute(args: [][]u8) !void {
 
     const file_w = file.writer();
     try file_w.print("\n", .{});
-    try file_w.print("  - src: http https://aquila.red/{s}/v{d}.{d}.tar.gz _ {d} {d}\n", .{ pkg_id, v_maj, v_min, v_maj, v_min });
+    try file_w.print("  - src: http {s}/{s}/v{d}.{d}.tar.gz _ {d} {d}\n", .{ aq.server_root, pkg_id, v_maj, v_min, v_maj, v_min });
     try file_w.print("    version: {s}\n", .{v_hash});
 
     std.log.info("Successfully added package {s}", .{pkg_id});

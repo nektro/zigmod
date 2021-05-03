@@ -10,6 +10,8 @@ pub const commands = struct {
     pub const add = @import("./aquila/add.zig");
 };
 
+pub const server_root = "https://aquila.red";
+
 pub fn execute(args: [][]u8) !void {
     if (args.len == 0) {
         std.debug.warn("{s}\n", .{
