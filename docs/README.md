@@ -28,6 +28,10 @@ $ ./zig-out/bin/zigmod
 
 Check here for the [full command reference](./commands/).
 
+Check here for the [`zig.mod` reference](./zig.mod.md).
+
+Check here for the [`deps.zig` reference](./deps.zig.md).
+
 ### A new project
 Create a new directory for your project and run these commands to get started:
 ```
