@@ -11,6 +11,8 @@ const u = @import("./../util/index.zig");
 
 pub const commands = struct {
     pub const add = @import("./aquila/add.zig");
+    pub const update = @import("./aquila/update.zig");
+    pub const modfile = @import("./aquila/modfile.zig");
 };
 
 pub const server_root = "https://aquila.red";
