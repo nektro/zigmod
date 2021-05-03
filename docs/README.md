@@ -26,7 +26,7 @@ $ ./zig-out/bin/zigmod
 
 ## Getting Started
 
-For a full command reference you can check [here](./commands/).
+Check here for the [full command reference](./commands/).
 
 ### A new project
 Create a new directory for your project and run these commands to get started:
