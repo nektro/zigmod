@@ -8,4 +8,5 @@ pub const commands = struct {
     pub const sum = @import("./cmd/sum.zig");
     pub const zpm = @import("./cmd/zpm.zig");
     pub const license = @import("./cmd/license.zig");
+    pub const aq = @import("./cmd/aq.zig");
 };
