@@ -270,7 +270,7 @@ pub fn validate_hash(input: []const u8, file_path: []const u8) !bool {
         .sha256 => try do_hash(std.crypto.hash.sha2.Sha256, data),
         .sha512 => try do_hash(std.crypto.hash.sha2.Sha512, data),
     };
-    const result = std.mem.eql(u8, expected, actual);
+    const result = std.mem.startsWith(u8, actual, expected);
     if (!result) {
         std.log.info("expected: {s}, actual: {s}", .{ expected, actual });
     }
