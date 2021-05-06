@@ -39,8 +39,7 @@ pub fn execute(args: [][]u8) !void {
 
     const file_w = file.writer();
     try file_w.print("\n", .{});
-    try file_w.print("  - src: http {s}/{s}/v{d}.{d}.tar.gz _ {d} {d}\n", .{ aq.server_root, pkg_id, v_maj, v_min, v_maj, v_min });
-    try file_w.print("    version: {s}\n", .{v_hash});
+    try file_w.print("  - src: http {s}/v{d}.{d}.tar.gz {s} {d} {d}\n", .{ url, v_maj, v_min, v_hash[0..20], v_maj, v_min });
 
     std.log.info("Successfully added package {s}", .{pkg_id});
 }
