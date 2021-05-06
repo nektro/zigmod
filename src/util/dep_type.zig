@@ -40,7 +40,7 @@ pub const DepType = enum {
                 _ = try u.run_cmd(null, &.{ "hg", "clone", rpath, dpath });
             },
             .http => {
-                try u.mkdir_all(dpath);
+                try std.fs.cwd().makePath(dpath);
                 _ = try u.run_cmd(dpath, &.{ "wget", rpath });
                 const f = rpath[std.mem.lastIndexOf(u8, rpath, "/").? + 1 ..];
                 if (std.mem.endsWith(u8, f, ".zip")) {
