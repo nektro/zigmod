@@ -56,14 +56,24 @@ pub fn execute(args: [][]u8) !void {
         }
     }
 
+    const has_zigdotmod = blk: {
+        const _url = try std.mem.join(gpa, "/", &.{ found.git, "blob", "HEAD", "zig.mod" });
+        const _req = try zfetch.Request.init(gpa, _url, null);
+        defer _req.deinit();
+        try _req.do(.GET, null, null);
+        break :blk _req.status.code == 200;
+    };
+
     const file = try std.fs.cwd().openFile("zig.mod", .{ .read = true, .write = true });
     try file.seekTo(try file.getEndPos());
 
     const file_w = file.writer();
     try file_w.print("\n", .{});
     try file_w.print("  - src: git {s}\n", .{std.mem.trimRight(u8, found.git, ".git")});
-    try file_w.print("    name: {s}\n", .{found.name});
-    try file_w.print("    main: {s}\n", .{found.root_file.?[1..]});
+    if (!has_zigdotmod) {
+        try file_w.print("    name: {s}\n", .{found.name});
+        try file_w.print("    main: {s}\n", .{found.root_file.?[1..]});
+    }
 
     std.log.info("Successfully added package {s} by {s}", .{ found.name, found.author });
 }
