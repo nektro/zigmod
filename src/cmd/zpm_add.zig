@@ -2,7 +2,6 @@ const std = @import("std");
 const gpa = std.heap.c_allocator;
 
 const zfetch = @import("zfetch");
-const json = @import("json");
 
 const u = @import("./../util/index.zig");
 
@@ -30,11 +29,12 @@ pub fn execute(args: [][]u8) !void {
     const r = req.reader();
 
     const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
-    const val = try json.parse(gpa, body_content);
+    var stream = std.json.TokenStream.init(body_content);
+    const val = try std.json.parse([]Zpm.Package, &stream, .{});
 
     const found = blk: {
-        for (val.Array) |pkg| {
-            if (std.mem.eql(u8, pkg.get("name").?.String, args[0])) {
+        for (val) |pkg| {
+            if (std.mem.eql(u8, pkg.name, args[0])) {
                 break :blk pkg;
             }
         }
@@ -42,17 +42,17 @@ pub fn execute(args: [][]u8) !void {
         unreachable;
     };
 
-    u.assert(found.get("root_file") != null, "package must have an entry point to be able to be added to your dependencies", .{});
+    u.assert(found.root_file != null, "package must have an entry point to be able to be added to your dependencies", .{});
 
     const self_module = try u.ModFile.init(gpa, "zig.mod");
     for (self_module.deps) |dep| {
-        if (std.mem.eql(u8, dep.name, found.get("name").?.String)) {
-            std.log.warn("dependency with name '{s}' already exists in your dependencies", .{found.get("name").?.String});
+        if (std.mem.eql(u8, dep.name, found.name)) {
+            std.log.warn("dependency with name '{s}' already exists in your dependencies", .{found.name});
         }
     }
     for (self_module.devdeps) |dep| {
-        if (std.mem.eql(u8, dep.name, found.get("name").?.String)) {
-            std.log.warn("dependency with name '{s}' already exists in your dev_dependencies", .{found.get("name").?.String});
+        if (std.mem.eql(u8, dep.name, found.name)) {
+            std.log.warn("dependency with name '{s}' already exists in your dev_dependencies", .{found.name});
         }
     }
 
@@ -61,9 +61,9 @@ pub fn execute(args: [][]u8) !void {
 
     const file_w = file.writer();
     try file_w.print("\n", .{});
-    try file_w.print("  - src: git {s}\n", .{found.get("git").?.String});
-    try file_w.print("    name: {s}\n", .{found.get("name").?.String});
-    try file_w.print("    main: {s}\n", .{found.get("root_file").?.String[1..]});
+    try file_w.print("  - src: git {s}\n", .{found.git});
+    try file_w.print("    name: {s}\n", .{found.name});
+    try file_w.print("    main: {s}\n", .{found.root_file.?[1..]});
 
-    std.log.info("Successfully added package {s} by {s}", .{ found.get("name").?.String, found.get("author").?.String });
+    std.log.info("Successfully added package {s} by {s}", .{ found.name, found.author });
 }
