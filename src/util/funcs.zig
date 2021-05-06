@@ -186,28 +186,6 @@ pub fn last(in: [][]const u8) ![]const u8 {
     return in[in.len - 1];
 }
 
-pub fn rm_recv(path: []const u8) anyerror!void {
-    const abs_path = std.fs.realpathAlloc(gpa, path) catch |e| switch (e) {
-        error.FileNotFound => return,
-        else => return e,
-    };
-    const file = try std.fs.openFileAbsolute(abs_path, .{});
-    defer file.close();
-    const s = try file.stat();
-    if (s.kind == .Directory) {
-        const dir = std.fs.cwd().openDir(abs_path, .{
-            .iterate = true,
-        }) catch unreachable;
-        var iter = dir.iterate();
-        while (try iter.next()) |item| {
-            try rm_recv(try std.fs.path.join(gpa, &.{ abs_path, item.name }));
-        }
-        try std.fs.deleteDirAbsolute(abs_path);
-    } else {
-        try std.fs.deleteFileAbsolute(abs_path);
-    }
-}
-
 const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 pub fn random_string(len: usize) ![]const u8 {

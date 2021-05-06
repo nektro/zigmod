@@ -144,12 +144,12 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
                     try std.fs.cwd().deleteFile(file_path);
                     return pv;
                 }
-                try u.rm_recv(pv);
+                try std.fs.cwd().deleteTree(pv);
                 u.assert(false, "{s} does not match hash {s}", .{ d.path, d.version });
                 return p;
             }
             if (try u.does_folder_exist(p)) {
-                try u.rm_recv(p);
+                try std.fs.cwd().deleteTree(p);
             }
             const file_path = try std.fs.path.join(gpa, &.{ p, file_name });
             try d.type.pull(d.path, p);
