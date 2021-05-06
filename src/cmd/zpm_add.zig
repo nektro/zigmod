@@ -50,6 +50,11 @@ pub fn execute(args: [][]u8) !void {
             std.log.warn("dependency with name '{s}' already exists in your dependencies", .{found.get("name").?.String});
         }
     }
+    for (self_module.devdeps) |dep| {
+        if (std.mem.eql(u8, dep.name, found.get("name").?.String)) {
+            std.log.warn("dependency with name '{s}' already exists in your dev_dependencies", .{found.get("name").?.String});
+        }
+    }
 
     const file = try std.fs.cwd().openFile("zig.mod", .{ .read = true, .write = true });
     try file.seekTo(try file.getEndPos());
