@@ -13,9 +13,13 @@ MIT:
 = https://opensource.org/licenses/MIT
 - This
 - v/git/github.com/yaml/libyaml/tag-0.2.5
-- v/git/github.com/nektro/zig-ansi/commit-25039ca
-- v/git/github.com/ziglibs/known-folders/commit-f0f4188
-- v/git/github.com/Vexu/zuri/commit-41bcd78
-- v/git/github.com/alexnask/iguanaTLS/commit-1767e48
-- v/git/github.com/nektro/zig-licenses/commit-1a19e4b
+- git/github.com/nektro/zig-ansi
+- git/github.com/ziglibs/known-folders
+- git/github.com/nektro/zig-licenses
+- git/github.com/truemedian/zfetch
+- git/github.com/truemedian/hzzp
+- git/github.com/alexnask/iguanaTLS
+- git/github.com/MasterQ32/zig-network
+- git/github.com/MasterQ32/zig-uri
+- git/github.com/nektro/zig-json
 ```
