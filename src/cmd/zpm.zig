@@ -36,7 +36,7 @@ pub fn execute(args: [][]u8) !void {
             return;
         }
     }
-    std.debug.panic("error: unknown command \"{s}\" for \"zigmod zpm\"", .{args[0]});
+    u.assert(false, "unknown command \"{s}\" for \"zigmod zpm\"", .{args[0]});
 }
 
 pub fn server_fetch(url: []const u8) !json.Value {
