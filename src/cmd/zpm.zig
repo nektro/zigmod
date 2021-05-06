@@ -25,6 +25,7 @@ pub fn execute(args: [][]u8) !void {
             \\
             \\The subcommands available are:
             \\  - add       Append this package to your dependencies
+            \\  - showjson  Print raw json from queried API responses
         });
         return;
     }
