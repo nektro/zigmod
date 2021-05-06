@@ -47,7 +47,7 @@ pub fn execute(args: [][]u8) !void {
     const self_module = try u.ModFile.init(gpa, "zig.mod");
     for (self_module.deps) |dep| {
         if (std.mem.eql(u8, dep.name, found.get("name").?.String)) {
-            u.assert(false, "dependency with name '{s}' already exists in your dependencies", .{found.get("name").?.String});
+            std.log.warn("dependency with name '{s}' already exists in your dependencies", .{found.get("name").?.String});
         }
     }
 
