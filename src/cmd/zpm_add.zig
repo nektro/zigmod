@@ -30,7 +30,7 @@ pub fn execute(args: [][]u8) !void {
 
     const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
     var stream = std.json.TokenStream.init(body_content);
-    const val = try std.json.parse([]Zpm.Package, &stream, .{});
+    const val = try std.json.parse([]Zpm.Package, &stream, .{ .allocator = gpa });
 
     const found = blk: {
         for (val) |pkg| {
