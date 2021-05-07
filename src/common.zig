@@ -12,7 +12,7 @@ pub const CollectOptions = struct {
     update: bool,
 };
 
-pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, comptime options: CollectOptions) !u.Module {
+pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: CollectOptions) !u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     try moduledeps.append(try collect_deps(dir, mpath, options));
@@ -35,7 +35,7 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, comptime options: C
     };
 }
 
-pub fn collect_deps(dir: []const u8, mpath: []const u8, comptime options: CollectOptions) anyerror!u.Module {
+pub fn collect_deps(dir: []const u8, mpath: []const u8, options: CollectOptions) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     for (m.deps) |d| {
@@ -67,7 +67,7 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
     }
 }
 
-fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime options: CollectOptions) ![]const u8 {
+fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: CollectOptions) ![]const u8 {
     const p = try fs.path.join(gpa, &.{ basedir, try d.clean_path() });
     const pv = try fs.path.join(gpa, &.{ basedir, try d.clean_path_v() });
     const tempdir = try fs.path.join(gpa, &.{ basedir, "temp" });
@@ -159,7 +159,7 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, comptime o
     }
 }
 
-fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8, parent_name: []const u8, comptime options: CollectOptions) !void {
+fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8, parent_name: []const u8, options: CollectOptions) !void {
     const moddir = try get_moddir(dir, d, parent_name, options);
     switch (d.type) {
         .system_lib => {

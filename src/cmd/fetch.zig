@@ -12,10 +12,11 @@ const common = @import("./../common.zig");
 pub fn execute(args: [][]u8) !void {
     //
     const dir = try fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const should_update = !(args.len >= 1 and std.mem.eql(u8, args[0], "--no-update"));
 
     const top_module = try common.collect_deps_deep(dir, "zig.mod", .{
-        .log = true,
-        .update = true,
+        .log = should_update,
+        .update = should_update,
     });
 
     //
