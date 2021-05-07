@@ -12,6 +12,7 @@ const u = @import("./../util/index.zig");
 pub const commands = struct {
     pub const add = @import("./zpm_add.zig");
     pub const showjson = @import("./zpm/showjson.zig");
+    pub const tags = @import("./zpm/tags.zig");
 };
 
 pub const server_root = "https://zpm.random-projects.net/api";
@@ -26,6 +27,7 @@ pub fn execute(args: [][]u8) !void {
             \\The subcommands available are:
             \\  - add       Append this package to your dependencies
             \\  - showjson  Print raw json from queried API responses
+            \\  - tags      Print the list of tags available on the server.
         });
         return;
     }

@@ -37,6 +37,7 @@ pub const _ids = .{
     "yyhw90zkzgmubwpp87n0pzf936n850an66y1c6qan5y6sogv",
     "u9w9dpp6p804p38o3u87f437pf942wxunyjite27dyhtu7ns",
     "ocmr9rtohgccd6gm6tp8b1yzylyzkqwvo1q4btrsvj0cse9y",
+    "tnj3qf44tpeq469x94qnu7jzus5n7sen9ewrrn8kldngbac0",
 };
 
 pub const _paths = .{
@@ -51,6 +52,7 @@ pub const _paths = .{
     "/git/github.com/MasterQ32/zig-network/",
     "/git/github.com/MasterQ32/zig-uri/",
     "/git/github.com/nektro/zig-json/",
+    "/v/http/aquila.red/1/nektro/range/v0.1.tar.gz/d2f72fdd/",
 };
 
 pub const package_data = struct {
@@ -63,7 +65,8 @@ pub const package_data = struct {
     pub const _u9w9dpp6p804p38o3u87f437pf942wxunyjite27dyhtu7ns = std.build.Pkg{ .name = "uri", .path = cache ++ "/git/github.com/MasterQ32/zig-uri/uri.zig", .dependencies = &[_]std.build.Pkg{ } };
     pub const _ejw82j2ipa0eul25ohgdh6yy5nkrtn2pf0rq18m0079w6wj7 = std.build.Pkg{ .name = "zfetch", .path = cache ++ "/git/github.com/truemedian/zfetch/src/main.zig", .dependencies = &[_]std.build.Pkg{ _9k24gimke1anv665ilg4si32ayl3dsaqgmdfdpu1ceoky8tl, _csbnipaad8n77buaszsnjvlmn6j173fl7pkprsctelswjywe, _yyhw90zkzgmubwpp87n0pzf936n850an66y1c6qan5y6sogv, _u9w9dpp6p804p38o3u87f437pf942wxunyjite27dyhtu7ns, } };
     pub const _ocmr9rtohgccd6gm6tp8b1yzylyzkqwvo1q4btrsvj0cse9y = std.build.Pkg{ .name = "json", .path = cache ++ "/git/github.com/nektro/zig-json/src/lib.zig", .dependencies = &[_]std.build.Pkg{ } };
-    pub const _89ujp8gq842x6mzok8feypwze138n2d96zpugw44hcq7406r = std.build.Pkg{ .name = "zigmod", .path = cache ++ "/../../src/lib.zig", .dependencies = &[_]std.build.Pkg{ _s84v9o48ucb0xq0cmzq0cn433hgw0iaqztugja16h8bzxu3h, _2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf, _0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r, _ejw82j2ipa0eul25ohgdh6yy5nkrtn2pf0rq18m0079w6wj7, _ocmr9rtohgccd6gm6tp8b1yzylyzkqwvo1q4btrsvj0cse9y, } };
+    pub const _tnj3qf44tpeq469x94qnu7jzus5n7sen9ewrrn8kldngbac0 = std.build.Pkg{ .name = "range", .path = cache ++ "/v/http/aquila.red/1/nektro/range/v0.1.tar.gz/d2f72fdd/src/lib.zig", .dependencies = &[_]std.build.Pkg{ } };
+    pub const _89ujp8gq842x6mzok8feypwze138n2d96zpugw44hcq7406r = std.build.Pkg{ .name = "zigmod", .path = cache ++ "/../../src/lib.zig", .dependencies = &[_]std.build.Pkg{ _s84v9o48ucb0xq0cmzq0cn433hgw0iaqztugja16h8bzxu3h, _2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf, _0npcrzfdlrvkf44mzjo8bduj9gmqyefo0j3rstt6b0pm2r6r, _ejw82j2ipa0eul25ohgdh6yy5nkrtn2pf0rq18m0079w6wj7, _ocmr9rtohgccd6gm6tp8b1yzylyzkqwvo1q4btrsvj0cse9y, _tnj3qf44tpeq469x94qnu7jzus5n7sen9ewrrn8kldngbac0, } };
 };
 
 pub const packages = &[_]std.build.Pkg{
