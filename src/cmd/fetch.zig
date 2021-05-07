@@ -56,6 +56,11 @@ pub fn execute(args: [][]u8) !void {
 
     const list = &std.ArrayList(u.Module).init(gpa);
     try common.collect_pkgs(top_module, list);
+    for (list.items) |*mod| {
+        if (mod.id.len > 12) {
+            mod.id = mod.id[0..12];
+        }
+    }
 
     try w.writeAll("pub const _ids = .{\n");
     try print_ids(w, list.items);
@@ -152,7 +157,7 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
         if (!array) {
             try w.print("    pub const {s} = packages[{}];\n", .{ std.mem.replaceOwned(u8, gpa, d.name, "-", "_"), i });
         } else {
-            try w.print("    package_data._{s},\n", .{d.id});
+            try w.print("    package_data._{s},\n", .{d.id[0..12]});
         }
     }
     try w.print("{s}", .{try u.concat(&.{ r, "}" })});
@@ -221,7 +226,7 @@ fn print_pkg_data_to(w: fs.File.Writer, list: *std.ArrayList(u.Module), list2: *
             try w.print("    pub const _{s} = std.build.Pkg{{ .name = \"{s}\", .path = cache ++ \"/{}/{s}\", .dependencies = &[_]std.build.Pkg{{", .{ mod.id, mod.name, std.zig.fmtEscapes(mod.clean_path), mod.main });
             for (mod.deps) |d| {
                 if (d.main.len > 0) {
-                    try w.print(" _{s},", .{d.id});
+                    try w.print(" _{s},", .{d.id[0..12]});
                 }
             }
             try w.print(" }} }};\n", .{});
