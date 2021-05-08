@@ -17,14 +17,14 @@ pub fn execute(args: [][]u8) !void {
     const val = try zpm.server_fetch(url);
 
     const name_col_width = blk: {
-        var w: usize = 0;
+        var w: usize = 4;
         for (val.Array) |tag| {
             const len = tag.get("name").?.String.len;
             if (len > w) {
                 w = len;
             }
         }
-        break :blk w + 4;
+        break :blk w + 2;
     };
 
     try out.writeAll("NAME");
