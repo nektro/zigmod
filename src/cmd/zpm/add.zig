@@ -3,8 +3,8 @@ const gpa = std.heap.c_allocator;
 
 const zfetch = @import("zfetch");
 
-const u = @import("./../util/index.zig");
-const zpm = @import("./zpm.zig");
+const u = @import("./../../util/index.zig");
+const zpm = @import("./../zpm.zig");
 
 //
 //

@@ -10,7 +10,7 @@ const u = @import("./../util/index.zig");
 //
 
 pub const commands = struct {
-    pub const add = @import("./zpm_add.zig");
+    pub const add = @import("./zpm/add.zig");
     pub const showjson = @import("./zpm/showjson.zig");
     pub const tags = @import("./zpm/tags.zig");
 };
