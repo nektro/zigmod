@@ -15,7 +15,7 @@ jobs:
       - run: git submodule update --init --recursive
 
       - run: apt -y install xz-utils jq
-      - run: ./download_zig.sh 0.8.0-dev.2093+c47028cd0
+      - run: ./download_zig.sh 0.8.0-dev.2133+ad33e3483
       - run: zig version
       - run: zig env
       - run: zig build -Dbootstrap
