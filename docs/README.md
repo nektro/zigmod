@@ -14,12 +14,18 @@ As Zig is still in development itself, if you plan to contribute to Zigmod you w
 You may download a precompiled binary from https://github.com/nektro/zigmod/releases or build the project from source.
 
 ### Build Zigmod from source
-Assuming you have Zig master installed,
+Zigmod partially uses itself to manage dependencies but can be bootstrapped with the 2 (two) included Git submodules. The first step will generate a build of Zigmod that only has the `fetch` command. This binary can then be used to grab the rest of the dependencies and generate a full build.
+
 ```
 $ git clone https://github.com/nektro/zigmod --recursive
 $ cd zigmod
 $ zig build -Dbootstrap
 $ ./zig-out/bin/zigmod fetch
+```
+
+Now that we made our bootstrap build and have the rest of our dependencies, we can build as normal.
+
+```
 $ zig build
 $ ./zig-out/bin/zigmod
 ```
@@ -39,6 +45,10 @@ $ git init
 $ zig init-exe
 $ zigmod init
 ```
+
+You will also want to add `/.zigmod` and `/deps.zig` to your `.gitignore`.
+
+Then run `zigmod fetch`. After that you will be ready to integrate Zigmod with your existing `build.zig` which you can learn how to do [here](commands/fetch.md).
 
 ## Principles
 Zigmod is but a prototype and not the official Zig package manager. As such I wanted to lay out some of the guiding principles learned/used when making the project. You can find that document [here](./principles.md).

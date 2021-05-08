@@ -3,7 +3,7 @@
 zigmod fetch
 ```
 
-- This command takes no parameters and will generate a `deps.zig` in the root of your project.
+- This command takes no parameters and will generate a `deps.zig` in the root of your project. This is the file that you will then import into your `build.zig` to automatically add all the necessary packages and (any) C code that may be in your dependencies.
 - `deps.zig` is not typically checked into your source control.
 
 For a full reference on the fields available in `deps.zig` you can check [here](../deps.zig.md).
