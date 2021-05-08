@@ -13,6 +13,7 @@ pub const commands = struct {
     pub const add = @import("./zpm/add.zig");
     pub const showjson = @import("./zpm/showjson.zig");
     pub const tags = @import("./zpm/tags.zig");
+    pub const search = @import("./zpm/search.zig");
 };
 
 pub const server_root = "https://zpm.random-projects.net/api";
@@ -37,6 +38,7 @@ pub fn execute(args: [][]u8) !void {
             \\  - add       Append this package to your dependencies
             \\  - showjson  Print raw json from queried API responses
             \\  - tags      Print the list of tags available on the server.
+            \\  - search    Search the api for available packages and print them.
         });
         return;
     }
