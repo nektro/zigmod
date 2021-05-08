@@ -9,3 +9,6 @@ The default remote is https://zpm.random-projects.net/.
 
 The subcommands available are:
 - [`add`](zpm_add.md)
+- [`search`](zpm_search.md)
+- [`tags`](zpm_tags.md)
+- [`showjson`](zpm_showjson.md)
