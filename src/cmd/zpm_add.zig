@@ -4,20 +4,10 @@ const gpa = std.heap.c_allocator;
 const zfetch = @import("zfetch");
 
 const u = @import("./../util/index.zig");
+const zpm = @import("./zpm.zig");
 
 //
 //
-
-pub const Zpm = struct {
-    pub const Package = struct {
-        author: []const u8,
-        name: []const u8,
-        tags: [][]const u8,
-        git: []const u8,
-        root_file: ?[]const u8,
-        description: []const u8,
-    };
-};
 
 pub fn execute(args: [][]u8) !void {
     const url = "https://zpm.random-projects.net/api/packages";
@@ -30,7 +20,7 @@ pub fn execute(args: [][]u8) !void {
 
     const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
     var stream = std.json.TokenStream.init(body_content);
-    const val = try std.json.parse([]Zpm.Package, &stream, .{ .allocator = gpa });
+    const val = try std.json.parse([]zpm.Package, &stream, .{ .allocator = gpa });
 
     const found = blk: {
         for (val) |pkg| {

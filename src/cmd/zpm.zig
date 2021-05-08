@@ -17,6 +17,15 @@ pub const commands = struct {
 
 pub const server_root = "https://zpm.random-projects.net/api";
 
+pub const Package = struct {
+    author: []const u8,
+    name: []const u8,
+    tags: [][]const u8,
+    git: []const u8,
+    root_file: ?[]const u8,
+    description: []const u8,
+};
+
 pub fn execute(args: [][]u8) !void {
     if (args.len == 0) {
         std.debug.warn("{s}\n", .{
