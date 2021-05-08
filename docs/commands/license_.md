@@ -22,4 +22,5 @@ MIT:
 - git/github.com/MasterQ32/zig-network
 - git/github.com/MasterQ32/zig-uri
 - git/github.com/nektro/zig-json
+- v/http/aquila.red/1/nektro/range/v0.1.tar.gz/d2f72fdd
 ```
