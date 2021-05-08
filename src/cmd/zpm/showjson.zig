@@ -4,7 +4,7 @@ const gpa = std.heap.c_allocator;
 const zfetch = @import("zfetch");
 const json = @import("json");
 
-const u = @import("./../util/index.zig");
+const u = @import("./../../util/index.zig");
 const zpm = @import("./../zpm.zig");
 
 //

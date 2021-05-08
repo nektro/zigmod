@@ -1,8 +1,8 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
-const fs = std.fs;
 
 const known_folders = @import("known-folders");
+
 const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
 
@@ -11,7 +11,7 @@ const common = @import("./../common.zig");
 
 pub fn execute(args: [][]u8) !void {
     //
-    const dir = try fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const dir = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
     const should_update = !(args.len >= 1 and std.mem.eql(u8, args[0], "--no-update"));
 
     const top_module = try common.collect_deps_deep(dir, "zig.mod", .{
@@ -20,7 +20,7 @@ pub fn execute(args: [][]u8) !void {
     });
 
     //
-    const f = try fs.cwd().createFile("deps.zig", .{});
+    const f = try std.fs.cwd().createFile("deps.zig", .{});
     defer f.close();
 
     const w = f.writer();
@@ -109,7 +109,7 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("};\n\n");
 }
 
-fn print_ids(w: fs.File.Writer, list: []u.Module) !void {
+fn print_ids(w: std.fs.File.Writer, list: []u.Module) !void {
     for (list) |mod| {
         if (std.mem.eql(u8, mod.id, "root")) {
             continue;
@@ -121,7 +121,7 @@ fn print_ids(w: fs.File.Writer, list: []u.Module) !void {
     }
 }
 
-fn print_paths(w: fs.File.Writer, list: []u.Module) !void {
+fn print_paths(w: std.fs.File.Writer, list: []u.Module) !void {
     for (list) |mod| {
         if (std.mem.eql(u8, mod.id, "root")) {
             continue;
@@ -138,7 +138,7 @@ fn print_paths(w: fs.File.Writer, list: []u.Module) !void {
     }
 }
 
-fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array: bool) anyerror!void {
+fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array: bool) anyerror!void {
     if (m.has_no_zig_deps() and tabs > 0) {
         try w.print("null", .{});
         return;
@@ -163,7 +163,7 @@ fn print_deps(w: fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array:
     try w.print("{s}", .{try u.concat(&.{ r, "}" })});
 }
 
-fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
+fn print_incl_dirs_to(w: std.fs.File.Writer, list: []u.Module) !void {
     for (list) |mod, i| {
         if (mod.is_sys_lib) {
             continue;
@@ -178,7 +178,7 @@ fn print_incl_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
     }
 }
 
-fn print_csrc_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
+fn print_csrc_dirs_to(w: std.fs.File.Writer, list: []u.Module) !void {
     for (list) |mod, i| {
         if (mod.is_sys_lib) {
             continue;
@@ -193,7 +193,7 @@ fn print_csrc_dirs_to(w: fs.File.Writer, list: []u.Module) !void {
     }
 }
 
-fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
+fn print_csrc_flags_to(w: std.fs.File.Writer, list: []u.Module) !void {
     for (list) |mod, i| {
         if (mod.is_sys_lib) {
             continue;
@@ -209,7 +209,7 @@ fn print_csrc_flags_to(w: fs.File.Writer, list: []u.Module) !void {
     }
 }
 
-fn print_sys_libs_to(w: fs.File.Writer, list: []u.Module, list2: *std.ArrayList([]const u8)) !void {
+fn print_sys_libs_to(w: std.fs.File.Writer, list: []u.Module, list2: *std.ArrayList([]const u8)) !void {
     for (list) |mod| {
         if (!mod.is_sys_lib) {
             continue;
@@ -218,7 +218,7 @@ fn print_sys_libs_to(w: fs.File.Writer, list: []u.Module, list2: *std.ArrayList(
     }
 }
 
-fn print_pkg_data_to(w: fs.File.Writer, list: *std.ArrayList(u.Module), list2: *std.ArrayList(u.Module)) anyerror!void {
+fn print_pkg_data_to(w: std.fs.File.Writer, list: *std.ArrayList(u.Module), list2: *std.ArrayList(u.Module)) anyerror!void {
     var i: usize = 0;
     while (i < list.items.len) : (i += 1) {
         const mod = list.items[i];

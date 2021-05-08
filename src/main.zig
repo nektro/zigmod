@@ -1,5 +1,6 @@
 const std = @import("std");
 const builtin = std.builtin;
+
 const build_options = @import("build_options");
 const zigmod = @import("zigmod");
 
@@ -17,7 +18,7 @@ pub fn main() !void {
 
     if (args.len == 0) {
         u.print("zigmod {s} {s} {s} {s}", .{
-            @import("build_options").version,
+            build_options.version,
             @tagName(builtin.os.tag),
             @tagName(builtin.arch),
             @tagName(builtin.abi),

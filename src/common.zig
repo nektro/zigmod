@@ -1,6 +1,5 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
-const fs = std.fs;
 
 const u = @import("./util/index.zig");
 
@@ -68,9 +67,9 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
 }
 
 fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: CollectOptions) ![]const u8 {
-    const p = try fs.path.join(gpa, &.{ basedir, try d.clean_path() });
-    const pv = try fs.path.join(gpa, &.{ basedir, try d.clean_path_v() });
-    const tempdir = try fs.path.join(gpa, &.{ basedir, "temp" });
+    const p = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path() });
+    const pv = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path_v() });
+    const tempdir = try std.fs.path.join(gpa, &.{ basedir, "temp" });
     if (options.log) {
         u.print("fetch: {s}: {s}: {s}", .{ parent_name, @tagName(d.type), d.path });
     }
@@ -101,8 +100,8 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: C
                 if ((try u.run_cmd(tempdir, &.{ "git", "checkout", vers.string })) > 0) {
                     u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
                 }
-                const td_fd = try fs.cwd().openDir(basedir, .{});
-                try fs.cwd().makePath(pv);
+                const td_fd = try std.fs.cwd().openDir(basedir, .{});
+                try std.fs.cwd().makePath(pv);
                 try td_fd.rename("temp", try d.clean_path_v());
                 if (vers.id != .branch) {
                     const pvd = try std.fs.cwd().openDir(pv, .{});

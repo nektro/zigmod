@@ -6,7 +6,7 @@ const zfetch = @import("zfetch");
 const json = @import("json");
 const range = @import("range").range;
 
-const u = @import("./../util/index.zig");
+const u = @import("./../../util/index.zig");
 const zpm = @import("./../zpm.zig");
 
 //
@@ -41,7 +41,7 @@ pub fn execute(args: [][]u8) !void {
 }
 
 fn print_c_n(c: u8, n: usize) !void {
-    for (range(n)) |_, i| {
+    for (range(n)) |_| {
         try out.writeAll(&.{c});
     }
 }

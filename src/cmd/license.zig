@@ -1,13 +1,11 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 
+const style = @import("ansi").style;
+const licenses = @import("licenses");
+
 const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
-
-const ansi = @import("ansi");
-const style = ansi.style;
-
-const licenses = @import("licenses");
 
 const Module = u.Module;
 const List = std.ArrayList(u.Module);
