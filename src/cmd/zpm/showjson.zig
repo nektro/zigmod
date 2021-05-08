@@ -11,9 +11,10 @@ const zpm = @import("./../zpm.zig");
 //
 
 pub fn execute(args: [][]u8) !void {
+    const out = std.io.getStdOut().writer();
+
     const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, args[0] });
     const val = try zpm.server_fetch(url);
 
-    const out = std.io.getStdOut().writer();
     try out.print("{}\n", .{val});
 }

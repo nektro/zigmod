@@ -1,6 +1,5 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
-const out = std.io.getStdOut().writer();
 
 const zfetch = @import("zfetch");
 const json = @import("json");
@@ -13,6 +12,8 @@ const zpm = @import("./../zpm.zig");
 //
 
 pub fn execute(args: [][]u8) !void {
+    const out = std.io.getStdOut().writer();
+
     const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, "packages" });
     const val = try zpm.server_fetch(url);
 
@@ -57,24 +58,24 @@ pub fn execute(args: [][]u8) !void {
     };
 
     try out.writeAll("NAME");
-    try print_c_n(' ', name_col_width - 4);
+    try print_c_n(out, ' ', name_col_width - 4);
     try out.writeAll("AUTHOR");
-    try print_c_n(' ', author_col_width - 6);
+    try print_c_n(out, ' ', author_col_width - 6);
     try out.writeAll("DESCRIPTION\n");
 
     for (list) |pkg| {
         try out.writeAll(pkg.name);
-        try print_c_n(' ', name_col_width - pkg.name.len);
+        try print_c_n(out, ' ', name_col_width - pkg.name.len);
 
         try out.writeAll(pkg.author);
-        try print_c_n(' ', author_col_width - pkg.author.len);
+        try print_c_n(out, ' ', author_col_width - pkg.author.len);
 
         try out.writeAll(pkg.description);
         try out.writeAll("\n");
     }
 }
 
-fn print_c_n(c: u8, n: usize) !void {
+fn print_c_n(out: anytype, c: u8, n: usize) !void {
     for (range(n)) |_| {
         try out.writeAll(&.{c});
     }
