@@ -23,6 +23,7 @@ A package manager for the Zig programming language.
 Initially,
 ```
 $ git clone https://github.com/nektro/zigmod --recursive
+$ cd zigmod
 $ zig build -Dbootstrap
 $ ./zig-out/bin/zigmod fetch
 ```
