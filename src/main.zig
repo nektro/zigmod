@@ -20,7 +20,7 @@ pub fn main() !void {
         u.print("zigmod {s} {s} {s} {s}", .{
             build_options.version,
             @tagName(builtin.os.tag),
-            @tagName(builtin.arch),
+            @tagName(builtin.cpu.arch),
             @tagName(builtin.abi),
         });
         return;
