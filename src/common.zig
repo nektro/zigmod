@@ -17,6 +17,9 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: CollectOpt
     defer moduledeps.deinit();
     try moduledeps.append(try collect_deps(dir, mpath, options));
     for (m.devdeps) |d| {
+        if (!d.is_for_this()) {
+            continue;
+        }
         try get_module_from_dep(moduledeps, d, dir, m.name, options);
     }
     return u.Module{
@@ -40,6 +43,9 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, options: CollectOptions)
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
     for (m.deps) |d| {
+        if (!d.is_for_this()) {
+            continue;
+        }
         try get_module_from_dep(moduledeps, d, dir, m.name, options);
     }
     return u.Module{
@@ -164,7 +170,7 @@ fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8
     const moddir = try get_moddir(dir, d, parent_name, options);
     switch (d.type) {
         .system_lib => {
-            if (d.is_for_this()) try list.append(u.Module{
+            try list.append(u.Module{
                 .is_sys_lib = true,
                 .id = "",
                 .name = d.path,
