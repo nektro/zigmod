@@ -40,7 +40,9 @@ pub const ModFile = struct {
         const main = mapping.get_string("main");
 
         const dep_list = try dep_list_by_name(alloc, mapping, "dependencies");
+        defer dep_list.deinit();
         const devdep_list = try dep_list_by_name(alloc, mapping, "dev_dependencies");
+        defer devdep_list.deinit();
 
         return Self{
             .alloc = alloc,
@@ -50,9 +52,9 @@ pub const ModFile = struct {
             .c_include_dirs = try mapping.get_string_array(alloc, "c_include_dirs"),
             .c_source_flags = try mapping.get_string_array(alloc, "c_source_flags"),
             .c_source_files = try mapping.get_string_array(alloc, "c_source_files"),
-            .deps = dep_list.items,
+            .deps = dep_list.toOwnedSlice(),
             .yaml = mapping,
-            .devdeps = devdep_list.items,
+            .devdeps = devdep_list.toOwnedSlice(),
         };
     }
 

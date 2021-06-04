@@ -46,9 +46,11 @@ pub const Module = struct {
 
     pub fn get_hash(self: Module, cdpath: []const u8) ![]const u8 {
         const file_list_1 = &std.ArrayList([]const u8).init(gpa);
+        defer file_list_1.deinit();
         try u.file_list(try u.concat(&.{ cdpath, "/", self.clean_path }), file_list_1);
 
         const file_list_2 = &std.ArrayList([]const u8).init(gpa);
+        defer file_list_2.deinit();
         for (file_list_1.items) |item| {
             const _a = u.trim_prefix(item, cdpath)[1..];
             const _b = u.trim_prefix(_a, self.clean_path)[1..];

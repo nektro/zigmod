@@ -95,6 +95,7 @@ pub const Mapping = struct {
 
     pub fn get_string_array(self: Mapping, alloc: *std.mem.Allocator, k: []const u8) ![][]const u8 {
         const list = &std.ArrayList([]const u8).init(alloc);
+        defer list.deinit();
         if (self.get(k)) |val| {
             if (val == .sequence) {
                 for (val.sequence) |item, i| {
@@ -105,7 +106,7 @@ pub const Mapping = struct {
                 }
             }
         }
-        return list.items;
+        return list.toOwnedSlice();
     }
 
     pub fn format(self: Mapping, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
@@ -191,6 +192,7 @@ fn condense_event_list(list: *std.ArrayList(Item), lines: Array) !void {
         try new_list.append(list.items[i]);
     }
 
+    list.deinit();
     list.* = new_list;
 }
 
