@@ -82,6 +82,9 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: C
         u.print("fetch: {s}: {s}: {s}", .{ parent_name, @tagName(d.type), d.path });
     }
     switch (d.type) {
+        .local => {
+            return d.path;
+        },
         .system_lib => {
             // no op
             return "";
@@ -186,6 +189,10 @@ fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8
             });
         },
         else => {
+            if (d.type == .local) {
+                try list.append(try u.Module.from(d));
+                return;
+            }
             var dd = try collect_deps(dir, try u.concat(&.{ moddir, "/zig.mod" }), options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {

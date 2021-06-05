@@ -50,12 +50,15 @@ This is the object used in the top-level `dependencies` attribute and used to ad
 This is the base attribute used to reference external code for use in your project. `type` is an enum and only allows certain values. `path` is the URL or other identifier used to locate the contents of this package based on the `type`.
 
 The available `type`s are:
+- `local`
 - `system_lib`
 - `git`
 - `hg`
 - `http`
 
 For the full details on `Dep` types, you can check out the source where the enum is defined: https://github.com/nektro/zigmod/blob/master/src/util/dep_type.zig.
+
+> Note: the `local` type modifies the input behavior to be shorthand for `<name> <main>` rather than `path version` since the latter fields don't make sense for local files.
 
 #### Dep `version`
 - Type: `string-string`

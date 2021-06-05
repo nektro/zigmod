@@ -8,6 +8,7 @@ const u = @import("./index.zig");
 
 // zig fmt: off
 pub const DepType = enum {
+    local,      // A 'package' derived from files in the same repository.
     system_lib, // std.build.LibExeObjStep.linkSystemLibrary
     git,        // https://git-scm.com/
     hg,         // https://www.mercurial-scm.org/
@@ -32,6 +33,7 @@ pub const DepType = enum {
 
     pub fn pull(self: DepType, rpath: []const u8, dpath: []const u8) !void {
         switch (self) {
+            .local => {},
             .system_lib => {},
             .git => {
                 u.assert((try u.run_cmd(null, &.{ "git", "clone", "--recurse-submodules", rpath, dpath })) == 0, "git clone {s} failed", .{rpath});
@@ -55,6 +57,7 @@ pub const DepType = enum {
 
     pub fn update(self: DepType, dpath: []const u8, rpath: []const u8) !void {
         switch (self) {
+            .local => {},
             .system_lib => {},
             .git => {
                 u.assert((try u.run_cmd(dpath, &.{ "git", "fetch" })) == 0, "git fetch failed", .{});

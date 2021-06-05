@@ -26,6 +26,9 @@ pub const Dep = struct {
     yaml: ?yaml.Mapping,
 
     pub fn clean_path(self: Dep) ![]const u8 {
+        if (self.type == .local) {
+            return if (self.path.len == 0) "../.." else self.path;
+        }
         var p = self.path;
         p = u.trim_prefix(p, "http://");
         p = u.trim_prefix(p, "https://");

@@ -70,6 +70,8 @@ pub const ModFile = struct {
                     var dtype: []const u8 = undefined;
                     var path: []const u8 = undefined;
                     var version: ?[]const u8 = null;
+                    var name = item.mapping.get_string("name");
+                    var main = item.mapping.get_string("main");
                     if (item.mapping.get("src")) |val| {
                         var src_iter = std.mem.tokenize(val.string, " ");
                         dtype = src_iter.next().?;
@@ -88,13 +90,23 @@ pub const ModFile = struct {
                         version = "";
                     }
                     const dep_type = std.meta.stringToEnum(u.DepType, dtype).?;
+                    if (dep_type == .local) {
+                        if (path.len > 0) {
+                            name = path;
+                            path = "";
+                        }
+                        if (version.?.len > 0) {
+                            main = version.?;
+                            version = "";
+                        }
+                    }
 
                     try dep_list.append(u.Dep{
                         .type = dep_type,
                         .path = path,
                         .id = item.mapping.get_string("id"),
-                        .name = item.mapping.get_string("name"),
-                        .main = item.mapping.get_string("main"),
+                        .name = name,
+                        .main = main,
                         .version = version.?,
                         .c_include_dirs = try item.mapping.get_string_array(alloc, "c_include_dirs"),
                         .c_source_flags = try item.mapping.get_string_array(alloc, "c_source_flags"),
