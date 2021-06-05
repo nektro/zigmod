@@ -2,6 +2,7 @@ const std = @import("std");
 const gpa = std.heap.c_allocator;
 
 const u = @import("./util/index.zig");
+const yaml = @import("./util/yaml.zig");
 
 //
 //
@@ -15,6 +16,10 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: CollectOpt
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
+    try std.fs.cwd().makePath(".zigmod/deps/files");
+    if (m.root_files.len > 0) {
+        try add_files_package("root", m.root_files, moduledeps, m.name);
+    }
     try moduledeps.append(try collect_deps(dir, mpath, options));
     for (m.devdeps) |d| {
         if (!d.is_for_this()) {
@@ -42,6 +47,9 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, options: CollectOptions)
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
+    if (m.files.len > 0) {
+        try add_files_package(m.id, m.files, moduledeps, m.name);
+    }
     for (m.deps) |d| {
         if (!d.is_for_this()) {
             continue;
@@ -218,4 +226,67 @@ fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8
             if (dd.is_for_this()) try list.append(dd);
         },
     }
+}
+
+fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, list: *std.ArrayList(u.Module), parent_name: []const u8) !void {
+    const destination = ".zigmod/deps/files";
+    const fname = try std.mem.join(gpa, "", &.{ pkg_name, ".zig" });
+
+    const map = &std.StringHashMap([]const u8).init(gpa);
+    defer map.deinit();
+
+    for (dirs) |dir_path| {
+        var walker = try std.fs.walkPath(gpa, dir_path);
+        while (try walker.next()) |p| {
+            if (p.kind == .Directory) {
+                continue;
+            }
+            const path = try std.mem.dupe(gpa, u8, p.path);
+            try map.put(path[dir_path.len..], path);
+        }
+    }
+
+    const rff = try (try std.fs.cwd().openDir(destination, .{})).createFile(fname, .{});
+    defer rff.close();
+    const w = rff.writer();
+    try w.writeAll(
+        \\const std = @import("std");
+        \\
+        \\const files = std.ComptimeStringMap([]const u8, .{
+        \\
+    );
+    var iter = map.iterator();
+    while (iter.next()) |item| {
+        try w.print("    .{{ .@\"0\" = \"{}\", .@\"1\" = @embedFile(\"./../../../{}\") }},\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
+    }
+    try w.writeAll("\n");
+    try w.writeAll(
+        \\});
+        \\
+        \\pub fn open(comptime path: []const u8) ?[]const u8 {
+        \\    if (path.len == 0) return null;
+        \\    if (path[0] != '/') return null;
+        \\    return files.get(path);
+        \\}
+        \\
+    );
+
+    const d: u.Dep = .{
+        .type = .local,
+        .path = "files",
+        .id = "",
+        .name = "self/files",
+        .main = fname,
+        .version = "absolute",
+        .c_include_dirs = &.{},
+        .c_source_flags = &.{},
+        .c_source_files = &.{},
+        .only_os = &.{},
+        .except_os = &.{},
+        .yaml = null,
+    };
+    try get_module_from_dep(list, d, destination, parent_name, .{
+        .log = false,
+        .update = false,
+    });
 }

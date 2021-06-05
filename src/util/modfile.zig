@@ -23,6 +23,8 @@ pub const ModFile = struct {
     deps: []u.Dep,
     yaml: yaml.Mapping,
     devdeps: []u.Dep,
+    root_files: [][]const u8,
+    files: [][]const u8,
 
     pub fn init(alloc: *std.mem.Allocator, fpath: []const u8) !Self {
         //
@@ -42,6 +44,7 @@ pub const ModFile = struct {
         if (std.mem.indexOf(u8, name, "/")) |_| {
             u.assert(false, "name may not contain any '/'", .{});
         }
+
         const dep_list = try dep_list_by_name(alloc, mapping, "dependencies");
         defer dep_list.deinit();
         const devdep_list = try dep_list_by_name(alloc, mapping, "dev_dependencies");
@@ -58,6 +61,8 @@ pub const ModFile = struct {
             .deps = dep_list.toOwnedSlice(),
             .yaml = mapping,
             .devdeps = devdep_list.toOwnedSlice(),
+            .root_files = try mapping.get_string_array(alloc, "root_files"),
+            .files = try mapping.get_string_array(alloc, "files"),
         };
     }
 
@@ -72,6 +77,7 @@ pub const ModFile = struct {
                     var version: ?[]const u8 = null;
                     var name = item.mapping.get_string("name");
                     var main = item.mapping.get_string("main");
+
                     if (item.mapping.get("src")) |val| {
                         var src_iter = std.mem.tokenize(val.string, " ");
                         dtype = src_iter.next().?;

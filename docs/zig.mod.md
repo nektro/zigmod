@@ -30,6 +30,14 @@ This is a list of [`clang`](https://clang.llvm.org/docs/UsersManual.html#command
 - Type: `[]string`
 This is a list of relative paths to C source files to compile along with this project. This will be required if you use Zig's [`@cImport`](https://ziglang.org/documentation/master/#cImport), `extern`, etc.
 
+### `files`
+- Type: `[]string`
+This accepts a list of local directories to embed static assets. These files will be provided through a `self/files` package to `@import(main)`.
+
+### `root_files`
+- Type: `[]string`
+This accepts a list of local directories to embed static assets. These files will be provided through a `self/files` package to `@import("root")`.
+
 ### `dependencies`
 - Type: `[]Dep`
 This is a list of `Dep` objects. `Dep` objects are how you include the other people's code in your project. See the `Dep` documentation below to learn more about the attributes available here.
