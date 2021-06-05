@@ -26,7 +26,7 @@ pub const Module = struct {
     pub fn from(dep: u.Dep) !Module {
         return Module{
             .is_sys_lib = false,
-            .id = dep.id,
+            .id = if (dep.id.len > 0) dep.id else try u.random_string(48),
             .name = dep.name,
             .main = dep.main,
             .c_include_dirs = dep.c_include_dirs,
