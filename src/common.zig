@@ -65,7 +65,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, options: CollectOptions)
 }
 
 pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void {
-    if (u.list_contains_gen(u.Module, list, mod)) {
+    if (u.list_contains_gen(u.Module, list.items, mod)) {
         return;
     }
     try list.append(mod);
@@ -185,7 +185,7 @@ fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8
                 .yaml = null,
             });
         },
-        else => blk: {
+        else => {
             var dd = try collect_deps(dir, try u.concat(&.{ moddir, "/zig.mod" }), options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
@@ -194,7 +194,7 @@ fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8
                         mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
                         if (mod_from.is_for_this()) try list.append(mod_from);
                     }
-                    break :blk;
+                    return;
                 },
                 else => e,
             };

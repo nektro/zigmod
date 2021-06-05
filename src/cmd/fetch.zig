@@ -220,31 +220,33 @@ fn print_sys_libs_to(w: std.fs.File.Writer, list: []u.Module, list2: *std.ArrayL
     }
 }
 
-fn print_pkg_data_to(w: std.fs.File.Writer, list: *std.ArrayList(u.Module), list2: *std.ArrayList(u.Module)) anyerror!void {
-    var i: usize = 0;
-    while (i < list.items.len) : (i += 1) {
-        const mod = list.items[i];
-        if (contains_all(mod.deps, list2)) {
-            try w.print("    pub const _{s} = std.build.Pkg{{ .name = \"{s}\", .path = cache ++ \"/{}/{s}\", .dependencies = &[_]std.build.Pkg{{", .{ mod.id, mod.name, std.zig.fmtEscapes(mod.clean_path), mod.main });
-            for (mod.deps) |d| {
-                if (d.main.len > 0) {
-                    try w.print(" _{s},", .{d.id[0..12]});
+fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(u.Module), done: *std.ArrayList(u.Module)) !void {
+    var len: usize = notdone.items.len;
+    while (notdone.items.len > 0) {
+        for (notdone.items) |mod, i| {
+            if (contains_all(mod.deps, done.items)) {
+                try w.print("    pub const _{s} = std.build.Pkg{{ .name = \"{s}\", .path = cache ++ \"/{}/{s}\", .dependencies = &[_]std.build.Pkg{{", .{ mod.id[0..12], mod.name, std.zig.fmtEscapes(mod.clean_path), mod.main });
+                for (mod.deps) |d| {
+                    if (d.main.len > 0) {
+                        try w.print(" _{s},", .{d.id[0..12]});
+                    }
                 }
-            }
-            try w.print(" }} }};\n", .{});
+                try w.print(" }} }};\n", .{});
 
-            try list2.append(mod);
-            _ = list.orderedRemove(i);
-            break;
+                try done.append(mod);
+                _ = notdone.orderedRemove(i);
+                break;
+            }
         }
-    }
-    if (list.items.len > 0) {
-        try print_pkg_data_to(w, list, list2);
+        if (notdone.items.len == len) {
+            u.assert(false, "notdone still has {d} items", .{len});
+        }
+        len = notdone.items.len;
     }
 }
 
 /// returns if all of the zig modules in needles are in haystack
-fn contains_all(needles: []u.Module, haystack: *std.ArrayList(u.Module)) bool {
+fn contains_all(needles: []u.Module, haystack: []const u.Module) bool {
     for (needles) |item| {
         if (item.main.len > 0 and !u.list_contains_gen(u.Module, haystack, item)) {
             return false;

@@ -135,8 +135,8 @@ pub fn list_contains(haystack: [][]const u8, needle: []const u8) bool {
     return false;
 }
 
-pub fn list_contains_gen(comptime T: type, haystack: *std.ArrayList(T), needle: T) bool {
-    for (haystack.items) |item| {
+pub fn list_contains_gen(comptime T: type, haystack: []const T, needle: T) bool {
+    for (haystack) |item| {
         if (item.eql(needle)) {
             return true;
         }
