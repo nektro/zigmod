@@ -56,11 +56,6 @@ pub fn execute(args: [][]u8) !void {
 
     const list = &std.ArrayList(u.Module).init(gpa);
     try common.collect_pkgs(top_module, list);
-    for (list.items) |*mod| {
-        if (mod.id.len > 12) {
-            mod.id = mod.id[0..12];
-        }
-    }
 
     try w.writeAll("pub const _ids = .{\n");
     try print_ids(w, list.items);
@@ -117,7 +112,7 @@ fn print_ids(w: std.fs.File.Writer, list: []u.Module) !void {
         if (mod.is_sys_lib) {
             continue;
         }
-        try w.print("    \"{s}\",\n", .{mod.id});
+        try w.print("    \"{s}\",\n", .{mod.id[0..12]});
     }
 }
 
@@ -203,7 +198,7 @@ fn print_csrc_flags_to(w: std.fs.File.Writer, list: []u.Module) !void {
         if (mod.c_source_flags.len == 0 and mod.c_source_files.len == 0) {
             continue;
         }
-        try w.print("    pub const @\"{s}\" = {s}", .{ mod.id, "&.{" });
+        try w.print("    pub const @\"{s}\" = {s}", .{ mod.id[0..12], "&.{" });
         for (mod.c_source_flags) |it| {
             try w.print("\"{}\",", .{std.zig.fmtEscapes(it)});
         }
