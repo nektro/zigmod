@@ -34,20 +34,20 @@ pub const DepType = enum {
         switch (self) {
             .system_lib => {},
             .git => {
-                _ = try u.run_cmd(null, &.{ "git", "clone", "--recurse-submodules", rpath, dpath });
+                u.assert((try u.run_cmd(null, &.{ "git", "clone", "--recurse-submodules", rpath, dpath })) == 0, "git clone {s} failed", .{rpath});
             },
             .hg => {
-                _ = try u.run_cmd(null, &.{ "hg", "clone", rpath, dpath });
+                u.assert((try u.run_cmd(null, &.{ "hg", "clone", rpath, dpath })) == 0, "hg clone {s} failed", .{rpath});
             },
             .http => {
                 try std.fs.cwd().makePath(dpath);
-                _ = try u.run_cmd(dpath, &.{ "wget", rpath });
+                u.assert((try u.run_cmd(dpath, &.{ "wget", rpath })) == 0, "wget {s} failed", .{rpath});
                 const f = rpath[std.mem.lastIndexOf(u8, rpath, "/").? + 1 ..];
                 if (std.mem.endsWith(u8, f, ".zip")) {
-                    _ = try u.run_cmd(dpath, &.{ "unzip", f, "-d", "." });
+                    u.assert((try u.run_cmd(dpath, &.{ "unzip", f, "-d", "." })) == 0, "unzip {s} failed", .{f});
                 }
                 if (std.mem.endsWith(u8, f, ".tar") or std.mem.endsWith(u8, f, ".tar.gz") or std.mem.endsWith(u8, f, ".tar.xz") or std.mem.endsWith(u8, f, ".tar.zst")) {
-                    _ = try u.run_cmd(dpath, &.{ "tar", "-xf", f, "-C", "." });
+                    u.assert((try u.run_cmd(dpath, &.{ "tar", "-xf", f, "-C", "." })) == 0, "un-tar {s} failed", .{f});
                 }
             },
         }
@@ -57,11 +57,11 @@ pub const DepType = enum {
         switch (self) {
             .system_lib => {},
             .git => {
-                _ = try u.run_cmd(dpath, &.{ "git", "fetch" });
-                _ = try u.run_cmd(dpath, &.{ "git", "pull" });
+                u.assert((try u.run_cmd(dpath, &.{ "git", "fetch" })) == 0, "git fetch failed", .{});
+                u.assert((try u.run_cmd(dpath, &.{ "git", "pull" })) == 0, "git pull failed", .{});
             },
             .hg => {
-                _ = try u.run_cmd(dpath, &.{ "hg", "pull" });
+                u.assert((try u.run_cmd(dpath, &.{ "hg", "pull" })) == 0, "hg pull failed", .{});
             },
             .http => {
                 //
