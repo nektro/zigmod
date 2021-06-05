@@ -44,7 +44,7 @@ Similar to `dependencies` but will only get added to the project if the current 
 This is the object used in the top-level `dependencies` attribute and used to add external code to your project.
 
 #### Dep `src`
-- Type: `type path`
+- Type: `type path ?version`
 - Example: `git https://github.com/Hejsil/zig-clap`
 - Required
 This is the base attribute used to reference external code for use in your project. `type` is an enum and only allows certain values. `path` is the URL or other identifier used to locate the contents of this package based on the `type`.
