@@ -39,6 +39,9 @@ pub const ModFile = struct {
         const name = mapping.get("name").?.string;
         const main = mapping.get_string("main");
 
+        if (std.mem.indexOf(u8, name, "/")) |_| {
+            u.assert(false, "name may not contain any '/'", .{});
+        }
         const dep_list = try dep_list_by_name(alloc, mapping, "dependencies");
         defer dep_list.deinit();
         const devdep_list = try dep_list_by_name(alloc, mapping, "dev_dependencies");
