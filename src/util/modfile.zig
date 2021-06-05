@@ -34,7 +34,7 @@ pub const ModFile = struct {
         return from_mapping(alloc, doc.mapping);
     }
 
-    pub fn from_mapping(alloc: *std.mem.Allocator, mapping: yaml.Mapping) anyerror!Self {
+    pub fn from_mapping(alloc: *std.mem.Allocator, mapping: yaml.Mapping) !Self {
         const id = mapping.get_string("id");
         const name = mapping.get("name").?.string;
         const main = mapping.get_string("main");

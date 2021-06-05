@@ -138,7 +138,7 @@ fn print_paths(w: std.fs.File.Writer, list: []u.Module) !void {
     }
 }
 
-fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array: bool) anyerror!void {
+fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array: bool) !void {
     if (m.has_no_zig_deps() and tabs > 0) {
         try w.print("null", .{});
         return;
