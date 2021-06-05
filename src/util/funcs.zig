@@ -106,11 +106,7 @@ pub fn join(xs: [][]const u8, delim: []const u8) ![]const u8 {
 }
 
 pub fn concat(items: [][]const u8) ![]const u8 {
-    var buf: []const u8 = "";
-    for (items) |x| {
-        buf = try std.fmt.allocPrint(gpa, "{s}{s}", .{ buf, x });
-    }
-    return buf;
+    return std.mem.join(gpa, "", items);
 }
 
 pub fn print_all(w: std.fs.File.Writer, items: anytype, ln: bool) !void {
