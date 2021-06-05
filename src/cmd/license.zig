@@ -47,20 +47,20 @@ pub fn execute(args: [][]u8) !void {
         if (!map_item.found_existing) {
             const temp = try gpa.create(List);
             temp.* = List.init(gpa);
-            map_item.entry.value = temp;
+            map_item.value_ptr.* = temp;
         }
-        const tracking_list = map_item.entry.value;
+        const tracking_list = map_item.value_ptr.*;
         try tracking_list.append(item);
     }
 
     var iter = map.iterator();
     while (iter.next()) |entry| {
-        std.debug.print(style.Bold ++ "{s}:\n", .{entry.key});
-        if (get_license(entry.key)) |license| {
+        std.debug.print(style.Bold ++ "{s}:\n", .{entry.key_ptr.*});
+        if (get_license(entry.key_ptr.*)) |license| {
             std.debug.print(style.Faint ++ "= {s}\n", .{license.url});
         }
         std.debug.print(style.ResetIntensity, .{});
-        for (entry.value.items) |item| {
+        for (entry.value_ptr.*.items) |item| {
             std.debug.print("- {s}\n", .{if (!std.mem.eql(u8, item.clean_path, "../..")) item.clean_path else "This"});
         }
         std.debug.print("\n", .{});
