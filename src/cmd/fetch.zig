@@ -155,7 +155,9 @@ fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, ar
             continue;
         }
         if (!array) {
-            try w.print("    pub const {s} = packages[{}];\n", .{ std.mem.replaceOwned(u8, gpa, d.name, "-", "_"), i });
+            const r1 = std.mem.replaceOwned(u8, gpa, d.name, "-", "_");
+            const r2 = std.mem.replaceOwned(u8, gpa, d.name, "/", "_");
+            try w.print("    pub const {s} = packages[{}];\n", .{ r2, i });
         } else {
             try w.print("    package_data._{s},\n", .{d.id[0..12]});
         }
