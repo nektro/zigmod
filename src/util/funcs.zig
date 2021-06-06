@@ -1,8 +1,6 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 
-const ansi = @import("ansi");
-
 const u = @import("index.zig");
 
 //
@@ -17,9 +15,12 @@ pub fn print(comptime fmt: []const u8, args: anytype) void {
     std.debug.print(fmt ++ "\n", args);
 }
 
+const ansi_red = "\x1B[31m";
+const ansi_reset = "\x1B[39m";
+
 pub fn assert(ok: bool, comptime fmt: []const u8, args: anytype) void {
     if (!ok) {
-        print(comptime ansi.color.Fg(.Red, "error: " ++ fmt), args);
+        print(ansi_red ++ fmt ++ ansi_reset, args);
         std.os.exit(1);
     }
 }

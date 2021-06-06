@@ -71,12 +71,10 @@ pub const package_data = struct {
 
 pub const packages = &[_]std.build.Pkg{
     package_data._89ujp8gq842x,
-    package_data._s84v9o48ucb0,
 };
 
 pub const pkgs = struct {
     pub const zigmod = packages[0];
-    pub const ansi = packages[1];
 };
 
 pub const c_include_dirs = &[_][]const u8{

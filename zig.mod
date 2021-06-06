@@ -25,11 +25,11 @@ dependencies:
       - src/scanner.c
       - src/writer.c
 
-  - src: git https://github.com/nektro/zig-ansi
-
   # Entries above this line are needed to bootstrap and kept as git submodules
   # --------
   # Entries below this line are only fetched with zigmod itself 
+
+  - src: git https://github.com/nektro/zig-ansi
 
   - src: git https://github.com/ziglibs/known-folders
 
@@ -40,6 +40,3 @@ dependencies:
   - src: git https://github.com/nektro/zig-json
 
   - src: http https://aquila.red/1/nektro/range/v0.1.tar.gz sha256-d2f72fdd8cdb8 0 1
-
-dev_dependencies:
-  - src: git https://github.com/nektro/zig-ansi
