@@ -20,9 +20,9 @@ pub const ModFile = struct {
     c_include_dirs: [][]const u8,
     c_source_flags: [][]const u8,
     c_source_files: [][]const u8,
-    deps: []u.Dep,
+    deps: []const u.Dep,
     yaml: yaml.Mapping,
-    devdeps: []u.Dep,
+    devdeps: []const u.Dep,
     root_files: [][]const u8,
     files: [][]const u8,
 
@@ -45,10 +45,6 @@ pub const ModFile = struct {
             u.assert(false, "name may not contain any '/'", .{});
         }
 
-        const dep_list = try dep_list_by_name(alloc, mapping, "dependencies");
-        defer dep_list.deinit();
-        const devdep_list = try dep_list_by_name(alloc, mapping, "dev_dependencies");
-        defer devdep_list.deinit();
 
         return Self{
             .alloc = alloc,
@@ -58,17 +54,16 @@ pub const ModFile = struct {
             .c_include_dirs = try mapping.get_string_array(alloc, "c_include_dirs"),
             .c_source_flags = try mapping.get_string_array(alloc, "c_source_flags"),
             .c_source_files = try mapping.get_string_array(alloc, "c_source_files"),
-            .deps = dep_list.toOwnedSlice(),
+            .deps = try dep_list_by_name(alloc, mapping, "dependencies"),
             .yaml = mapping,
-            .devdeps = devdep_list.toOwnedSlice(),
+            .devdeps = try dep_list_by_name(alloc, mapping, "dev_dependencies"),
             .root_files = try mapping.get_string_array(alloc, "root_files"),
             .files = try mapping.get_string_array(alloc, "files"),
         };
     }
 
-    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: []const u8) !*std.ArrayList(u.Dep) {
-        const dep_list = try alloc.create(std.ArrayList(u.Dep));
-        dep_list.* = std.ArrayList(u.Dep).init(alloc);
+    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: []const u8) ![]const u.Dep {
+        const dep_list = &std.ArrayList(u.Dep).init(alloc);
         if (mapping.get(prop)) |dep_seq| {
             if (dep_seq == .sequence) {
                 for (dep_seq.sequence) |item| {
@@ -124,6 +119,6 @@ pub const ModFile = struct {
                 }
             }
         }
-        return dep_list;
+        return dep_list.toOwnedSlice();
     }
 };
