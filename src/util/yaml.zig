@@ -1,4 +1,5 @@
 const std = @import("std");
+const yaml = @import("yaml");
 
 const c = @cImport({
     @cInclude("yaml.h");
@@ -9,6 +10,10 @@ const u = @import("./index.zig");
 //
 
 const Array = []const []const u8;
+
+pub const Stream = struct {
+    docs: []const Document,
+};
 
 pub const Document = struct {
     mapping: Mapping,
@@ -21,11 +26,15 @@ pub const Item = union(enum) {
     sequence: Sequence,
     document: Document,
     string: []const u8,
+    stream: Stream,
 
     pub fn format(self: Item, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
         try writer.writeAll("Item{");
         switch (self) {
-            .event, .kv, .document => {
+            .event => {
+                try std.fmt.format(writer, "{s}", .{@tagName(self.event.type)});
+            },
+            .kv, .document => {
                 unreachable;
             },
             .mapping => {
@@ -121,6 +130,8 @@ pub const Mapping = struct {
     }
 };
 
+pub const TokenList = []const c.yaml_event_t;
+
 //
 //
 
@@ -132,7 +143,7 @@ pub fn parse(alloc: *std.mem.Allocator, input: []const u8) !Document {
 
     _ = c.yaml_parser_set_input_string(&parser, input.ptr, input.len);
 
-    const all_events = &std.ArrayList(Item).init(alloc);
+    const all_events = &std.ArrayList(c.yaml_event_t).init(alloc);
     var event: c.yaml_event_t = undefined;
     while (true) {
         const p = c.yaml_parser_parse(&parser, &event);
@@ -141,7 +152,7 @@ pub fn parse(alloc: *std.mem.Allocator, input: []const u8) !Document {
         }
 
         const et = @enumToInt(event.type);
-        try all_events.append(.{ .event = event });
+        try all_events.append(event);
         c.yaml_event_delete(&event);
 
         if (et == c.YAML_STREAM_END_EVENT) {
@@ -151,179 +162,126 @@ pub fn parse(alloc: *std.mem.Allocator, input: []const u8) !Document {
 
     c.yaml_parser_delete(&parser);
 
-    var l: usize = all_events.items.len;
-    while (true) {
-        try condense_event_list(all_events, lines);
-        if (l == all_events.items.len) {
-            break;
-        }
-        l = all_events.items.len;
+    const p = &Parser{
+        .alloc = alloc,
+        .tokens = all_events.items,
+        .lines = lines,
+        .index = 0,
+    };
+    const stream = try p.parse();
+    return stream.docs[0];
+}
+
+pub const Parser = struct {
+    alloc: *std.mem.Allocator,
+    tokens: TokenList,
+    lines: Array,
+    index: usize,
+
+    pub fn parse(self: *Parser) !Stream {
+        const item = try parse_item(self, null);
+        return item.stream;
     }
 
-    u.assert(all_events.items.len == 1, "failure parsing zig.mod. please report an issue at https://github.com/nektro/zigmod/issues/new that contains the text of your zig.mod.", .{});
-    return all_events.items[0].document;
+    fn next(self: *Parser) ?c.yaml_event_t {
+        if (self.index >= self.tokens.len) {
+            return null;
+        }
+        defer self.index += 1;
+        return self.tokens[self.index];
+    }
+};
+
+pub const Error =
+    std.mem.Allocator.Error ||
+    error{YamlUnexpectedToken};
+
+fn parse_item(p: *Parser, start: ?c.yaml_event_t) Error!Item {
+    const tok = start orelse p.next();
+    return switch (tok.?.type) {
+        .YAML_STREAM_START_EVENT => Item{ .stream = try parse_stream(p) },
+        .YAML_DOCUMENT_START_EVENT => Item{ .document = try parse_document(p) },
+        .YAML_MAPPING_START_EVENT => Item{ .mapping = try parse_mapping(p) },
+        .YAML_SEQUENCE_START_EVENT => Item{ .sequence = try parse_sequence(p) },
+        .YAML_SCALAR_EVENT => Item{ .string = get_event_string(tok.?, p.lines) },
+        else => unreachable,
+    };
+}
+
+fn parse_stream(p: *Parser) Error!Stream {
+    const res = &std.ArrayList(Document).init(p.alloc);
+    defer res.deinit();
+
+    while (true) {
+        const tok = p.next();
+        if (tok.?.type == .YAML_STREAM_END_EVENT) {
+            return Stream{ .docs = res.toOwnedSlice() };
+        }
+        if (tok.?.type != .YAML_DOCUMENT_START_EVENT) {
+            return error.YamlUnexpectedToken;
+        }
+        const item = try parse_item(p, tok);
+        try res.append(item.document);
+    }
+}
+
+fn parse_document(p: *Parser) Error!Document {
+    const tok = p.next();
+    if (tok.?.type != .YAML_MAPPING_START_EVENT) {
+        return error.YamlUnexpectedToken;
+    }
+    const item = try parse_item(p, tok);
+
+    if (p.next().?.type != .YAML_DOCUMENT_END_EVENT) {
+        return error.YamlUnexpectedToken;
+    }
+    return Document{ .mapping = item.mapping };
+}
+
+fn parse_mapping(p: *Parser) Error!Mapping {
+    const res = &std.ArrayList(Key).init(p.alloc);
+    defer res.deinit();
+
+    while (true) {
+        const tok = p.next();
+        if (tok.?.type == .YAML_MAPPING_END_EVENT) {
+            return Mapping{ .items = res.toOwnedSlice() };
+        }
+        if (tok.?.type != .YAML_SCALAR_EVENT) {
+            return error.YamlUnexpectedToken;
+        }
+        try res.append(Key{
+            .key = get_event_string(tok.?, p.lines),
+            .value = try parse_value(p),
+        });
+    }
+}
+
+fn parse_value(p: *Parser) Error!Value {
+    const item = try parse_item(p, null);
+    return switch (item) {
+        .mapping => |x| Value{ .mapping = x },
+        .sequence => |x| Value{ .sequence = x },
+        .string => |x| Value{ .string = x },
+        else => unreachable,
+    };
+}
+
+fn parse_sequence(p: *Parser) Error!Sequence {
+    const res = &std.ArrayList(Item).init(p.alloc);
+    defer res.deinit();
+
+    while (true) {
+        const tok = p.next();
+        if (tok.?.type == .YAML_SEQUENCE_END_EVENT) {
+            return res.toOwnedSlice();
+        }
+        try res.append(try parse_item(p, tok));
+    }
 }
 
 fn get_event_string(event: c.yaml_event_t, lines: Array) []const u8 {
     const sm = event.start_mark;
     const em = event.end_mark;
     return lines[sm.line][sm.column..em.column];
-}
-
-fn condense_event_list(list: *std.ArrayList(Item), lines: Array) !void {
-    var i: usize = 0;
-    var new_list = std.ArrayList(Item).init(list.allocator);
-
-    while (i < list.items.len) : (i += 1) {
-        if (try condense_event_list_key(list.items, i, &new_list, lines)) |len| {
-            i += len;
-            continue;
-        }
-        if (try condense_event_list_mapping(list.items, i, &new_list, lines)) |len| {
-            i += len;
-            continue;
-        }
-        if (try condense_event_list_sequence(list.items, i, &new_list, lines)) |len| {
-            i += len;
-            continue;
-        }
-        if (try condense_event_list_document(list.items, i, &new_list, lines)) |len| {
-            i += len;
-            continue;
-        }
-        try new_list.append(list.items[i]);
-    }
-
-    list.deinit();
-    list.* = new_list;
-}
-
-fn condense_event_list_key(from: []Item, at: usize, to: *std.ArrayList(Item), lines: Array) !?usize {
-    if (at >= from.len - 1) {
-        return null;
-    }
-    const t = from[at];
-    const n = from[at + 1];
-
-    if (!(t == .event and @enumToInt(t.event.type) == c.YAML_SCALAR_EVENT)) {
-        return null;
-    }
-    if (n == .event and @enumToInt(n.event.type) == c.YAML_SCALAR_EVENT) {
-        try to.append(Item{
-            .kv = Key{
-                .key = get_event_string(t.event, lines),
-                .value = Value{ .string = get_event_string(n.event, lines) },
-            },
-        });
-        return 0 + 2 - 1;
-    }
-    if (n == .sequence) {
-        try to.append(Item{
-            .kv = Key{
-                .key = get_event_string(t.event, lines),
-                .value = Value{ .sequence = n.sequence },
-            },
-        });
-        return 0 + 2 - 1;
-    }
-    if (n == .mapping) {
-        try to.append(Item{
-            .kv = Key{
-                .key = get_event_string(t.event, lines),
-                .value = Value{ .mapping = n.mapping },
-            },
-        });
-        return 0 + 2 - 1;
-    }
-    return null;
-}
-
-fn condense_event_list_mapping(from: []Item, at: usize, to: *std.ArrayList(Item), lines: Array) !?usize {
-    if (!(from[at] == .event and @enumToInt(from[at].event.type) == c.YAML_MAPPING_START_EVENT)) {
-        return null;
-    }
-    var i: usize = 1;
-    while (true) : (i += 1) {
-        const ele = from[at + i];
-        if (ele == .event and @enumToInt(ele.event.type) == c.YAML_MAPPING_END_EVENT) {
-            break;
-        }
-        if (ele == .event) {
-            return null;
-        }
-    }
-
-    const keys = &std.ArrayList(Key).init(to.allocator);
-    for (from[at + 1 .. at + i]) |item| {
-        switch (item) {
-            .kv => {
-                try keys.append(item.kv);
-            },
-            else => unreachable,
-        }
-    }
-
-    try to.append(Item{
-        .mapping = Mapping{ .items = keys.items },
-    });
-    return 0 + i;
-}
-
-fn condense_event_list_sequence(from: []Item, at: usize, to: *std.ArrayList(Item), lines: Array) !?usize {
-    if (!(from[at] == .event and @enumToInt(from[at].event.type) == c.YAML_SEQUENCE_START_EVENT)) {
-        return null;
-    }
-    var i: usize = 1;
-    while (true) : (i += 1) {
-        const ele = from[at + i];
-        if (ele == .event) {
-            if (@enumToInt(ele.event.type) == c.YAML_SEQUENCE_END_EVENT) {
-                break;
-            }
-            if (@enumToInt(ele.event.type) == c.YAML_SCALAR_EVENT) {
-                continue;
-            }
-            return null;
-        }
-    }
-
-    const result = &std.ArrayList(Item).init(to.allocator);
-    for (from[at + 1 .. at + i]) |item| {
-        try result.append(switch (item) {
-            .mapping => item,
-            .event => Item{ .string = get_event_string(item.event, lines) },
-            else => unreachable,
-        });
-    }
-    try to.append(Item{
-        .sequence = result.items,
-    });
-    return 0 + i;
-}
-
-fn condense_event_list_document(from: []Item, at: usize, to: *std.ArrayList(Item), lines: Array) !?usize {
-    if (from.len < at + 4) {
-        return null;
-    }
-    if (!(from[at] == .event and @enumToInt(from[at].event.type) == c.YAML_STREAM_START_EVENT)) {
-        return null;
-    }
-    if (!(from[at + 1] == .event and @enumToInt(from[at + 1].event.type) == c.YAML_DOCUMENT_START_EVENT)) {
-        return null;
-    }
-    if (!(from[at + 2] == .mapping)) {
-        return null;
-    }
-    if (!(from[at + 3] == .event and @enumToInt(from[at + 3].event.type) == c.YAML_DOCUMENT_END_EVENT)) {
-        return null;
-    }
-    if (!(from[at + 4] == .event and @enumToInt(from[at + 4].event.type) == c.YAML_STREAM_END_EVENT)) {
-        return null;
-    }
-    try to.append(Item{
-        .document = Document{
-            .mapping = from[at + 2].mapping,
-        },
-    });
-    return 0 + 5 - 1;
 }
