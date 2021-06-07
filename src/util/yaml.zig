@@ -20,7 +20,7 @@ pub const Document = struct {
 };
 
 pub const Item = union(enum) {
-    event: c.yaml_event_t,
+    event: Token,
     kv: Key,
     mapping: Mapping,
     sequence: Sequence,
@@ -130,7 +130,8 @@ pub const Mapping = struct {
     }
 };
 
-pub const TokenList = []const c.yaml_event_t;
+pub const Token = c.yaml_event_t;
+pub const TokenList = []const Token;
 
 //
 //
@@ -143,8 +144,8 @@ pub fn parse(alloc: *std.mem.Allocator, input: []const u8) !Document {
 
     _ = c.yaml_parser_set_input_string(&parser, input.ptr, input.len);
 
-    const all_events = &std.ArrayList(c.yaml_event_t).init(alloc);
-    var event: c.yaml_event_t = undefined;
+    const all_events = &std.ArrayList(Token).init(alloc);
+    var event: Token = undefined;
     while (true) {
         const p = c.yaml_parser_parse(&parser, &event);
         if (p == 0) {
@@ -183,7 +184,7 @@ pub const Parser = struct {
         return item.stream;
     }
 
-    fn next(self: *Parser) ?c.yaml_event_t {
+    fn next(self: *Parser) ?Token {
         if (self.index >= self.tokens.len) {
             return null;
         }
@@ -196,7 +197,7 @@ pub const Error =
     std.mem.Allocator.Error ||
     error{YamlUnexpectedToken};
 
-fn parse_item(p: *Parser, start: ?c.yaml_event_t) Error!Item {
+fn parse_item(p: *Parser, start: ?Token) Error!Item {
     const tok = start orelse p.next();
     return switch (tok.?.type) {
         .YAML_STREAM_START_EVENT => Item{ .stream = try parse_stream(p) },
@@ -280,7 +281,7 @@ fn parse_sequence(p: *Parser) Error!Sequence {
     }
 }
 
-fn get_event_string(event: c.yaml_event_t, lines: Array) []const u8 {
+fn get_event_string(event: Token, lines: Array) []const u8 {
     const sm = event.start_mark;
     const em = event.end_mark;
     return lines[sm.line][sm.column..em.column];
