@@ -130,7 +130,7 @@ pub fn parse(alloc: *std.mem.Allocator, input: []const u8) !Document {
 
     _ = c.yaml_parser_set_input_string(&parser, input.ptr, input.len);
 
-    var all_events = std.ArrayList(Item).init(alloc);
+    const all_events = &std.ArrayList(Item).init(alloc);
     var event: c.yaml_event_t = undefined;
     while (true) {
         const p = c.yaml_parser_parse(&parser, &event);
@@ -151,7 +151,7 @@ pub fn parse(alloc: *std.mem.Allocator, input: []const u8) !Document {
 
     var l: usize = all_events.items.len;
     while (true) {
-        try condense_event_list(&all_events, lines);
+        try condense_event_list(all_events, lines);
         if (l == all_events.items.len) {
             break;
         }
