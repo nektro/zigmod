@@ -8,7 +8,7 @@ const u = @import("./index.zig");
 //
 //
 
-const Array = [][]const u8;
+const Array = []const []const u8;
 
 pub const Document = struct {
     mapping: Mapping,
@@ -18,7 +18,7 @@ pub const Item = union(enum) {
     event: c.yaml_event_t,
     kv: Key,
     mapping: Mapping,
-    sequence: []Item,
+    sequence: []const Item,
     document: Document,
     string: []const u8,
 
@@ -54,7 +54,7 @@ pub const Key = struct {
 pub const Value = union(enum) {
     string: []const u8,
     mapping: Mapping,
-    sequence: []Item,
+    sequence: []const Item,
 
     pub fn format(self: Value, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
         try writer.writeAll("Value{");
@@ -78,7 +78,7 @@ pub const Value = union(enum) {
 };
 
 pub const Mapping = struct {
-    items: []Key,
+    items: []const Key,
 
     pub fn get(self: Mapping, k: []const u8) ?Value {
         for (self.items) |item| {

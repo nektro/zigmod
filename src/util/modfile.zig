@@ -17,14 +17,14 @@ pub const ModFile = struct {
     id: []const u8,
     name: []const u8,
     main: []const u8,
-    c_include_dirs: [][]const u8,
-    c_source_flags: [][]const u8,
-    c_source_files: [][]const u8,
+    c_include_dirs: []const []const u8,
+    c_source_flags: []const []const u8,
+    c_source_files: []const []const u8,
     deps: []const u.Dep,
     yaml: yaml.Mapping,
     devdeps: []const u.Dep,
-    root_files: [][]const u8,
-    files: [][]const u8,
+    root_files: []const []const u8,
+    files: []const []const u8,
 
     pub fn init(alloc: *std.mem.Allocator, fpath: []const u8) !Self {
         //
