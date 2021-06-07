@@ -18,7 +18,7 @@ pub const Item = union(enum) {
     event: c.yaml_event_t,
     kv: Key,
     mapping: Mapping,
-    sequence: []const Item,
+    sequence: Sequence,
     document: Document,
     string: []const u8,
 
@@ -46,6 +46,8 @@ pub const Item = union(enum) {
     }
 };
 
+pub const Sequence = []const Item;
+
 pub const Key = struct {
     key: []const u8,
     value: Value,
@@ -54,7 +56,7 @@ pub const Key = struct {
 pub const Value = union(enum) {
     string: []const u8,
     mapping: Mapping,
-    sequence: []const Item,
+    sequence: Sequence,
 
     pub fn format(self: Value, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
         try writer.writeAll("Value{");
