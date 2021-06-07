@@ -26,6 +26,7 @@ fn detect_pkgname(def: []const u8) ![]const u8 {
     if (def.len > 0) {
         return def;
     }
+    u.assert(try u.does_file_exist("build.zig"), "init requires a build.zig file", .{});
     const dpath = try std.fs.cwd().realpathAlloc(gpa, "build.zig");
     const split = try u.split(dpath, std.fs.path.sep_str);
     var name = split[split.len - 2];
