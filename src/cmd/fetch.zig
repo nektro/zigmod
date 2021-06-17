@@ -220,7 +220,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(u.Module), d
     while (notdone.items.len > 0) {
         for (notdone.items) |mod, i| {
             if (contains_all(mod.deps, done.items)) {
-                try w.print("    pub const _{s} = std.build.Pkg{{ .name = \"{s}\", .path = cache ++ \"/{}/{s}\", .dependencies = &[_]std.build.Pkg{{", .{ mod.id[0..12], mod.name, std.zig.fmtEscapes(mod.clean_path), mod.main });
+                try w.print("    pub const _{s} = std.build.Pkg{{ .name = \"{s}\", .path = std.build.FileSource{{ .path = cache ++ \"/{}/{s}\" }}, .dependencies = &[_]std.build.Pkg{{", .{ mod.id[0..12], mod.name, std.zig.fmtEscapes(mod.clean_path), mod.main });
                 for (mod.deps) |d| {
                     if (d.main.len > 0) {
                         try w.print(" _{s},", .{d.id[0..12]});
