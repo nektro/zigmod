@@ -91,6 +91,9 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: C
     }
     switch (d.type) {
         .local => {
+            if (!std.mem.endsWith(u8, d.main, ".zig")) {
+                return d.main;
+            }
             return d.path;
         },
         .system_lib => {
@@ -197,23 +200,19 @@ fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8
             });
         },
         else => {
-            if (d.type == .local) {
-                try list.append(try u.Module.from(d));
-                return;
-            }
             var dd = try collect_deps(dir, try u.concat(&.{ moddir, "/zig.mod" }), options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                         var mod_from = try u.Module.from(d);
-                        mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
+                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
                         if (mod_from.is_for_this()) try list.append(mod_from);
                     }
                     return;
                 },
                 else => e,
             };
-            dd.clean_path = u.trim_prefix(moddir, dir)[1..];
-
+            const save = dd;
+            if (d.type != .local) dd.clean_path = u.trim_prefix(moddir, dir)[1..];
             if (dd.id.len == 0) dd.id = try u.random_string(48);
             if (d.name.len > 0) dd.name = d.name;
             if (d.main.len > 0) dd.main = d.main;
@@ -222,7 +221,7 @@ fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8
             if (d.c_source_files.len > 0) dd.c_source_files = d.c_source_files;
             if (d.only_os.len > 0) dd.only_os = d.only_os;
             if (d.except_os.len > 0) dd.except_os = d.except_os;
-
+            if (d.type == .local) dd.main = try std.fs.path.join(gpa, &.{ d.main, save.main });
             if (dd.is_for_this()) try list.append(dd);
         },
     }
