@@ -86,7 +86,7 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: C
     const p = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path() });
     const pv = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path_v() });
     const tempdir = try std.fs.path.join(gpa, &.{ basedir, "temp" });
-    if (options.log) {
+    if (options.log and d.type != .local) {
         u.print("fetch: {s}: {s}: {s}", .{ parent_name, @tagName(d.type), d.path });
     }
     switch (d.type) {
