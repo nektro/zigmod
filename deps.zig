@@ -56,17 +56,17 @@ pub const _paths = .{
 };
 
 pub const package_data = struct {
-    pub const _s84v9o48ucb0 = std.build.Pkg{ .name = "ansi", .path = cache ++ "/git/github.com/nektro/zig-ansi/src/lib.zig", .dependencies = &[_]std.build.Pkg{ } };
-    pub const _2ta738wrqbaq = std.build.Pkg{ .name = "known-folders", .path = cache ++ "/git/github.com/ziglibs/known-folders/known-folders.zig", .dependencies = &[_]std.build.Pkg{ } };
-    pub const _0npcrzfdlrvk = std.build.Pkg{ .name = "licenses", .path = cache ++ "/git/github.com/nektro/zig-licenses/src/lib.zig", .dependencies = &[_]std.build.Pkg{ } };
-    pub const _9k24gimke1an = std.build.Pkg{ .name = "hzzp", .path = cache ++ "/git/github.com/truemedian/hzzp/src/main.zig", .dependencies = &[_]std.build.Pkg{ } };
-    pub const _csbnipaad8n7 = std.build.Pkg{ .name = "iguanaTLS", .path = cache ++ "/git/github.com/alexnask/iguanaTLS/src/main.zig", .dependencies = &[_]std.build.Pkg{ } };
-    pub const _yyhw90zkzgmu = std.build.Pkg{ .name = "network", .path = cache ++ "/git/github.com/MasterQ32/zig-network/network.zig", .dependencies = &[_]std.build.Pkg{ } };
-    pub const _u9w9dpp6p804 = std.build.Pkg{ .name = "uri", .path = cache ++ "/git/github.com/MasterQ32/zig-uri/uri.zig", .dependencies = &[_]std.build.Pkg{ } };
-    pub const _ejw82j2ipa0e = std.build.Pkg{ .name = "zfetch", .path = cache ++ "/git/github.com/truemedian/zfetch/src/main.zig", .dependencies = &[_]std.build.Pkg{ _9k24gimke1an, _csbnipaad8n7, _yyhw90zkzgmu, _u9w9dpp6p804, } };
-    pub const _ocmr9rtohgcc = std.build.Pkg{ .name = "json", .path = cache ++ "/git/github.com/nektro/zig-json/src/lib.zig", .dependencies = &[_]std.build.Pkg{ } };
-    pub const _tnj3qf44tpeq = std.build.Pkg{ .name = "range", .path = cache ++ "/v/http/aquila.red/1/nektro/range/v0.1.tar.gz/d2f72fdd/src/lib.zig", .dependencies = &[_]std.build.Pkg{ } };
-    pub const _89ujp8gq842x = std.build.Pkg{ .name = "zigmod", .path = cache ++ "/../../src/lib.zig", .dependencies = &[_]std.build.Pkg{ _s84v9o48ucb0, _2ta738wrqbaq, _0npcrzfdlrvk, _ejw82j2ipa0e, _ocmr9rtohgcc, _tnj3qf44tpeq, } };
+    pub const _s84v9o48ucb0 = std.build.Pkg{ .name = "ansi", .path = std.build.FileSource{ .path = cache ++ "/git/github.com/nektro/zig-ansi/src/lib.zig" }, .dependencies = &[_]std.build.Pkg{ } };
+    pub const _2ta738wrqbaq = std.build.Pkg{ .name = "known-folders", .path = std.build.FileSource{ .path = cache ++ "/git/github.com/ziglibs/known-folders/known-folders.zig" }, .dependencies = &[_]std.build.Pkg{ } };
+    pub const _0npcrzfdlrvk = std.build.Pkg{ .name = "licenses", .path = std.build.FileSource{ .path = cache ++ "/git/github.com/nektro/zig-licenses/src/lib.zig" }, .dependencies = &[_]std.build.Pkg{ } };
+    pub const _9k24gimke1an = std.build.Pkg{ .name = "hzzp", .path = std.build.FileSource{ .path = cache ++ "/git/github.com/truemedian/hzzp/src/main.zig" }, .dependencies = &[_]std.build.Pkg{ } };
+    pub const _csbnipaad8n7 = std.build.Pkg{ .name = "iguanaTLS", .path = std.build.FileSource{ .path = cache ++ "/git/github.com/alexnask/iguanaTLS/src/main.zig" }, .dependencies = &[_]std.build.Pkg{ } };
+    pub const _yyhw90zkzgmu = std.build.Pkg{ .name = "network", .path = std.build.FileSource{ .path = cache ++ "/git/github.com/MasterQ32/zig-network/network.zig" }, .dependencies = &[_]std.build.Pkg{ } };
+    pub const _u9w9dpp6p804 = std.build.Pkg{ .name = "uri", .path = std.build.FileSource{ .path = cache ++ "/git/github.com/MasterQ32/zig-uri/uri.zig" }, .dependencies = &[_]std.build.Pkg{ } };
+    pub const _ejw82j2ipa0e = std.build.Pkg{ .name = "zfetch", .path = std.build.FileSource{ .path = cache ++ "/git/github.com/truemedian/zfetch/src/main.zig" }, .dependencies = &[_]std.build.Pkg{ _9k24gimke1an, _csbnipaad8n7, _yyhw90zkzgmu, _u9w9dpp6p804, } };
+    pub const _ocmr9rtohgcc = std.build.Pkg{ .name = "json", .path = std.build.FileSource{ .path = cache ++ "/git/github.com/nektro/zig-json/src/lib.zig" }, .dependencies = &[_]std.build.Pkg{ } };
+    pub const _tnj3qf44tpeq = std.build.Pkg{ .name = "range", .path = std.build.FileSource{ .path = cache ++ "/v/http/aquila.red/1/nektro/range/v0.1.tar.gz/d2f72fdd/src/lib.zig" }, .dependencies = &[_]std.build.Pkg{ } };
+    pub const _89ujp8gq842x = std.build.Pkg{ .name = "zigmod", .path = std.build.FileSource{ .path = cache ++ "/../../src/lib.zig" }, .dependencies = &[_]std.build.Pkg{ _s84v9o48ucb0, _2ta738wrqbaq, _0npcrzfdlrvk, _ejw82j2ipa0e, _ocmr9rtohgcc, _tnj3qf44tpeq, } };
 };
 
 pub const packages = &[_]std.build.Pkg{
