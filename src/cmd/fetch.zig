@@ -25,6 +25,8 @@ pub fn execute(args: [][]u8) !void {
 
     const w = f.writer();
     try w.writeAll("const std = @import(\"std\");\n");
+    try w.writeAll("const Pkg = std.build.Pkg;\n");
+    try w.writeAll("const FileSource = std.build.FileSource;\n");
     try w.writeAll("\n");
     try w.print("pub const cache = \"{}\";\n", .{std.zig.fmtEscapes(dir)});
     try w.writeAll("\n");
@@ -139,7 +141,7 @@ fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, ar
         return;
     }
     if (array) {
-        try u.print_all(w, .{"&[_]std.build.Pkg{"}, true);
+        try u.print_all(w, .{"&[_]Pkg{"}, true);
     } else {
         try u.print_all(w, .{"struct {"}, true);
     }
@@ -220,7 +222,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(u.Module), d
     while (notdone.items.len > 0) {
         for (notdone.items) |mod, i| {
             if (contains_all(mod.deps, done.items)) {
-                try w.print("    pub const _{s} = std.build.Pkg{{ .name = \"{s}\", .path = std.build.FileSource{{ .path = cache ++ \"/{}/{s}\" }}, .dependencies = &[_]std.build.Pkg{{", .{ mod.id[0..12], mod.name, std.zig.fmtEscapes(mod.clean_path), mod.main });
+                try w.print("    pub const _{s} = Pkg{{ .name = \"{s}\", .path = FileSource{{ .path = cache ++ \"/{}/{s}\" }}, .dependencies = &[_]Pkg{{", .{ mod.id[0..12], mod.name, std.zig.fmtEscapes(mod.clean_path), mod.main });
                 for (mod.deps) |d| {
                     if (d.main.len > 0) {
                         try w.print(" _{s},", .{d.id[0..12]});
