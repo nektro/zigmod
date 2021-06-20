@@ -180,7 +180,7 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: C
     }
 }
 
-fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8, parent_name: []const u8, options: CollectOptions) !void {
+pub fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8, parent_name: []const u8, options: CollectOptions) anyerror!void {
     const moddir = try get_moddir(dir, d, parent_name, options);
     switch (d.type) {
         .system_lib => {
@@ -203,7 +203,7 @@ fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8
             var dd = try collect_deps(dir, try u.concat(&.{ moddir, "/zig.mod" }), options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
-                        var mod_from = try u.Module.from(d);
+                        var mod_from = try u.Module.from(d, dir, options);
                         if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
                         if (mod_from.is_for_this()) try list.append(mod_from);
                     }
@@ -283,6 +283,7 @@ fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, list: *std.
         .only_os = &.{},
         .except_os = &.{},
         .yaml = null,
+        .deps = &.{},
     };
     try get_module_from_dep(list, d, destination, parent_name, .{
         .log = false,

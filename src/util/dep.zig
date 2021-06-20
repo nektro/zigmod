@@ -24,6 +24,7 @@ pub const Dep = struct {
     only_os: []const []const u8,
     except_os: []const []const u8,
     yaml: ?yaml.Mapping,
+    deps: []const u.Dep,
 
     pub fn clean_path(self: Dep) ![]const u8 {
         if (self.type == .local) {

@@ -4,6 +4,7 @@ const builtin = std.builtin;
 
 const u = @import("index.zig");
 const yaml = @import("./yaml.zig");
+const common = @import("./../common.zig");
 
 //
 //
@@ -23,7 +24,12 @@ pub const Module = struct {
     deps: []Module,
     clean_path: []const u8,
 
-    pub fn from(dep: u.Dep) !Module {
+    pub fn from(dep: u.Dep, dir: []const u8, options: common.CollectOptions) !Module {
+        const moddeps = &std.ArrayList(Module).init(gpa);
+        defer moddeps.deinit();
+        for (dep.deps) |d| {
+            try common.get_module_from_dep(moddeps, d, dir, dep.name, options);
+        }
         return Module{
             .is_sys_lib = false,
             .id = if (dep.id.len > 0) dep.id else try u.random_string(48),
@@ -32,7 +38,7 @@ pub const Module = struct {
             .c_include_dirs = dep.c_include_dirs,
             .c_source_flags = dep.c_source_flags,
             .c_source_files = dep.c_source_files,
-            .deps = &.{},
+            .deps = moddeps.toOwnedSlice(),
             .clean_path = try dep.clean_path(),
             .only_os = dep.only_os,
             .except_os = dep.except_os,

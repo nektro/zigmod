@@ -45,7 +45,6 @@ pub const ModFile = struct {
             u.assert(false, "name may not contain any '/'", .{});
         }
 
-
         return Self{
             .alloc = alloc,
             .id = if (id.len == 0) try u.random_string(48) else id,
@@ -62,7 +61,7 @@ pub const ModFile = struct {
         };
     }
 
-    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: []const u8) ![]const u.Dep {
+    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: []const u8) anyerror![]const u.Dep {
         const dep_list = &std.ArrayList(u.Dep).init(alloc);
         if (mapping.get(prop)) |dep_seq| {
             if (dep_seq == .sequence) {
@@ -115,6 +114,7 @@ pub const ModFile = struct {
                         .only_os = try u.list_remove(try u.split(item.mapping.get_string("only_os"), ","), ""),
                         .except_os = try u.list_remove(try u.split(item.mapping.get_string("except_os"), ","), ""),
                         .yaml = item.mapping,
+                        .deps = try dep_list_by_name(alloc, item.mapping, "dependencies"),
                     });
                 }
             }
