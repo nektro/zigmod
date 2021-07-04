@@ -37,7 +37,7 @@ pub const Item = union(enum) {
             .event => {
                 try std.fmt.format(writer, "{s}", .{@tagName(self.event.type)});
             },
-            .kv, .document => {
+            .kv, .document, .stream => {
                 unreachable;
             },
             .mapping => {
