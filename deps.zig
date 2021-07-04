@@ -54,7 +54,7 @@ pub const _paths = .{
     "/git/github.com/MasterQ32/zig-network/",
     "/git/github.com/MasterQ32/zig-uri/",
     "/git/github.com/nektro/zig-json/",
-    "/v/http/aquila.red/1/nektro/range/v0.1.tar.gz/d2f72fdd/",
+    "/git/github.com/nektro/zig-range/",
 };
 
 pub const package_data = struct {
@@ -67,7 +67,7 @@ pub const package_data = struct {
     pub const _u9w9dpp6p804 = Pkg{ .name = "uri", .path = FileSource{ .path = cache ++ "/git/github.com/MasterQ32/zig-uri/uri.zig" }, .dependencies = &[_]Pkg{ } };
     pub const _ejw82j2ipa0e = Pkg{ .name = "zfetch", .path = FileSource{ .path = cache ++ "/git/github.com/truemedian/zfetch/src/main.zig" }, .dependencies = &[_]Pkg{ _9k24gimke1an, _csbnipaad8n7, _yyhw90zkzgmu, _u9w9dpp6p804, } };
     pub const _ocmr9rtohgcc = Pkg{ .name = "json", .path = FileSource{ .path = cache ++ "/git/github.com/nektro/zig-json/src/lib.zig" }, .dependencies = &[_]Pkg{ } };
-    pub const _tnj3qf44tpeq = Pkg{ .name = "range", .path = FileSource{ .path = cache ++ "/v/http/aquila.red/1/nektro/range/v0.1.tar.gz/d2f72fdd/src/lib.zig" }, .dependencies = &[_]Pkg{ } };
+    pub const _tnj3qf44tpeq = Pkg{ .name = "range", .path = FileSource{ .path = cache ++ "/git/github.com/nektro/zig-range/src/lib.zig" }, .dependencies = &[_]Pkg{ } };
     pub const _89ujp8gq842x = Pkg{ .name = "zigmod", .path = FileSource{ .path = cache ++ "/../../src/lib.zig" }, .dependencies = &[_]Pkg{ _s84v9o48ucb0, _2ta738wrqbaq, _0npcrzfdlrvk, _ejw82j2ipa0e, _ocmr9rtohgcc, _tnj3qf44tpeq, } };
 };
 

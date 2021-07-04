@@ -39,4 +39,4 @@ dependencies:
 
   - src: git https://github.com/nektro/zig-json
 
-  - src: http https://aquila.red/1/nektro/range/v0.1.tar.gz sha256-d2f72fdd8cdb8 0 1
+  - src: git https://github.com/nektro/zig-range
