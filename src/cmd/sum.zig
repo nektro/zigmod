@@ -20,7 +20,7 @@ pub fn execute(args: [][]u8) !void {
     });
 
     //
-    const f = try std.fs.cwd().createFile("zig.sum", .{});
+    const f = try std.fs.cwd().createFile("zigmod.sum", .{});
     defer f.close();
     const w = f.writer();
 
