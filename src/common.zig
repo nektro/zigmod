@@ -40,6 +40,7 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: CollectOpt
         .only_os = &.{},
         .except_os = &.{},
         .yaml = m.yaml,
+        .dep = null,
     };
 }
 
@@ -69,6 +70,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, options: CollectOptions)
         .only_os = &.{},
         .except_os = &.{},
         .yaml = m.yaml,
+        .dep = null,
     };
 }
 
@@ -197,6 +199,7 @@ pub fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []cons
                 .deps = &[_]u.Module{},
                 .clean_path = d.path,
                 .yaml = null,
+                .dep = d,
             });
         },
         else => {
@@ -211,6 +214,7 @@ pub fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []cons
                 },
                 else => e,
             };
+            dd.dep = d;
             const save = dd;
             if (d.type != .local) dd.clean_path = u.trim_prefix(moddir, dir)[1..];
             if (dd.id.len == 0) dd.id = try u.random_string(48);

@@ -104,6 +104,20 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("pub const system_libs = &[_][]const u8{\n");
     try print_sys_libs_to(w, list.items, &std.ArrayList([]const u8).init(gpa));
     try w.writeAll("};\n\n");
+
+    //
+
+    const fl = try std.fs.cwd().createFile("zig.lock", .{});
+    defer fl.close();
+
+    const wl = fl.writer();
+    for (list.items) |m| {
+        if (m.dep) |md| {
+            const mpath = try std.fs.path.join(gpa, &.{ dir, m.clean_path });
+            const version = if (md.version.len > 0) md.version else (try md.type.exact_version(mpath))[0..14];
+            try wl.print("{s} {s} {s} {s}\n", .{ m.id, @tagName(md.type), md.path, version });
+        }
+    }
 }
 
 fn print_ids(w: std.fs.File.Writer, list: []u.Module) !void {

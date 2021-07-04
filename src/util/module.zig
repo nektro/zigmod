@@ -20,9 +20,9 @@ pub const Module = struct {
     only_os: []const []const u8,
     except_os: []const []const u8,
     yaml: ?yaml.Mapping,
-
     deps: []Module,
     clean_path: []const u8,
+    dep: ?u.Dep,
 
     pub fn from(dep: u.Dep, dir: []const u8, options: common.CollectOptions) !Module {
         const moddeps = &std.ArrayList(Module).init(gpa);
@@ -43,6 +43,7 @@ pub const Module = struct {
             .only_os = dep.only_os,
             .except_os = dep.except_os,
             .yaml = dep.yaml,
+            .dep = dep,
         };
     }
 

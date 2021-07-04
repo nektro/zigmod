@@ -249,3 +249,13 @@ pub fn do_hash(comptime algo: type, data: []const u8) ![]const u8 {
     const hex = try std.fmt.allocPrint(gpa, "{x}", .{std.fmt.fmtSliceHexLower(out[0..])});
     return hex;
 }
+
+/// Returns the result of running `git rev-parse HEAD`
+pub fn git_rev_HEAD(alloc: *std.mem.Allocator, path: []const u8) ![]const u8 {
+    const max = std.math.maxInt(usize);
+    const dir = try std.fs.cwd().openDir(path, .{});
+    const dirg = try dir.openDir(".git", .{});
+    const h = std.mem.trimRight(u8, try dirg.readFileAlloc(alloc, "HEAD", max), "\n");
+    const r = std.mem.trimRight(u8, try dirg.readFileAlloc(alloc, h[5..], max), "\n");
+    return r;
+}
