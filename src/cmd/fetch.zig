@@ -136,6 +136,8 @@ fn print_paths(w: std.fs.File.Writer, list: []u.Module) !void {
 }
 
 fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, array: bool) !void {
+    _ = dir;
+
     if (m.has_no_zig_deps() and tabs > 0) {
         try w.print("null", .{});
         return;
@@ -152,8 +154,8 @@ fn print_deps(w: std.fs.File.Writer, dir: []const u8, m: u.Module, tabs: i32, ar
             continue;
         }
         if (!array) {
-            const r1 = std.mem.replaceOwned(u8, gpa, d.name, "-", "_");
-            const r2 = std.mem.replaceOwned(u8, gpa, d.name, "/", "_");
+            const r1 = try std.mem.replaceOwned(u8, gpa, d.name, "-", "_");
+            const r2 = try std.mem.replaceOwned(u8, gpa, r1, "/", "_");
             try w.print("    pub const {s} = packages[{}];\n", .{ r2, i });
         } else {
             try w.print("    package_data._{s},\n", .{d.id[0..12]});
@@ -193,7 +195,7 @@ fn print_csrc_dirs_to(w: std.fs.File.Writer, list: []u.Module) !void {
 }
 
 fn print_csrc_flags_to(w: std.fs.File.Writer, list: []u.Module) !void {
-    for (list) |mod, i| {
+    for (list) |mod| {
         if (mod.is_sys_lib) {
             continue;
         }
@@ -209,6 +211,8 @@ fn print_csrc_flags_to(w: std.fs.File.Writer, list: []u.Module) !void {
 }
 
 fn print_sys_libs_to(w: std.fs.File.Writer, list: []u.Module, list2: *std.ArrayList([]const u8)) !void {
+    _ = list2;
+
     for (list) |mod| {
         if (!mod.is_sys_lib) {
             continue;

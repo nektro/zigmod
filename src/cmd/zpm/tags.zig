@@ -12,6 +12,8 @@ const zpm = @import("./../zpm.zig");
 //
 
 pub fn execute(args: [][]u8) !void {
+    _ = args;
+
     const out = std.io.getStdOut().writer();
 
     const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, "tags" });

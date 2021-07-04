@@ -29,6 +29,9 @@ pub const Item = union(enum) {
     stream: Stream,
 
     pub fn format(self: Item, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
+        _ = fmt;
+        _ = options;
+
         try writer.writeAll("Item{");
         switch (self) {
             .event => {
@@ -68,6 +71,9 @@ pub const Value = union(enum) {
     sequence: Sequence,
 
     pub fn format(self: Value, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
+        _ = fmt;
+        _ = options;
+
         try writer.writeAll("Value{");
         switch (self) {
             .string => {
@@ -109,7 +115,7 @@ pub const Mapping = struct {
         defer list.deinit();
         if (self.get(k)) |val| {
             if (val == .sequence) {
-                for (val.sequence) |item, i| {
+                for (val.sequence) |item| {
                     if (item != .string) {
                         continue;
                     }
@@ -121,6 +127,9 @@ pub const Mapping = struct {
     }
 
     pub fn format(self: Mapping, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
+        _ = fmt;
+        _ = options;
+
         try writer.writeAll("{ ");
         for (self.items) |it| {
             try std.fmt.format(writer, "{s}: ", .{it.key});
@@ -152,7 +161,7 @@ pub fn parse(alloc: *std.mem.Allocator, input: []const u8) !Document {
             break;
         }
 
-        const et = @enumToInt(event.type);
+        const et = event.type;
         try all_events.append(event);
         c.yaml_event_delete(&event);
 
@@ -200,11 +209,11 @@ pub const Error =
 fn parse_item(p: *Parser, start: ?Token) Error!Item {
     const tok = start orelse p.next();
     return switch (tok.?.type) {
-        .YAML_STREAM_START_EVENT => Item{ .stream = try parse_stream(p) },
-        .YAML_DOCUMENT_START_EVENT => Item{ .document = try parse_document(p) },
-        .YAML_MAPPING_START_EVENT => Item{ .mapping = try parse_mapping(p) },
-        .YAML_SEQUENCE_START_EVENT => Item{ .sequence = try parse_sequence(p) },
-        .YAML_SCALAR_EVENT => Item{ .string = get_event_string(tok.?, p.lines) },
+        c.YAML_STREAM_START_EVENT => Item{ .stream = try parse_stream(p) },
+        c.YAML_DOCUMENT_START_EVENT => Item{ .document = try parse_document(p) },
+        c.YAML_MAPPING_START_EVENT => Item{ .mapping = try parse_mapping(p) },
+        c.YAML_SEQUENCE_START_EVENT => Item{ .sequence = try parse_sequence(p) },
+        c.YAML_SCALAR_EVENT => Item{ .string = get_event_string(tok.?, p.lines) },
         else => unreachable,
     };
 }
@@ -215,10 +224,10 @@ fn parse_stream(p: *Parser) Error!Stream {
 
     while (true) {
         const tok = p.next();
-        if (tok.?.type == .YAML_STREAM_END_EVENT) {
+        if (tok.?.type == c.YAML_STREAM_END_EVENT) {
             return Stream{ .docs = res.toOwnedSlice() };
         }
-        if (tok.?.type != .YAML_DOCUMENT_START_EVENT) {
+        if (tok.?.type != c.YAML_DOCUMENT_START_EVENT) {
             return error.YamlUnexpectedToken;
         }
         const item = try parse_item(p, tok);
@@ -228,12 +237,12 @@ fn parse_stream(p: *Parser) Error!Stream {
 
 fn parse_document(p: *Parser) Error!Document {
     const tok = p.next();
-    if (tok.?.type != .YAML_MAPPING_START_EVENT) {
+    if (tok.?.type != c.YAML_MAPPING_START_EVENT) {
         return error.YamlUnexpectedToken;
     }
     const item = try parse_item(p, tok);
 
-    if (p.next().?.type != .YAML_DOCUMENT_END_EVENT) {
+    if (p.next().?.type != c.YAML_DOCUMENT_END_EVENT) {
         return error.YamlUnexpectedToken;
     }
     return Document{ .mapping = item.mapping };
@@ -245,10 +254,10 @@ fn parse_mapping(p: *Parser) Error!Mapping {
 
     while (true) {
         const tok = p.next();
-        if (tok.?.type == .YAML_MAPPING_END_EVENT) {
+        if (tok.?.type == c.YAML_MAPPING_END_EVENT) {
             return Mapping{ .items = res.toOwnedSlice() };
         }
-        if (tok.?.type != .YAML_SCALAR_EVENT) {
+        if (tok.?.type != c.YAML_SCALAR_EVENT) {
             return error.YamlUnexpectedToken;
         }
         try res.append(Key{
@@ -274,7 +283,7 @@ fn parse_sequence(p: *Parser) Error!Sequence {
 
     while (true) {
         const tok = p.next();
-        if (tok.?.type == .YAML_SEQUENCE_END_EVENT) {
+        if (tok.?.type == c.YAML_SEQUENCE_END_EVENT) {
             return res.toOwnedSlice();
         }
         try res.append(try parse_item(p, tok));

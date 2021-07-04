@@ -8,7 +8,8 @@ const aq = @import("./../aq.zig");
 //
 
 pub fn execute(args: [][]u8) !void {
-    //
+    _ = args;
+
     const mod = try u.ModFile.init(gpa, "zig.mod");
 
     for (mod.deps) |d| {

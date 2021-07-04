@@ -56,6 +56,8 @@ pub const DepType = enum {
     }
 
     pub fn update(self: DepType, dpath: []const u8, rpath: []const u8) !void {
+        _ = rpath;
+
         switch (self) {
             .local => {},
             .system_lib => {},

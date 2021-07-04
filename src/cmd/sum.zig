@@ -10,7 +10,8 @@ const common = @import("./../common.zig");
 //
 
 pub fn execute(args: [][]u8) !void {
-    //
+    _ = args;
+
     const dir = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
 
     const top_module = try common.collect_deps_deep(dir, "zig.mod", .{
