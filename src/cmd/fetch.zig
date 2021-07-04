@@ -107,7 +107,7 @@ pub fn execute(args: [][]u8) !void {
 
     //
 
-    const fl = try std.fs.cwd().createFile("zig.lock", .{});
+    const fl = try std.fs.cwd().createFile("zigmod.lock", .{});
     defer fl.close();
 
     const wl = fl.writer();
