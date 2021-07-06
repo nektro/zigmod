@@ -107,6 +107,10 @@ pub fn execute(args: [][]u8) !void {
 
     //
 
+    try create_lockfile(list, dir);
+}
+
+fn create_lockfile(list: *std.ArrayList(u.Module), dir: []const u8) !void {
     const fl = try std.fs.cwd().createFile("zigmod.lock", .{});
     defer fl.close();
 
