@@ -19,7 +19,7 @@ jobs:
       - run: zig version
       - run: zig env
       - run: zig build -Dbootstrap
-      - run: ./zig-out/bin/zigmod fetch
+      - run: ./zig-out/bin/zigmod ci
       - run: ./build_all_zig.sh
       - store_artifacts:
           path: ./zig-out/bin/
