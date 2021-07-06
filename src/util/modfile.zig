@@ -20,9 +20,9 @@ pub const ModFile = struct {
     c_include_dirs: []const []const u8,
     c_source_flags: []const []const u8,
     c_source_files: []const []const u8,
-    deps: []const u.Dep,
+    deps: []u.Dep,
     yaml: yaml.Mapping,
-    devdeps: []const u.Dep,
+    devdeps: []u.Dep,
     root_files: []const []const u8,
     files: []const []const u8,
 
@@ -61,7 +61,7 @@ pub const ModFile = struct {
         };
     }
 
-    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: []const u8) anyerror![]const u.Dep {
+    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: []const u8) anyerror![]u.Dep {
         const dep_list = &std.ArrayList(u.Dep).init(alloc);
         if (mapping.get(prop)) |dep_seq| {
             if (dep_seq == .sequence) {

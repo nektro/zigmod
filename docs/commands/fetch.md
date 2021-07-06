@@ -5,6 +5,7 @@ zigmod fetch
 
 - This command takes no parameters and will generate a `deps.zig` in the root of your project. This is the file that you will then import into your `build.zig` to automatically add all the necessary packages and (any) C code that may be in your dependencies.
 - `deps.zig` is not typically checked into your source control.
+- This command will also produce a `zigmod.lock` which you can use to easily generate [reproducible builds](https://reproducible-builds.org/) using the [`ci`](./ci.md) command.
 
 For a full reference on the fields available in `deps.zig` you can check [here](../deps.zig.md).
 

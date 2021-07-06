@@ -14,11 +14,11 @@ pub const Module = struct {
     id: []const u8,
     name: []const u8,
     main: []const u8,
-    c_include_dirs: []const []const u8,
-    c_source_flags: []const []const u8,
-    c_source_files: []const []const u8,
-    only_os: []const []const u8,
-    except_os: []const []const u8,
+    c_include_dirs: []const []const u8 = &.{},
+    c_source_flags: []const []const u8 = &.{},
+    c_source_files: []const []const u8 = &.{},
+    only_os: []const []const u8 = &.{},
+    except_os: []const []const u8 = &.{},
     yaml: ?yaml.Mapping,
     deps: []Module,
     clean_path: []const u8,
@@ -27,7 +27,7 @@ pub const Module = struct {
     pub fn from(dep: u.Dep, dir: []const u8, options: common.CollectOptions) !Module {
         const moddeps = &std.ArrayList(Module).init(gpa);
         defer moddeps.deinit();
-        for (dep.deps) |d| {
+        for (dep.deps) |*d| {
             if (try common.get_module_from_dep(d, dir, dep.name, options)) |founddep| {
                 try moddeps.append(founddep);
             }

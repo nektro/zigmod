@@ -10,6 +10,7 @@ const yaml = @import("./util/yaml.zig");
 pub const CollectOptions = struct {
     log: bool,
     update: bool,
+    lock: ?[]const [4][]const u8 = null,
 };
 
 pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: CollectOptions) !u.Module {
@@ -21,7 +22,7 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: CollectOpt
         try moduledeps.append(try add_files_package("root", m.root_files, m.name));
     }
     try moduledeps.append(try collect_deps(dir, mpath, options));
-    for (m.devdeps) |d| {
+    for (m.devdeps) |*d| {
         if (try get_module_from_dep(d, dir, m.name, options)) |founddep| {
             try moduledeps.append(founddep);
         }
@@ -31,13 +32,8 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: CollectOpt
         .id = "root",
         .name = "root",
         .main = m.main,
-        .c_include_dirs = &.{},
-        .c_source_flags = &.{},
-        .c_source_files = &.{},
         .deps = moduledeps.toOwnedSlice(),
         .clean_path = "",
-        .only_os = &.{},
-        .except_os = &.{},
         .yaml = m.yaml,
         .dep = null,
     };
@@ -50,7 +46,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, options: CollectOptions)
     if (m.files.len > 0) {
         try moduledeps.append(try add_files_package(m.id, m.files, m.name));
     }
-    for (m.deps) |d| {
+    for (m.deps) |*d| {
         if (try get_module_from_dep(d, dir, m.name, options)) |founddep| {
             try moduledeps.append(founddep);
         }
@@ -65,8 +61,6 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, options: CollectOptions)
         .c_source_files = m.c_source_files,
         .deps = moduledeps.toOwnedSlice(),
         .clean_path = "../..",
-        .only_os = &.{},
-        .except_os = &.{},
         .yaml = m.yaml,
         .dep = null,
     };
@@ -180,8 +174,18 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: C
     }
 }
 
-pub fn get_module_from_dep(d: u.Dep, dir: []const u8, parent_name: []const u8, options: CollectOptions) anyerror!?u.Module {
-    const moddir = try get_moddir(dir, d, parent_name, options);
+pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, options: CollectOptions) anyerror!?u.Module {
+    if (options.lock) |lock| {
+        for (lock) |item| {
+            if (std.mem.eql(u8, item[0], try d.clean_path())) {
+                d.type = std.meta.stringToEnum(u.DepType, item[1]).?;
+                d.path = item[2];
+                d.version = item[3];
+                break;
+            }
+        }
+    }
+    const moddir = try get_moddir(dir, d.*, parent_name, options);
     switch (d.type) {
         .system_lib => {
             return u.Module{
@@ -191,20 +195,17 @@ pub fn get_module_from_dep(d: u.Dep, dir: []const u8, parent_name: []const u8, o
                 .only_os = d.only_os,
                 .except_os = d.except_os,
                 .main = "",
-                .c_include_dirs = &.{},
-                .c_source_flags = &.{},
-                .c_source_files = &.{},
                 .deps = &[_]u.Module{},
                 .clean_path = d.path,
                 .yaml = null,
-                .dep = d,
+                .dep = d.*,
             };
         },
         else => {
             var dd = try collect_deps(dir, try u.concat(&.{ moddir, "/zig.mod" }), options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
-                        var mod_from = try u.Module.from(d, dir, options);
+                        var mod_from = try u.Module.from(d.*, dir, options);
                         if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
@@ -213,7 +214,7 @@ pub fn get_module_from_dep(d: u.Dep, dir: []const u8, parent_name: []const u8, o
                 },
                 else => e,
             };
-            dd.dep = d;
+            dd.dep = d.*;
             const save = dd;
             if (d.type != .local) dd.clean_path = u.trim_prefix(moddir, dir)[1..];
             if (dd.id.len == 0) dd.id = try u.random_string(48);
@@ -274,23 +275,35 @@ fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_name
         \\
     );
 
-    const d: u.Dep = .{
+    var d: u.Dep = .{
         .type = .local,
         .path = "files",
         .id = "",
         .name = "self/files",
         .main = fname,
         .version = "absolute",
-        .c_include_dirs = &.{},
-        .c_source_flags = &.{},
-        .c_source_files = &.{},
-        .only_os = &.{},
-        .except_os = &.{},
         .yaml = null,
         .deps = &.{},
     };
-    return (try get_module_from_dep(d, destination, parent_name, .{
+    return (try get_module_from_dep(&d, destination, parent_name, .{
         .log = false,
         .update = false,
     })).?;
+}
+
+pub fn parse_lockfile(path: []const u8) ![]const [4][]const u8 {
+    const list = &std.ArrayList([4][]const u8).init(gpa);
+    const max = std.math.maxInt(usize);
+    const f = try std.fs.cwd().openFile(path, .{});
+    const r = f.reader();
+    while (try r.readUntilDelimiterOrEofAlloc(gpa, '\n', max)) |line| {
+        var iter = std.mem.split(line, " ");
+        try list.append([4][]const u8{
+            iter.next().?,
+            iter.next().?,
+            iter.next().?,
+            iter.next().?,
+        });
+    }
+    return list.toOwnedSlice();
 }

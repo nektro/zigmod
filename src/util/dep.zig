@@ -18,13 +18,13 @@ pub const Dep = struct {
     name: []const u8,
     main: []const u8,
     version: []const u8,
-    c_include_dirs: []const []const u8,
-    c_source_flags: []const []const u8,
-    c_source_files: []const []const u8,
-    only_os: []const []const u8,
-    except_os: []const []const u8,
+    c_include_dirs: []const []const u8 = &.{},
+    c_source_flags: []const []const u8 = &.{},
+    c_source_files: []const []const u8 = &.{},
+    only_os: []const []const u8 = &.{},
+    except_os: []const []const u8 = &.{},
     yaml: ?yaml.Mapping,
-    deps: []const u.Dep,
+    deps: []u.Dep,
 
     pub fn clean_path(self: Dep) ![]const u8 {
         if (self.type == .local) {
