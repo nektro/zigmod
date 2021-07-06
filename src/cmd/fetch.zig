@@ -116,6 +116,7 @@ fn create_lockfile(list: *std.ArrayList(u.Module), dir: []const u8) !void {
     defer fl.close();
 
     const wl = fl.writer();
+    try wl.writeAll("2\n");
     for (list.items) |m| {
         if (m.dep) |md| {
             if (md.type == .local) {
@@ -123,7 +124,7 @@ fn create_lockfile(list: *std.ArrayList(u.Module), dir: []const u8) !void {
             }
             const mpath = try std.fs.path.join(gpa, &.{ dir, m.clean_path });
             const version = if (md.version.len > 0) md.version else (try md.type.exact_version(mpath));
-            try wl.print("{s} {s} {s} {s}\n", .{ m.clean_path, @tagName(md.type), md.path, version });
+            try wl.print("{s} {s} {s}\n", .{ @tagName(md.type), md.path, version });
         }
     }
 }

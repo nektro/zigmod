@@ -296,14 +296,46 @@ pub fn parse_lockfile(path: []const u8) ![]const [4][]const u8 {
     const max = std.math.maxInt(usize);
     const f = try std.fs.cwd().openFile(path, .{});
     const r = f.reader();
-    while (try r.readUntilDelimiterOrEofAlloc(gpa, '\n', max)) |line| {
-        var iter = std.mem.split(line, " ");
-        try list.append([4][]const u8{
-            iter.next().?,
-            iter.next().?,
-            iter.next().?,
-            iter.next().?,
-        });
+    var i: usize = 0;
+    var v: usize = 1;
+    while (try r.readUntilDelimiterOrEofAlloc(gpa, '\n', max)) |line| : (i += 1) {
+        if (i == 0 and std.mem.eql(u8, line, "2")) {
+            v = 2;
+            continue;
+        }
+        switch (v) {
+            1 => {
+                var iter = std.mem.split(line, " ");
+                try list.append([4][]const u8{
+                    iter.next().?,
+                    iter.next().?,
+                    iter.next().?,
+                    iter.next().?,
+                });
+            },
+            2 => {
+                var iter = std.mem.split(line, " ");
+                const asdep = u.Dep{
+                    .type = std.meta.stringToEnum(u.DepType, iter.next().?).?,
+                    .path = iter.next().?,
+                    .version = iter.next().?,
+                    .id = "",
+                    .name = "",
+                    .main = "",
+                    .yaml = null,
+                    .deps = &.{},
+                };
+                try list.append([4][]const u8{
+                    try asdep.clean_path(),
+                    @tagName(asdep.type),
+                    asdep.path,
+                    asdep.version,
+                });
+            },
+            else => {
+                u.assert(false, "invalid zigmod.lock version: {d}", .{v});
+            },
+        }
     }
     return list.toOwnedSlice();
 }
