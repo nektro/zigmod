@@ -255,7 +255,7 @@ pub fn git_rev_HEAD(alloc: *std.mem.Allocator, path: []const u8) ![]const u8 {
     const max = std.math.maxInt(usize);
     const dir = try std.fs.cwd().openDir(path, .{});
     const dirg = try dir.openDir(".git", .{});
-    const h = std.mem.trimRight(u8, try dirg.readFileAlloc(alloc, "HEAD", max), "\n");
-    const r = std.mem.trimRight(u8, try dirg.readFileAlloc(alloc, h[5..], max), "\n");
+    const h = std.mem.trim(u8, try dirg.readFileAlloc(alloc, "HEAD", max), "\n");
+    const r = std.mem.trim(u8, try dirg.readFileAlloc(alloc, h[5..], max), "\n");
     return r;
 }
