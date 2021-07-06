@@ -18,14 +18,13 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: CollectOpt
     defer moduledeps.deinit();
     try std.fs.cwd().makePath(".zigmod/deps/files");
     if (m.root_files.len > 0) {
-        try add_files_package("root", m.root_files, moduledeps, m.name);
+        try moduledeps.append(try add_files_package("root", m.root_files, m.name));
     }
     try moduledeps.append(try collect_deps(dir, mpath, options));
     for (m.devdeps) |d| {
-        if (!d.is_for_this()) {
-            continue;
+        if (try get_module_from_dep(d, dir, m.name, options)) |founddep| {
+            try moduledeps.append(founddep);
         }
-        try get_module_from_dep(moduledeps, d, dir, m.name, options);
     }
     return u.Module{
         .is_sys_lib = false,
@@ -49,13 +48,12 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, options: CollectOptions)
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
     if (m.files.len > 0) {
-        try add_files_package(m.id, m.files, moduledeps, m.name);
+        try moduledeps.append(try add_files_package(m.id, m.files, m.name));
     }
     for (m.deps) |d| {
-        if (!d.is_for_this()) {
-            continue;
+        if (try get_module_from_dep(d, dir, m.name, options)) |founddep| {
+            try moduledeps.append(founddep);
         }
-        try get_module_from_dep(moduledeps, d, dir, m.name, options);
     }
     return u.Module{
         .is_sys_lib = false,
@@ -182,11 +180,11 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: C
     }
 }
 
-pub fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []const u8, parent_name: []const u8, options: CollectOptions) anyerror!void {
+pub fn get_module_from_dep(d: u.Dep, dir: []const u8, parent_name: []const u8, options: CollectOptions) anyerror!?u.Module {
     const moddir = try get_moddir(dir, d, parent_name, options);
     switch (d.type) {
         .system_lib => {
-            try list.append(u.Module{
+            return u.Module{
                 .is_sys_lib = true,
                 .id = "",
                 .name = d.path,
@@ -200,7 +198,7 @@ pub fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []cons
                 .clean_path = d.path,
                 .yaml = null,
                 .dep = d,
-            });
+            };
         },
         else => {
             var dd = try collect_deps(dir, try u.concat(&.{ moddir, "/zig.mod" }), options) catch |e| switch (e) {
@@ -208,9 +206,10 @@ pub fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []cons
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                         var mod_from = try u.Module.from(d, dir, options);
                         if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
-                        if (mod_from.is_for_this()) try list.append(mod_from);
+                        if (mod_from.is_for_this()) return mod_from;
+                        return null;
                     }
-                    return;
+                    return e;
                 },
                 else => e,
             };
@@ -226,12 +225,13 @@ pub fn get_module_from_dep(list: *std.ArrayList(u.Module), d: u.Dep, dir: []cons
             if (d.only_os.len > 0) dd.only_os = d.only_os;
             if (d.except_os.len > 0) dd.except_os = d.except_os;
             if (d.type == .local) dd.main = try std.fs.path.join(gpa, &.{ d.main, save.main });
-            if (dd.is_for_this()) try list.append(dd);
+            if (dd.is_for_this()) return dd;
+            return null;
         },
     }
 }
 
-fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, list: *std.ArrayList(u.Module), parent_name: []const u8) !void {
+fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_name: []const u8) !u.Module {
     const destination = ".zigmod/deps/files";
     const fname = try std.mem.join(gpa, "", &.{ pkg_name, ".zig" });
 
@@ -289,8 +289,8 @@ fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, list: *std.
         .yaml = null,
         .deps = &.{},
     };
-    try get_module_from_dep(list, d, destination, parent_name, .{
+    return (try get_module_from_dep(d, destination, parent_name, .{
         .log = false,
         .update = false,
-    });
+    })).?;
 }
