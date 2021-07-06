@@ -19,7 +19,15 @@ pub fn execute(args: [][]u8) !void {
         .update = should_update,
     });
 
-    //
+    const list = &std.ArrayList(u.Module).init(gpa);
+    try common.collect_pkgs(top_module, list);
+
+    try create_depszig(dir, top_module, list);
+
+    try create_lockfile(list, dir);
+}
+
+pub fn create_depszig(dir: []const u8, top_module: u.Module, list: *std.ArrayList(u.Module)) !void {
     const f = try std.fs.cwd().createFile("deps.zig", .{});
     defer f.close();
 
@@ -55,9 +63,6 @@ pub fn execute(args: [][]u8) !void {
         \\}
         \\
     });
-
-    const list = &std.ArrayList(u.Module).init(gpa);
-    try common.collect_pkgs(top_module, list);
 
     try w.writeAll("pub const _ids = .{\n");
     try print_ids(w, list.items);
@@ -104,10 +109,6 @@ pub fn execute(args: [][]u8) !void {
     try w.writeAll("pub const system_libs = &[_][]const u8{\n");
     try print_sys_libs_to(w, list.items, &std.ArrayList([]const u8).init(gpa));
     try w.writeAll("};\n\n");
-
-    //
-
-    try create_lockfile(list, dir);
 }
 
 fn create_lockfile(list: *std.ArrayList(u.Module), dir: []const u8) !void {
