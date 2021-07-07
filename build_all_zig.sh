@@ -10,7 +10,6 @@ targets="
 aarch64-linux-musl
 aarch64-macos-gnu
 i386-linux-musl
-riscv64-linux-musl
 x86_64-linux-musl
 x86_64-windows-gnu
 x86_64-macos-gnu
