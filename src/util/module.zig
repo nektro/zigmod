@@ -24,7 +24,7 @@ pub const Module = struct {
     clean_path: []const u8,
     dep: ?u.Dep,
 
-    pub fn from(dep: u.Dep, dir: []const u8, options: common.CollectOptions) !Module {
+    pub fn from(dep: u.Dep, dir: []const u8, options: *common.CollectOptions) !Module {
         const moddeps = &std.ArrayList(Module).init(gpa);
         defer moddeps.deinit();
         for (dep.deps) |*d| {

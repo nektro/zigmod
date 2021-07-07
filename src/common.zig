@@ -3,6 +3,7 @@ const gpa = std.heap.c_allocator;
 
 const u = @import("./util/index.zig");
 const yaml = @import("./util/yaml.zig");
+const string = []const u8;
 
 //
 //
@@ -11,10 +12,18 @@ pub const CollectOptions = struct {
     log: bool,
     update: bool,
     lock: ?[]const [4][]const u8 = null,
+    alloc: *std.mem.Allocator = gpa,
+    already_fetched: *std.ArrayList(string) = undefined,
+
+    pub fn init(self: *CollectOptions) !void {
+        self.already_fetched = try self.alloc.create(std.ArrayList(string));
+        self.already_fetched.* = std.ArrayList(string).init(self.alloc);
+    }
 };
 
-pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: CollectOptions) !u.Module {
+pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: *CollectOptions) !u.Module {
     const m = try u.ModFile.init(gpa, mpath);
+    try options.init();
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
     try std.fs.cwd().makePath(".zigmod/deps/files");
@@ -39,7 +48,7 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: CollectOpt
     };
 }
 
-pub fn collect_deps(dir: []const u8, mpath: []const u8, options: CollectOptions) anyerror!u.Module {
+pub fn collect_deps(dir: []const u8, mpath: []const u8, options: *CollectOptions) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     const moduledeps = &std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
@@ -76,9 +85,13 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
     }
 }
 
-fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: CollectOptions) ![]const u8 {
+fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *CollectOptions) ![]const u8 {
     const p = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path() });
     const pv = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path_v() });
+
+    if (u.list_contains(options.already_fetched.items, p)) return p;
+    if (u.list_contains(options.already_fetched.items, pv)) return pv;
+
     const tempdir = try std.fs.path.join(gpa, &.{ basedir, "temp" });
     if (options.log and d.type != .local) {
         u.print("fetch: {s}: {s}: {s}", .{ parent_name, @tagName(d.type), d.path });
@@ -174,7 +187,7 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: C
     }
 }
 
-pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, options: CollectOptions) anyerror!?u.Module {
+pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, options: *CollectOptions) anyerror!?u.Module {
     if (options.lock) |lock| {
         for (lock) |item| {
             if (std.mem.eql(u8, item[0], try d.clean_path())) {
@@ -186,6 +199,7 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
         }
     }
     const moddir = try get_moddir(dir, d.*, parent_name, options);
+    try options.already_fetched.append(moddir);
     switch (d.type) {
         .system_lib => {
             return u.Module{
@@ -286,10 +300,11 @@ fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_name
         .yaml = null,
         .deps = &.{},
     };
-    return (try get_module_from_dep(&d, destination, parent_name, .{
+    var options = CollectOptions{
         .log = false,
         .update = false,
-    })).?;
+    };
+    return (try get_module_from_dep(&d, destination, parent_name, &options)).?;
 }
 
 pub fn parse_lockfile(path: []const u8) ![]const [4][]const u8 {

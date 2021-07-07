@@ -14,10 +14,11 @@ pub fn execute(args: [][]u8) !void {
     const dir = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
     const should_update = !(args.len >= 1 and std.mem.eql(u8, args[0], "--no-update"));
 
-    const top_module = try common.collect_deps_deep(dir, "zig.mod", .{
+    var options = common.CollectOptions{
         .log = should_update,
         .update = should_update,
-    });
+    };
+    const top_module = try common.collect_deps_deep(dir, "zig.mod", &options);
 
     const list = &std.ArrayList(u.Module).init(gpa);
     try common.collect_pkgs(top_module, list);

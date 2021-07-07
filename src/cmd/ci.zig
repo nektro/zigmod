@@ -12,11 +12,12 @@ pub fn execute(args: [][]u8) !void {
 
     const dir = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
 
-    const top_module = try common.collect_deps_deep(dir, "zig.mod", .{
+    var options = common.CollectOptions{
         .log = true,
         .update = false,
         .lock = try common.parse_lockfile("zigmod.lock"),
-    });
+    };
+    const top_module = try common.collect_deps_deep(dir, "zig.mod", &options);
 
     const list = &std.ArrayList(u.Module).init(gpa);
     try common.collect_pkgs(top_module, list);
