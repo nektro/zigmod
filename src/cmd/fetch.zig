@@ -101,6 +101,10 @@ pub fn create_depszig(dir: []const u8, top_module: u.Module, list: *std.ArrayLis
     try w.writeAll("pub const pkgs = ");
     try print_pkgs(w, top_module);
     try w.writeAll(";\n\n");
+
+    try w.writeAll("pub const imports = struct {\n");
+    try print_imports(w, top_module, dir);
+    try w.writeAll("};\n\n");
 }
 
 fn create_lockfile(list: *std.ArrayList(u.Module), dir: []const u8) !void {
@@ -240,4 +244,15 @@ fn print_pkgs(w: std.fs.File.Writer, m: u.Module) !void {
         try w.print("    pub const {s} = package_data._{s};\n", .{ r2, d.id[0..12] });
     }
     try w.writeAll("}");
+}
+
+fn print_imports(w: std.fs.File.Writer, m: u.Module, dir: []const u8) !void {
+    for (m.deps) |d| {
+        if (d.main.len == 0) {
+            continue;
+        }
+        const r1 = try std.mem.replaceOwned(u8, gpa, d.name, "-", "_");
+        const r2 = try std.mem.replaceOwned(u8, gpa, r1, "/", "_");
+        try w.print("    pub const {s} = @import(\"{s}/{}/{s}\");\n", .{ r2, dir, std.zig.fmtEscapes(d.clean_path), d.main });
+    }
 }

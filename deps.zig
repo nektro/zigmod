@@ -114,3 +114,7 @@ pub const pkgs = struct {
     pub const zigmod = package_data._89ujp8gq842x;
 };
 
+pub const imports = struct {
+    pub const zigmod = @import(".zigmod/deps/../../src/lib.zig");
+};
+

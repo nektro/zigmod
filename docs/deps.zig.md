@@ -35,3 +35,7 @@ This is a an array of all of the items in `package_data`, but only contains the 
 ### `pkgs`
 - Type: `struct<NAME, Package>`
 This is a struct that associates the package name to the relavant `Package`. The only packages listed are the dependencies of the root project. 
+
+### `imports`
+- Type: `struct<NAME, @import(main)>`
+This is a struct that contains the imports of your `dev_dependencies`. Added in response to [zig#2206](https://github.com/ziglang/zig/issues/2206).
