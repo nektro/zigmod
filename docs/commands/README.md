@@ -3,6 +3,7 @@ Listed below is all of the commands available in Zigmod. All are meant to be run
 
 - [`init`](init.md)
 - [`fetch`](fetch.md)
+- [`ci`](ci.md)
 - [`license`](license_.md)
 - [`sum`](sum.md)
 
