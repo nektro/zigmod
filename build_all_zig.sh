@@ -10,7 +10,6 @@ targets="
 aarch64-linux-musl
 aarch64-macos-gnu
 arm-linux-musleabihf
-i386-windows-gnu
 i386-linux-musl
 riscv64-linux-musl
 x86_64-linux-musl
