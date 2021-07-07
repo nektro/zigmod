@@ -210,7 +210,8 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
-                    return e;
+                    u.assert(false, "no zig.mod found and no override props defined. unable to use add this dependency!", .{});
+                    unreachable;
                 },
                 else => e,
             };
