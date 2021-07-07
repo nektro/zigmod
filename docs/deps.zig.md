@@ -9,42 +9,29 @@ The relative path root to which all dependency sources are saved. Currently alwa
 - Type: `pub fn (exe: *std.build.LibExeObjStep) void`
 A helper function to add all of the packages, C files, and system libraries to the passed exectuable. It will also automatically link libC in the event that any C files are found in the dependency tree.
 
-### `_ids`
-- Type: `[][]const u8`
-A comptime-known string array of all of the [ID's](zig.mod.md#id) used in this project.
-
-### `_paths`
-- Type: `[][]const u8`
-A comptime-known string array of the source paths to each dependency relative to `cache`.
-
-### `package_data`
-- Type: `struct<ID, std.build.Pkg>`
-This is a meta struct that associates ID's to their relavant `std.build.Pkg` initialization, complete with sub-packages and all.
-
-### `packages`
-- Type: `[]std.build.Pkg`
-This is a an array of all of the items in `package_data`, but able to be referenced by index, rather than package ID.
-
-### `pkgs`
-- Type: `struct<NAME, std.build.Pkg>`
-This is a struct that associates the package name to the relavant `std.build.Pkg`. The only packages listed are the dependencies of the root project. Additionally, the data here can be referenced to use dependencies at build time in `build.zig` through importing the path of the project like so:
+### `Package`
 ```zig
-const deps = @import("./deps.zig");
-const my_dev_dep = @import(deps.pkgs.my_dev_dep.path);
+pub const Package = struct {
+    pkg: ?Pkg = null,
+    c_include_dirs: []const string = &.{},
+    c_source_files: []const string = &.{},
+    c_source_flags: []const string = &.{},
+    system_libs: []const string = &.{},
+};
 ```
 
-### `c_include_dirs`
-- Type: `[][]const u8`
-An ensembled list of all the `c_include_dirs` lists.
-
-### `c_source_flags`
+### `dirs`
 - Type: `struct<ID, []const u8>`
-An ensembled list of all the `c_source_flags` lists.
+A comptime-known string array of the package directories for each dependency relative to the project root.
 
-### `c_source_files`
-- Type: `[][2][]const u8`
-An ensembled list of all the `c_source_files` lists.
+### `package_data`
+- Type: `struct<ID, Package>`
+This is a meta struct that associates ID's to their relavant `Package` definition.
 
-### `system_libs`
-- Type: `[][]const u8`
-An ensembled list of all the `system_libs` lists.
+### `packages`
+- Type: `[]Package`
+This is a an array of all of the items in `package_data`, but only contains the final versions of `dev_dependencies`.
+
+### `pkgs`
+- Type: `struct<NAME, Package>`
+This is a struct that associates the package name to the relavant `Package`. The only packages listed are the dependencies of the root project. 

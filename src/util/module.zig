@@ -107,4 +107,13 @@ pub const Module = struct {
         }
         return true;
     }
+
+    pub fn has_syslib_deps(self: Module) bool {
+        for (self.deps) |d| {
+            if (d.is_sys_lib) {
+                return true;
+            }
+        }
+        return false;
+    }
 };
