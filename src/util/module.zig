@@ -116,4 +116,8 @@ pub const Module = struct {
         }
         return false;
     }
+
+    pub fn short_id(self: Module) []const u8 {
+        return u.slice(u8, self.id, 0, 12);
+    }
 };

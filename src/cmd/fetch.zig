@@ -83,7 +83,7 @@ pub fn create_depszig(dir: []const u8, top_module: u.Module, list: *std.ArrayLis
     try w.writeAll("pub const package_data = struct {\n");
     const duped = &std.ArrayList(u.Module).init(gpa);
     for (list.items) |mod| {
-        if (std.mem.eql(u8, mod.id, "root")) {
+        if (mod.is_sys_lib) {
             continue;
         }
         try duped.append(mod);
@@ -115,6 +115,7 @@ fn create_lockfile(list: *std.ArrayList(u.Module), dir: []const u8) !void {
             if (md.type == .local) {
                 continue;
             }
+            if (md.type == .system_lib) continue;
             const mpath = try std.fs.path.join(gpa, &.{ dir, m.clean_path });
             const version = if (md.version.len > 0) md.version else (try md.type.exact_version(mpath));
             try wl.print("{s} {s} {s}\n", .{ @tagName(md.type), md.path, version });
@@ -124,10 +125,12 @@ fn create_lockfile(list: *std.ArrayList(u.Module), dir: []const u8) !void {
 
 fn print_dirs(w: std.fs.File.Writer, list: []const u.Module) !void {
     for (list) |mod| {
+        if (mod.is_sys_lib) continue;
         if (std.mem.eql(u8, mod.id, "root")) {
+            try w.print("    pub const _root = \"\";\n", .{});
             continue;
         }
-        try w.print("    pub const _{s} = cache ++ \"/{}\";\n", .{ mod.id[0..12], std.zig.fmtEscapes(mod.clean_path) });
+        try w.print("    pub const _{s} = cache ++ \"/{}\";\n", .{ mod.short_id(), std.zig.fmtEscapes(mod.clean_path) });
     }
 }
 
@@ -151,14 +154,14 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(u.Module), d
                     \\    pub const _{s} = Package{{
                     \\
                 , .{
-                    mod.id[0..12],
+                    mod.short_id(),
                 });
-                if (mod.main.len > 0) {
+                if (mod.main.len > 0 and !std.mem.eql(u8, mod.id, "root")) {
                     try w.print(
                         \\        .pkg = Pkg{{ .name = "{s}", .path = .{{ .path = dirs._{s} ++ "/{s}" }}, .dependencies =
                     , .{
                         mod.name,
-                        mod.id[0..12],
+                        mod.short_id(),
                         mod.main,
                     });
                     if (mod.has_no_zig_deps()) {
@@ -200,7 +203,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(u.Module), d
                 if (mod.has_syslib_deps()) {
                     try w.writeAll("        .system_libs = &.{");
                     for (mod.deps) |item, j| {
-                        if (!mod.is_sys_lib) continue;
+                        if (!item.is_sys_lib) continue;
                         try w.print(" \"{}\"", .{std.zig.fmtEscapes(item.name)});
                         if (j != mod.deps.len - 1) try w.writeAll(",");
                     }

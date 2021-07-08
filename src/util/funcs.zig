@@ -259,3 +259,9 @@ pub fn git_rev_HEAD(alloc: *std.mem.Allocator, path: []const u8) ![]const u8 {
     const r = std.mem.trim(u8, try dirg.readFileAlloc(alloc, h[5..], max), "\n");
     return r;
 }
+
+pub fn slice(comptime T: type, input: []const T, from: usize, to: usize) []const T {
+    const f = std.math.max(from, 0);
+    const t = std.math.min(to, input.len);
+    return input[f..t];
+}
