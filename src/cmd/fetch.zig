@@ -76,10 +76,6 @@ pub fn create_depszig(dir: []const u8, top_module: u.Module, list: *std.ArrayLis
         \\
     });
 
-    // try w.writeAll("pub const _ids = .{\n");
-    // try print_ids(w, list.items);
-    // try w.writeAll("};\n\n");
-
     try w.writeAll("pub const dirs = struct {\n");
     try print_dirs(w, list.items);
     try w.writeAll("};\n\n");
