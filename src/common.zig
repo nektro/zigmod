@@ -204,7 +204,7 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
         .system_lib => {
             return u.Module{
                 .is_sys_lib = true,
-                .id = "",
+                .id = try u.do_hash(std.crypto.hash.sha3.Sha3_384, d.path),
                 .name = d.path,
                 .only_os = d.only_os,
                 .except_os = d.except_os,
