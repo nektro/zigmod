@@ -10,7 +10,7 @@ pub const sources = struct {
 };
 
 pub fn execute(args: [][]u8) !void {
-    if (args.len == 0) {
+    if (args.len < 2) {
         std.debug.warn("{s}\n", .{
             \\This is a subcommand to add a package from a given source, it requires the source type as a flag and the path as argument.
             \\
