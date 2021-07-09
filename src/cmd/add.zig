@@ -1,8 +1,12 @@
 const std = @import("std");
 
+//
+//
+
 pub const sources = struct {
-    pub const zpm = @import("./zpm/add.zig");
-    pub const aq  = @import("./aquila/add.zig");
+    pub const zpm = @import("./add/zpm.zig");
+    pub const aq  = @import("./add/aquila.zig");
+    pub const git = @import("./add/git.zig");
 };
 
 pub fn execute(args: [][]u8) !void {
@@ -13,10 +17,12 @@ pub fn execute(args: [][]u8) !void {
             \\The available sources are:
             \\  --zpm       Add a package from a zpm server instance using its name (defaults to https://zpm.random-projects.net/)
             \\  --aq        Add a package from an aquila instance using its path (defaults to https://aquila.red)
+            \\  --git       Add a package from a git repository using its URL
             \\
             \\Examples:
             \\  zigmod add --aq 1/truemedian/zfetch
             \\  zigmod add --zpm apple_pie
+            \\  zigmod add --git https://github.com/zenith391/zgt
         });
         return;
     }
