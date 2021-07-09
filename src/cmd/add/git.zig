@@ -8,8 +8,19 @@ const u = @import("./../../util/index.zig");
 //
 //
 
+fn trimRightSlice(comptime T: type, slice: []const T, slice_to_strip: []const T) []const T {
+    if (slice.len < slice_to_strip.len) return slice;
+
+    const end = slice.len - slice_to_strip.len;
+    if (std.mem.eql(T, slice[end..], slice_to_strip)) { // only trim if it ends with exactly the slice to strip
+        return slice[0..end];
+    } else {
+        return slice;
+    }
+}
+
 pub fn execute(args: [][]u8) !void {
-    const url = args[0];
+    const url = trimRightSlice(u8, args[0], ".git");
 
     const has_zigdotmod = blk: {
         const _url = try std.mem.join(gpa, "/", &.{ url, "blob", "HEAD", "zig.mod" });
@@ -25,7 +36,7 @@ pub fn execute(args: [][]u8) !void {
 
     const file_w = file.writer();
     try file_w.print("\n", .{});
-    try file_w.print("  - src: git {s}\n", .{std.mem.trimRight(u8, url, ".git")});
+    try file_w.print("  - src: git {s}\n", .{ url });
     if (!has_zigdotmod) {
         const stdin = std.io.getStdIn().reader();
         u.print("The given git repository does not have a zigmod file, information will have to be entered manually:", .{});
