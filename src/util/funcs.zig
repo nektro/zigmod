@@ -49,8 +49,8 @@ pub fn trim_prefix(in: []const u8, prefix: []const u8) []const u8 {
     return in;
 }
 
-pub fn does_file_exist(fpath: []const u8) !bool {
-    const file = std.fs.cwd().openFile(fpath, .{}) catch |e| switch (e) {
+pub fn does_file_exist(fpath: []const u8, dir: ?std.fs.Dir) !bool {
+    const file = (dir orelse std.fs.cwd()).openFile(fpath, .{}) catch |e| switch (e) {
         error.FileNotFound => return false,
         error.IsDir => return true,
         else => return e,
@@ -264,4 +264,40 @@ pub fn slice(comptime T: type, input: []const T, from: usize, to: usize) []const
     const f = std.math.max(from, 0);
     const t = std.math.min(to, input.len);
     return input[f..t];
+}
+
+pub fn detect_pkgname(override: []const u8, dir: ?std.fs.Dir) ![]const u8 {
+    if (override.len > 0) {
+        return override;
+    }
+    if (!(try does_file_exist("build.zig", dir))) {
+        return error.NoBuildZig;
+    }
+    const dpath = try (dir orelse std.fs.cwd()).realpathAlloc(gpa, "build.zig");
+    const splitP = try split(dpath, std.fs.path.sep_str);
+    var name = splitP[splitP.len - 2];
+    name = trim_prefix(name, "zig-");
+    assert(name.len > 0, "package name must not be an empty string", .{});
+    return name;
+}
+
+pub fn detct_mainfile(override: []const u8, dir: ?std.fs.Dir, name: []const u8) ![]const u8 {
+    if (override.len > 0) {
+        if (try does_file_exist(override, dir)) {
+            if (std.mem.endsWith(u8, override, ".zig")) {
+                return override;
+            }
+        }
+    }
+    const namedotzig = try std.mem.concat(gpa, u8, &.{ name, ".zig" });
+    if (try does_file_exist(namedotzig, dir)) {
+        return namedotzig;
+    }
+    if (try does_file_exist(try std.fs.path.join(gpa, &.{ "src", "lib.zig" }), dir)) {
+        return "src/lib.zig";
+    }
+    if (try does_file_exist(try std.fs.path.join(gpa, &.{ "src", "main.zig" }), dir)) {
+        return "src/main.zig";
+    }
+    return error.CantFindMain;
 }
