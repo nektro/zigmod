@@ -224,6 +224,20 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
+                    const moddirO = try std.fs.cwd().openDir(moddir, .{});
+                    const tryname = try u.detect_pkgname("", moddirO);
+                    const trymain = u.detct_mainfile("", moddirO, tryname) catch |err| switch (err) {
+                        error.CantFindMain => null,
+                        else => return err,
+                    };
+                    if (trymain) |_| {
+                        d.*.name = tryname;
+                        d.*.main = trymain.?;
+                        var mod_from = try u.Module.from(d.*, dir, options);
+                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
+                        if (mod_from.is_for_this()) return mod_from;
+                        return null;
+                    }
                     u.assert(false, "no zig.mod found and no override props defined. unable to use add this dependency!", .{});
                     unreachable;
                 },
