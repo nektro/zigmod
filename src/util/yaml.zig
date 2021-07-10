@@ -35,7 +35,8 @@ pub const Item = union(enum) {
         try writer.writeAll("Item{");
         switch (self) {
             .event => {
-                try std.fmt.format(writer, "{s}", .{@tagName(self.event.type)});
+                // try std.fmt.format(writer, "{s}", .{@tagName(self.event.type)});
+                try std.fmt.format(writer, "event {d}", .{self.event});
             },
             .kv, .document, .stream => {
                 unreachable;
