@@ -25,6 +25,11 @@ pub fn main() !void {
             @tagName(builtin.cpu.arch),
             @tagName(builtin.abi),
         });
+        u.print("", .{});
+        u.print("The commands available are:", .{});
+        inline for (std.meta.declarations(available)) |decl| {
+            u.print("  - {s}", .{decl.name});
+        }
         return;
     }
 
