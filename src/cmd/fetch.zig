@@ -260,9 +260,9 @@ fn print_imports(w: std.fs.File.Writer, m: u.Module, dir: []const u8) !void {
 
 fn zig_name_from_pkg_name(w: std.fs.File.Writer, name: []const u8) ![]const u8 {
     var legal = name;
-    try std.mem.replaceOwned(u8, gpa, legal, "-", "_");
-    try std.mem.replaceOwned(u8, gpa, legal, "/", "_");
-    try std.mem.replaceOwned(u8, gpa, legal, ".", "_");
+    legal = try std.mem.replaceOwned(u8, gpa, legal, "-", "_");
+    legal = try std.mem.replaceOwned(u8, gpa, legal, "/", "_");
+    legal = try std.mem.replaceOwned(u8, gpa, legal, ".", "_");
     return legal;
 }
     
