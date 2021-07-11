@@ -75,10 +75,12 @@ pub const DepType = enum {
     }
 
     pub fn exact_version(self: DepType, mpath: []const u8) ![]const u8 {
+        var mdir = try std.fs.cwd().openDir(mpath, .{});
+        defer mdir.close();
         return switch (self) {
             .local => "",
             .system_lib => "",
-            .git => try std.fmt.allocPrint(gpa, "commit-{s}", .{(try u.git_rev_HEAD(gpa, mpath))[0..7]}),
+            .git => try std.fmt.allocPrint(gpa, "commit-{s}", .{(try u.git_rev_HEAD(gpa, mdir))[0..7]}),
             .hg => "",
             .http => "",
         };
