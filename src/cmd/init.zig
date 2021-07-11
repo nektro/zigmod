@@ -7,7 +7,7 @@ const u = @import("./../util/index.zig");
 //
 
 pub fn execute(args: [][]u8) !void {
-    const name = u.detect_pkgname(u.try_index([]const u8, args, 0, ""), null) catch |err| switch (err) {
+    const name = u.detect_pkgname(u.try_index([]const u8, args, 0, ""), "") catch |err| switch (err) {
         error.NoBuildZig => {
             u.assert(false, "init requires a build.zig file", .{});
             unreachable;

@@ -229,7 +229,7 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
                         return null;
                     }
                     const moddirO = try std.fs.cwd().openDir(moddir, .{});
-                    const tryname = try u.detect_pkgname("", moddirO);
+                    const tryname = try u.detect_pkgname("", moddir);
                     const trymain = u.detct_mainfile("", moddirO, tryname) catch |err| switch (err) {
                         error.CantFindMain => null,
                         else => return err,

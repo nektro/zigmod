@@ -265,14 +265,14 @@ pub fn slice(comptime T: type, input: []const T, from: usize, to: usize) []const
     return input[f..t];
 }
 
-pub fn detect_pkgname(override: []const u8, dir: ?std.fs.Dir) ![]const u8 {
+pub fn detect_pkgname(override: []const u8, dir: []const u8) ![]const u8 {
     if (override.len > 0) {
         return override;
     }
-    if (!(try does_file_exist("build.zig", dir))) {
+    if (!(try does_file_exist("build.zig", try std.fs.cwd().openDir(dir, .{})))) {
         return error.NoBuildZig;
     }
-    const dpath = try (dir orelse std.fs.cwd()).realpathAlloc(gpa, "build.zig");
+    const dpath = try std.fs.realpathAlloc(gpa, try std.mem.concat(gpa, u8, &.{ dir, "build.zig" }));
     const splitP = try split(dpath, std.fs.path.sep_str);
     var name = splitP[splitP.len - 2];
     name = trim_prefix(name, "zig-");

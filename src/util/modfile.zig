@@ -26,10 +26,8 @@ pub const ModFile = struct {
     root_files: []const []const u8,
     files: []const []const u8,
 
-    pub fn init(alloc: *std.mem.Allocator, fpath: []const u8) !Self {
-        //
-        const mpath = try std.fs.realpathAlloc(alloc, fpath);
-        const file = try std.fs.openFileAbsolute(mpath, .{});
+    pub fn init(alloc: *std.mem.Allocator, mpath: []const u8) !Self {
+        const file = try std.fs.cwd().openFile(mpath, .{});
         defer file.close();
         const input = try file.reader().readAllAlloc(alloc, mb);
         const doc = try yaml.parse(alloc, input);
