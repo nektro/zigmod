@@ -67,6 +67,7 @@ pub fn create_depszig(dir: []const u8, top_module: u.Module, list: *std.ArrayLis
         \\}
         \\
         \\pub const Package = struct {
+        \\    directory: string,
         \\    pkg: ?Pkg = null,
         \\    c_include_dirs: []const string = &.{},
         \\    c_source_files: []const string = &.{},
@@ -152,8 +153,10 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(u.Module), d
             if (contains_all(mod.deps, done.items)) {
                 try w.print(
                     \\    pub const _{s} = Package{{
+                    \\        .directory = dirs._{s},
                     \\
                 , .{
+                    mod.short_id(),
                     mod.short_id(),
                 });
                 if (mod.main.len > 0 and !std.mem.eql(u8, mod.id, "root")) {

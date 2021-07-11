@@ -12,6 +12,7 @@ A helper function to add all of the packages, C files, and system libraries to t
 ### `Package`
 ```zig
 pub const Package = struct {
+    directory: string,
     pkg: ?Pkg = null,
     c_include_dirs: []const string = &.{},
     c_source_files: []const string = &.{},
@@ -19,10 +20,6 @@ pub const Package = struct {
     system_libs: []const string = &.{},
 };
 ```
-
-### `dirs`
-- Type: `struct<ID, []const u8>`
-A comptime-known string array of the package directories for each dependency relative to the project root.
 
 ### `package_data`
 - Type: `struct<ID, Package>`
