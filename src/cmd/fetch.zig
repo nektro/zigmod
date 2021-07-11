@@ -242,9 +242,8 @@ fn print_pkgs(w: std.fs.File.Writer, m: u.Module) !void {
         if (d.main.len == 0) {
             continue;
         }
-        const r1 = try std.mem.replaceOwned(u8, gpa, d.name, "-", "_");
-        const r2 = try std.mem.replaceOwned(u8, gpa, r1, "/", "_");
-        try w.print("    pub const {s} = package_data._{s};\n", .{ r2, d.id[0..12] });
+        const legal = try zig_name_from_pkg_name(w, d.name);
+        try w.print("    pub const {s} = package_data._{s};\n", .{ legal, d.id[0..12] });
     }
     try w.writeAll("}");
 }
@@ -254,9 +253,16 @@ fn print_imports(w: std.fs.File.Writer, m: u.Module, dir: []const u8) !void {
         if (d.main.len == 0) {
             continue;
         }
-        const r1 = try std.mem.replaceOwned(u8, gpa, d.name, "-", "_");
-        const r2 = try std.mem.replaceOwned(u8, gpa, r1, "/", "_");
-        const r3 = try std.mem.replaceOwned(u8, gpa, r2, ".", "_");
-        try w.print("    pub const {s} = @import(\"{s}/{}/{s}\");\n", .{ r3, dir, std.zig.fmtEscapes(d.clean_path), d.main });
+        const legal = try zig_name_from_pkg_name(w, d.name);
+        try w.print("    pub const {s} = @import(\"{s}/{}/{s}\");\n", .{ legal, dir, std.zig.fmtEscapes(d.clean_path), d.main });
     }
 }
+
+fn zig_name_from_pkg_name(w: std.fs.File.Writer, name: []const u8) ![]const u8 {
+    var legal = name;
+    try std.mem.replaceOwned(u8, gpa, legal, "-", "_");
+    try std.mem.replaceOwned(u8, gpa, legal, "/", "_");
+    try std.mem.replaceOwned(u8, gpa, legal, ".", "_");
+    return legal;
+}
+    
