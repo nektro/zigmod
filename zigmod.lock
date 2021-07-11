@@ -3,7 +3,7 @@ git https://github.com/yaml/libyaml tag-0.2.5
 git https://github.com/nektro/zig-ansi commit-930ab1f
 git https://github.com/ziglibs/known-folders commit-f5e5fb8
 git https://github.com/nektro/zig-licenses commit-16272ba
-git https://github.com/truemedian/zfetch commit-44d541e
+git https://github.com/truemedian/zfetch commit-8bbc7b3
 git https://github.com/truemedian/hzzp commit-2d30bdd
 git https://github.com/alexnask/iguanaTLS commit-0d39a36
 git https://github.com/MasterQ32/zig-network commit-b9c9176
