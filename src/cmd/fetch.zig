@@ -256,6 +256,7 @@ fn print_imports(w: std.fs.File.Writer, m: u.Module, dir: []const u8) !void {
         }
         const r1 = try std.mem.replaceOwned(u8, gpa, d.name, "-", "_");
         const r2 = try std.mem.replaceOwned(u8, gpa, r1, "/", "_");
-        try w.print("    pub const {s} = @import(\"{s}/{}/{s}\");\n", .{ r2, dir, std.zig.fmtEscapes(d.clean_path), d.main });
+        const r3 = try std.mem.replaceOwned(u8, gpa, r2, ".", "_");
+        try w.print("    pub const {s} = @import(\"{s}/{}/{s}\");\n", .{ r3, dir, std.zig.fmtEscapes(d.clean_path), d.main });
     }
 }
