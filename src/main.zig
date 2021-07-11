@@ -16,6 +16,8 @@ pub fn main() !void {
     const proc_args = try std.process.argsAlloc(gpa);
     const args = proc_args[1..];
 
+    const available = if (build_options.bootstrap) zigmod.commands_to_bootstrap else zigmod.commands;
+
     if (args.len == 0) {
         u.print("zigmod {s} {s} {s} {s}", .{
             build_options.version,
@@ -25,8 +27,6 @@ pub fn main() !void {
         });
         return;
     }
-
-    const available = if (build_options.bootstrap) zigmod.commands_to_bootstrap else zigmod.commands;
 
     inline for (std.meta.declarations(available)) |decl| {
         if (std.mem.eql(u8, args[0], decl.name)) {
