@@ -1,4 +1,5 @@
 pub const commands_to_bootstrap = struct {
+    pub const version = @import("./cmd/version.zig");
     pub const fetch = @import("./cmd/fetch.zig");
     pub const ci = @import("./cmd/ci.zig");
 };
