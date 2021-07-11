@@ -89,8 +89,9 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *
     const p = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path() });
     const pv = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path_v() });
 
-    if (u.list_contains(options.already_fetched.items, p)) return p;
-    if (u.list_contains(options.already_fetched.items, pv)) return pv;
+    const nocache = d.type == .local or d.type == .system_lib;
+    if (!nocache and u.list_contains(options.already_fetched.items, p)) return p;
+    if (!nocache and u.list_contains(options.already_fetched.items, pv)) return pv;
 
     const tempdir = try std.fs.path.join(gpa, &.{ basedir, "temp" });
     if (options.log and d.type != .local) {
@@ -199,7 +200,10 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
         }
     }
     const moddir = try get_moddir(dir, d.*, parent_name, options);
-    try options.already_fetched.append(moddir);
+
+    const nocache = d.type == .local or d.type == .system_lib;
+    if (!nocache) try options.already_fetched.append(moddir);
+
     switch (d.type) {
         .system_lib => {
             return u.Module{
