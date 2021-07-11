@@ -39,7 +39,7 @@ pub const Package = struct {
     system_libs: []const string = &.{},
 };
 
-pub const dirs = struct {
+const dirs = struct {
     pub const _89ujp8gq842x = cache ++ "/../..";
     pub const _8mdbh0zuneb0 = cache ++ "/v/git/github.com/yaml/libyaml/tag-0.2.5";
     pub const _s84v9o48ucb0 = cache ++ "/git/github.com/nektro/zig-ansi";
