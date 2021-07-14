@@ -1,0 +1,40 @@
+name: Continuous Build
+
+on:
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: "0 5 * * *"
+
+jobs:
+  native-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        host:
+          [
+            ubuntu-latest,
+            macos-latest,
+            windows-latest,
+          ]
+
+    runs-on: ${{matrix.host}}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@v1
+        with:
+          version: master
+
+      - name: Bootstrap Build
+        run: zig build -Dbootstrap
+        
+      - name: Fetch
+        run: ./zig-out/bin/zigmod ci
+        
+      - name: Full Build
+        run: zig build
