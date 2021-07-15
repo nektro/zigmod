@@ -10,7 +10,6 @@ const u = @import("./../util/index.zig");
 //
 
 pub const commands = struct {
-    pub const add = @import("./zpm/add.zig");
     pub const showjson = @import("./zpm/showjson.zig");
     pub const tags = @import("./zpm/tags.zig");
     pub const search = @import("./zpm/search.zig");
@@ -35,7 +34,6 @@ pub fn execute(args: [][]u8) !void {
             \\The default remote is https://zpm.random-projects.net/.
             \\
             \\The subcommands available are:
-            \\  - add       Append this package to your dependencies
             \\  - showjson  Print raw json from queried API responses
             \\  - tags      Print the list of tags available on the server.
             \\  - search    Search the api for available packages and print them.
