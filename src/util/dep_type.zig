@@ -80,7 +80,7 @@ pub const DepType = enum {
         return switch (self) {
             .local => "",
             .system_lib => "",
-            .git => try std.fmt.allocPrint(gpa, "commit-{s}", .{(try u.git_rev_HEAD(gpa, mdir))[0..7]}),
+            .git => try std.fmt.allocPrint(gpa, "commit-{s}", .{(try u.git_rev_HEAD(gpa, mdir))}),
             .hg => "",
             .http => "",
         };
