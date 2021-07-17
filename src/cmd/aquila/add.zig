@@ -34,8 +34,8 @@ pub fn execute(args: [][]u8) !void {
     try file.seekTo(try file.getEndPos());
 
     const v_hash = to_add.get("tar_hash").?.String;
-    const v_maj = to_add.get("real_major").?.Number;
-    const v_min = to_add.get("real_minor").?.Number;
+    const v_maj = to_add.get("real_major").?.Int;
+    const v_min = to_add.get("real_minor").?.Int;
 
     const file_w = file.writer();
     try file_w.print("\n", .{});

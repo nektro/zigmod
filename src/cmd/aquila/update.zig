@@ -39,8 +39,8 @@ fn check_dep(dep: u.Dep) !void {
     const versions = val.get("versions").?.Array;
     const latest = versions[versions.len - 1];
 
-    const rmaj = latest.get("real_major").?.Number;
-    const rmin = latest.get("real_minor").?.Number;
+    const rmaj = latest.get("real_major").?.Int;
+    const rmin = latest.get("real_minor").?.Int;
 
     if (rmaj == vers[0] and rmin == vers[1]) {
         return;
@@ -56,12 +56,12 @@ fn url_to_pkgid(url: []const u8) []const u8 {
     return res;
 }
 
-fn vers_get_pieces(v: []const u8) ![2]f64 {
+fn vers_get_pieces(v: []const u8) ![2]i64 {
     var it = std.mem.split(v[1..], ".");
     const maj = it.next().?;
     const min = it.next().?;
-    return [_]f64{
-        try std.fmt.parseFloat(f64, maj),
-        try std.fmt.parseFloat(f64, min),
+    return [_]i64{
+        try std.fmt.parseInt(i64, maj, 10),
+        try std.fmt.parseInt(i64, min, 10),
     };
 }

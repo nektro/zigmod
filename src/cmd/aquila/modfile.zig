@@ -14,8 +14,8 @@ pub fn execute(args: [][]u8) !void {
     const val = try aq.server_fetch(url);
 
     const v = val.get("vers").?;
-    const maj = v.get("real_major").?.Number;
-    const min = v.get("real_minor").?.Number;
+    const maj = v.get("real_major").?.Int;
+    const min = v.get("real_minor").?.Int;
     const hash = v.get("tar_hash").?.String;
 
     std.debug.print("  - src: http {s}/{s}.tar.gz _ {d} {d}\n", .{ aq.server_root, pkg_id_v, maj, min });
