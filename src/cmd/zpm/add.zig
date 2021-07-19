@@ -59,7 +59,7 @@ pub fn execute(args: [][]u8) !void {
 
     const file_w = file.writer();
     try file_w.print("\n", .{});
-    try file_w.print("  - src: git {s}\n", .{std.mem.trimRight(u8, found.git, ".git")});
+    try file_w.print("  - src: git {s}\n", .{u.trim_suffix(found.git, ".git")});
     if (!has_zigdotmod) {
         try file_w.print("    name: {s}\n", .{found.name});
         try file_w.print("    main: {s}\n", .{found.root_file.?[1..]});
