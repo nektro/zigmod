@@ -82,8 +82,8 @@ pub fn _join(comptime delim: []const u8, comptime xs: [][]const u8) []const u8 {
     return buf;
 }
 
-pub fn trim_suffix(comptime T: type, in: []const T, suffix: []const T) []const T {
-    if (std.mem.endsWith(T, in, suffix)) {
+pub fn trim_suffix(in: []const u8, suffix: []const u8) []const u8 {
+    if (std.mem.endsWith(u8, in, suffix)) {
         return in[0 .. in.len - suffix.len];
     }
     return in;
