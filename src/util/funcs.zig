@@ -269,7 +269,8 @@ pub fn detect_pkgname(override: []const u8, dir: []const u8) ![]const u8 {
     if (override.len > 0) {
         return override;
     }
-    if (!(try does_file_exist("build.zig", try std.fs.cwd().openDir(dir, .{})))) {
+    const dirO = if (dir.len == 0) std.fs.cwd() else try std.fs.cwd().openDir(dir, .{});
+    if (!(try does_file_exist("build.zig", dirO))) {
         return error.NoBuildZig;
     }
     const dpath = try std.fs.realpathAlloc(gpa, try std.mem.concat(gpa, u8, &.{ dir, "build.zig" }));
