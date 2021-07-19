@@ -1,15 +1,13 @@
-name: Continuous Build
+name: CI
 
 on:
   push:
     branches: [master]
   pull_request:
     branches: [master]
-  schedule:
-    - cron: "0 5 * * *"
 
 jobs:
-  native-build:
+  test:
     strategy:
       fail-fast: false
       matrix:
