@@ -51,8 +51,8 @@ fn check_dep(dep: u.Dep) !void {
 
 fn url_to_pkgid(url: []const u8) []const u8 {
     var res = url;
-    res = std.mem.trimLeft(u8, res, aq.server_root);
-    res = std.mem.trimRight(u8, res, ".tar.gz");
+    res = u.trim_prefix(res, aq.server_root);
+    res = u.trim_suffix(res, ".tar.gz");
     return res;
 }
 
