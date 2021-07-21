@@ -58,8 +58,8 @@ pub fn execute(args: [][]u8) !void {
     var iter = map.iterator();
     while (iter.next()) |entry| {
         std.debug.print(style.Bold ++ "{s}:\n", .{entry.key_ptr.*});
-        if (get_license(entry.key_ptr.*)) |license| {
-            std.debug.print(style.Faint ++ "= {s}\n", .{license.url});
+        if (u.list_contains(licenses.spdx, entry.key_ptr.*)) {
+            std.debug.print(style.Faint ++ "= {s}{s}\n", .{ "https://spdx.org/licenses/", entry.key_ptr.* });
         }
         std.debug.print(style.ResetIntensity, .{});
         for (entry.value_ptr.*.items) |item| {
@@ -74,14 +74,4 @@ pub fn execute(args: [][]u8) !void {
             std.debug.print("- {s}\n", .{if (!std.mem.eql(u8, item.clean_path, "../..")) item.clean_path else "This"});
         }
     }
-}
-
-fn get_license(name: []const u8) ?licenses.License {
-    const T = licenses.spdx;
-    inline for (std.meta.declarations(T)) |decl| {
-        if (std.mem.eql(u8, decl.name, name)) {
-            return @field(T, decl.name);
-        }
-    }
-    return null;
 }
