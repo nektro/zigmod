@@ -305,3 +305,21 @@ pub fn detct_mainfile(override: []const u8, dir: ?std.fs.Dir, name: []const u8) 
     }
     return error.CantFindMain;
 }
+
+pub fn indexOfN(haystack: []const u8, needle: u8, n: usize) ?usize {
+    var i: usize = 0;
+    var c: usize = 0;
+    while (c < n) {
+        i = indexOfAfter(haystack, needle, i) orelse return null;
+        c += 1;
+    }
+    return i;
+}
+
+pub fn indexOfAfter(haystack: []const u8, needle: u8, after: usize) ?usize {
+    for (haystack) |c, i| {
+        if (i <= after) continue;
+        if (c == needle) return i;
+    }
+    return null;
+}
