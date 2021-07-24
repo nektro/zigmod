@@ -1,6 +1,6 @@
 2
 git https://github.com/yaml/libyaml tag-0.2.5
-git https://github.com/nektro/zig-ansi commit-930ab1f373012214e1a362a5d2b2cb2852242620
+git https://github.com/nektro/zig-ansi commit-8ffadb65efdb424c6fe07a804107a775d55ebfe5
 git https://github.com/ziglibs/known-folders commit-f5e5fb8370de41fbc220c0c0770d62bdf00530ea
 git https://github.com/nektro/zig-licenses commit-c9b8cbf3565675a056ad4e9b57cb4f84020e7680
 git https://github.com/truemedian/zfetch commit-8bbc7b34cd417794841e1432585334bc969dfe83
