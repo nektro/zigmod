@@ -34,9 +34,9 @@ pub fn main() !void {
         return;
     }
 
-    if (builtin.os.tag == .windows) {
+    if (!build_options.bootstrap and builtin.os.tag == .windows) {
         const console = win32.system.console;
-        console.SetConsoleMode(std.io.getStdOut().handle, console.ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+        _ = console.SetConsoleMode(std.io.getStdOut().handle, console.ENABLE_VIRTUAL_TERMINAL_PROCESSING);
     }
 
     inline for (std.meta.declarations(available)) |decl| {

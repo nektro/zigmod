@@ -114,14 +114,14 @@ pub const package_data = struct {
         .pkg = Pkg{ .name = "range", .path = .{ .path = dirs._tnj3qf44tpeq ++ "/src/lib.zig" }, .dependencies = null },
     };
 
+    pub const _89ujp8gq842x = Package{
+        .directory = dirs._89ujp8gq842x,
+        .pkg = Pkg{ .name = "zigmod", .path = .{ .path = dirs._89ujp8gq842x ++ "/src/lib.zig" }, .dependencies = &.{ _s84v9o48ucb0.pkg.?, _2ta738wrqbaq.pkg.?, _0npcrzfdlrvk.pkg.?, _ejw82j2ipa0e.pkg.?, _ocmr9rtohgcc.pkg.?, _tnj3qf44tpeq.pkg.? } },
+    };
+
     pub const _o6ogpor87xc2 = Package{
         .directory = dirs._o6ogpor87xc2,
         .pkg = Pkg{ .name = "win32", .path = .{ .path = dirs._o6ogpor87xc2 ++ "/win32.zig" }, .dependencies = null },
-    };
-
-    pub const _89ujp8gq842x = Package{
-        .directory = dirs._89ujp8gq842x,
-        .pkg = Pkg{ .name = "zigmod", .path = .{ .path = dirs._89ujp8gq842x ++ "/src/lib.zig" }, .dependencies = &.{ _s84v9o48ucb0.pkg.?, _2ta738wrqbaq.pkg.?, _0npcrzfdlrvk.pkg.?, _ejw82j2ipa0e.pkg.?, _ocmr9rtohgcc.pkg.?, _tnj3qf44tpeq.pkg.?, _o6ogpor87xc2.pkg.? } },
     };
 
     pub const _root = Package{
@@ -132,13 +132,16 @@ pub const package_data = struct {
 
 pub const packages = &[_]Package{
     package_data._89ujp8gq842x,
+    package_data._o6ogpor87xc2,
 };
 
 pub const pkgs = struct {
     pub const zigmod = package_data._89ujp8gq842x;
+    pub const win32 = package_data._o6ogpor87xc2;
 };
 
 pub const imports = struct {
     pub const zigmod = @import(".zigmod/deps/../../src/lib.zig");
+    pub const win32 = @import(".zigmod/deps/git/github.com/marlersoft/zigwin32/win32.zig");
 };
 
