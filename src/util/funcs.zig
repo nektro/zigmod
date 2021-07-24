@@ -155,14 +155,18 @@ pub fn file_list(dpath: []const u8, list: *std.ArrayList([]const u8)) !void {
     }
 }
 
-pub fn run_cmd(dir: ?[]const u8, args: []const []const u8) !u32 {
-    const result = std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
+pub fn run_cmd_raw(dir: ?[]const u8, args: []const []const u8) !std.ChildProcess.ExecResult {
+    return std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
         error.FileNotFound => {
             u.assert(false, "\"{s}\" command not found", .{args[0]});
             unreachable;
         },
         else => return e,
     };
+}
+
+pub fn run_cmd(dir: ?[]const u8, args: []const []const u8) !u32 {
+    const result = try run_cmd_raw(dir, args);
     gpa.free(result.stdout);
     gpa.free(result.stderr);
     return result.term.Exited;
