@@ -6,6 +6,8 @@ const string = []const u8;
 const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
 
+const ansi = @import("ansi");
+
 const root = @import("root");
 const build_options = if (@hasDecl(root, "build_options")) root.build_options else struct {};
 const bootstrap = if (@hasDecl(build_options, "bootstrap")) build_options.bootstrap else false;
@@ -32,6 +34,8 @@ pub fn execute(args: [][]u8) !void {
     if (bootstrap) return;
 
     try create_lockfile(list, dir);
+
+    try diff_lockfile();
 }
 
 pub fn create_depszig(dir: string, top_module: u.Module, list: *std.ArrayList(u.Module)) !void {
@@ -128,6 +132,94 @@ fn create_lockfile(list: *std.ArrayList(u.Module), dir: string) !void {
             try wl.print("{s} {s} {s}\n", .{ @tagName(md.type), md.path, version });
         }
     }
+}
+
+const DiffChange = struct {
+    from: string,
+    to: string,
+};
+
+fn diff_lockfile() !void {
+    const max = std.math.maxInt(usize);
+
+    if (try u.does_folder_exist(".git")) {
+        const result = try u.run_cmd_raw(null, &.{ "git", "diff", "zigmod.lock" });
+        const r = std.io.fixedBufferStream(result.stdout).reader();
+        while (try r.readUntilDelimiterOrEofAlloc(gpa, '\n', max)) |line| {
+            if (std.mem.startsWith(u8, line, "@@")) break;
+        }
+
+        const rems = &std.ArrayList(string).init(gpa);
+        const adds = &std.ArrayList(string).init(gpa);
+        while (try r.readUntilDelimiterOrEofAlloc(gpa, '\n', max)) |line| {
+            if (line[0] == ' ') continue;
+            if (line[0] == '-') try rems.append(line[1..]);
+            if (line[0] == '+') if (line[1] == '2') continue else try adds.append(line[1..]);
+        }
+
+        const changes = &std.StringHashMap(DiffChange).init(gpa);
+
+        var i: usize = 0;
+        while (i < rems.items.len) {
+            const it = rems.items[i];
+            const sni = u.indexOfN(it, ' ', 2).?;
+
+            var j: usize = 0;
+            while (j < adds.items.len) {
+                const jt = adds.items[j];
+                const snj = u.indexOfN(jt, ' ', 2).?;
+
+                if (std.mem.eql(u8, it[0..sni], jt[0..snj])) {
+                    try changes.put(it[0..sni], .{
+                        .from = it[u.indexOfAfter(it, '-', sni).? + 1 .. it.len],
+                        .to = jt[u.indexOfAfter(jt, '-', snj).? + 1 .. jt.len],
+                    });
+                    _ = rems.orderedRemove(i);
+                    _ = adds.orderedRemove(j);
+                    break;
+                }
+                j += 1;
+            }
+            i += 1;
+        }
+
+        if (adds.items.len > 0) {
+            std.debug.print(comptime ansi.color.Faint("Newly added packages:\n"), .{});
+            defer std.debug.print("\n", .{});
+
+            for (adds.items) |it| {
+                std.debug.print("- {s}\n", .{it});
+            }
+        }
+
+        if (rems.items.len > 0) {
+            std.debug.print(comptime ansi.color.Faint("Removed packages:\n"), .{});
+            defer std.debug.print("\n", .{});
+
+            for (rems.items) |it| {
+                std.debug.print("- {s}\n", .{it});
+            }
+        }
+
+        if (changes.unmanaged.size > 0) std.debug.print(comptime ansi.color.Faint("Updated packages:\n"), .{});
+        var iter = changes.iterator();
+        while (iter.next()) |it| {
+            if (diff_printchange("git https://github.com", "- {s}/compare/{s}...{s}\n", it)) continue;
+            if (diff_printchange("git https://gitlab.com", "- {s}/-/compare/{s}...{s}\n", it)) continue;
+            if (diff_printchange("git https://gitea.com", "- {s}/compare/{s}...{s}\n", it)) continue;
+
+            std.debug.print("- {s}\n", .{it.key_ptr.*});
+            std.debug.print("  - {s} ... {s}\n", .{ it.value_ptr.from, it.value_ptr.to });
+        }
+    }
+}
+
+fn diff_printchange(comptime testt: string, comptime replacement: string, item: std.StringHashMap(DiffChange).Entry) bool {
+    if (std.mem.startsWith(u8, item.key_ptr.*, testt)) {
+        std.debug.print(replacement, .{ item.key_ptr.*[4..], item.value_ptr.from, item.value_ptr.to });
+        return true;
+    }
+    return false;
 }
 
 fn print_dirs(w: std.fs.File.Writer, list: []const u.Module) !void {
