@@ -1,9 +1,15 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 
+const ansi = @import("ansi");
+
 const u = @import("./util/index.zig");
 const yaml = @import("./util/yaml.zig");
 const string = []const u8;
+
+const root = @import("root");
+const build_options = if (@hasDecl(root, "build_options")) root.build_options else struct {};
+const bootstrap = if (@hasDecl(build_options, "bootstrap")) build_options.bootstrap else false;
 
 //
 //
@@ -96,6 +102,12 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *
     const tempdir = try std.fs.path.join(gpa, &.{ basedir, "temp" });
     if (options.log and d.type != .local) {
         u.print("fetch: {s}: {s}: {s}", .{ parent_name, @tagName(d.type), d.path });
+    }
+    defer {
+        if (!bootstrap and options.log and d.type != .local) {
+            std.debug.print("{s}", .{ansi.csi.CursorUp(1)});
+            std.debug.print("{s}", .{ansi.csi.EraseInLine(0)});
+        }
     }
     switch (d.type) {
         .local => {
