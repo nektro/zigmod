@@ -1,6 +1,7 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 
+const string = []const u8;
 
 const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
@@ -33,7 +34,7 @@ pub fn execute(args: [][]u8) !void {
     try create_lockfile(list, dir);
 }
 
-pub fn create_depszig(dir: []const u8, top_module: u.Module, list: *std.ArrayList(u.Module)) !void {
+pub fn create_depszig(dir: string, top_module: u.Module, list: *std.ArrayList(u.Module)) !void {
     const f = try std.fs.cwd().createFile("deps.zig", .{});
     defer f.close();
 
@@ -110,7 +111,7 @@ pub fn create_depszig(dir: []const u8, top_module: u.Module, list: *std.ArrayLis
     try w.writeAll("};\n\n");
 }
 
-fn create_lockfile(list: *std.ArrayList(u.Module), dir: []const u8) !void {
+fn create_lockfile(list: *std.ArrayList(u.Module), dir: string) !void {
     const fl = try std.fs.cwd().createFile("zigmod.lock", .{});
     defer fl.close();
 
@@ -254,7 +255,7 @@ fn print_pkgs(w: std.fs.File.Writer, m: u.Module) !void {
     try w.writeAll("}");
 }
 
-fn print_imports(w: std.fs.File.Writer, m: u.Module, dir: []const u8) !void {
+fn print_imports(w: std.fs.File.Writer, m: u.Module, dir: string) !void {
     for (m.deps) |d| {
         if (d.main.len == 0) {
             continue;
