@@ -31,6 +31,7 @@ pub const DepType = enum {
     // ipfs,       // https://www.ipfs.com/
     // hypercore,  // https://hypercore-protocol.org/
 
+    // zig fmt: on
     pub fn pull(self: DepType, rpath: []const u8, dpath: []const u8) !void {
         switch (self) {
             .local => {},
@@ -55,6 +56,7 @@ pub const DepType = enum {
         }
     }
 
+    // zig fmt: on
     pub fn update(self: DepType, dpath: []const u8, rpath: []const u8) !void {
         _ = rpath;
 
@@ -74,6 +76,7 @@ pub const DepType = enum {
         }
     }
 
+    // zig fmt: on
     pub fn exact_version(self: DepType, mpath: []const u8) ![]const u8 {
         var mdir = try std.fs.cwd().openDir(mpath, .{});
         defer mdir.close();
