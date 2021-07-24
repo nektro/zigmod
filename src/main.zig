@@ -3,6 +3,7 @@ const builtin = std.builtin;
 
 pub const build_options = @import("build_options");
 const zigmod = @import("zigmod");
+const win32 = @import("win32");
 
 pub const u = @import("./util/index.zig");
 pub const common = @import("./common.zig");
@@ -31,6 +32,11 @@ pub fn main() !void {
             u.print("  - {s}", .{decl.name});
         }
         return;
+    }
+
+    if (builtin.os.tag == .windows) {
+        const console = win32.system.console;
+        console.SetConsoleMode(std.io.getStdOut().handle, console.ENABLE_VIRTUAL_TERMINAL_PROCESSING);
     }
 
     inline for (std.meta.declarations(available)) |decl| {

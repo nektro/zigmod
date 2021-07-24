@@ -10,3 +10,4 @@ git https://github.com/MasterQ32/zig-network commit-b9c91769d8ebd626c8e45b2abb05
 git https://github.com/MasterQ32/zig-uri commit-52cdd2061bec0579519f0d30280597f3a1db8b75
 git https://github.com/nektro/zig-json commit-72e555fbc0776f2600aee19b01e5ab1855ebec7a
 git https://github.com/nektro/zig-range commit-890ca308fe09b3d5c866d5cfb3b3d7a95dbf939f
+git https://github.com/marlersoft/zigwin32 commit-ca6b8e5c378e31655fa11b886b44b62f703ef090
