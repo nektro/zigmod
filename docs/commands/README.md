@@ -3,6 +3,7 @@ Listed below is all of the commands available in Zigmod. All are meant to be run
 
 Running `zigmod` with no commands will print this list.
 
+- [`version`](version.md)
 - [`init`](init.md)
 - [`fetch`](fetch.md)
 - [`ci`](ci.md)
