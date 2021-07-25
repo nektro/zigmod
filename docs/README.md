@@ -10,7 +10,7 @@ The rest of this documentation will assume you already have Zig installed.
 
 As Zig is still in development itself, if you plan to contribute to Zigmod you will need a master download of Zig. Those can be obtained from https://ziglang.org/download/#release-master.
 
-The most recent release Zigmod was verified to work with is `0.9.0-dev.443+9d1fb98fa`.
+The most recent release Zigmod was verified to work with is `0.9.0-dev.642+b87105c92`.
 
 ## Download
 You may download a precompiled binary from https://github.com/nektro/zigmod/releases or build the project from source.
