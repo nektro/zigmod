@@ -127,7 +127,6 @@ pub const package_data = struct {
     pub const _root = Package{
         .directory = dirs._root,
     };
-
 };
 
 pub const packages = &[_]Package{
@@ -142,6 +141,4 @@ pub const pkgs = struct {
 
 pub const imports = struct {
     pub const zigmod = @import(".zigmod/deps/../../src/lib.zig");
-    pub const win32 = @import(".zigmod/deps/git/github.com/marlersoft/zigwin32/win32.zig");
 };
-
