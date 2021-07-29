@@ -285,7 +285,9 @@ fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_name
     defer map.deinit();
 
     for (dirs) |dir_path| {
-        var walker = try std.fs.walkPath(gpa, dir_path);
+        const dir = try std.fs.cwd().openDir(dir_path, .{ .iterate = true });
+        var walker = try dir.walk(gpa);
+        defer walker.deinit();
         while (try walker.next()) |p| {
             if (p.kind == .Directory) {
                 continue;

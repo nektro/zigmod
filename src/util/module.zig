@@ -61,8 +61,8 @@ pub const Module = struct {
         const file_list_2 = &std.ArrayList([]const u8).init(gpa);
         defer file_list_2.deinit();
         for (file_list_1.items) |item| {
-            const _a = u.trim_prefix(item, cdpath)[1..];
-            const _b = u.trim_prefix(_a, self.clean_path)[1..];
+            const _a = u.trim_prefix(item, cdpath);
+            const _b = u.trim_prefix(_a, self.clean_path);
             if (_b[0] == '.') continue;
             try file_list_2.append(_b);
         }

@@ -142,7 +142,9 @@ pub fn list_contains_gen(comptime T: type, haystack: []const T, needle: T) bool 
 }
 
 pub fn file_list(dpath: []const u8, list: *std.ArrayList([]const u8)) !void {
-    var walk = try std.fs.walkPath(gpa, dpath);
+    const dir = try std.fs.cwd().openDir(dpath, .{ .iterate = true });
+    var walk = try dir.walk(gpa);
+    defer walk.deinit();
     while (true) {
         if (try walk.next()) |entry| {
             if (entry.kind != .File) {
