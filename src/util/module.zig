@@ -76,7 +76,7 @@ pub const Module = struct {
 
         const h = &std.crypto.hash.Blake3.init(.{});
         for (file_list_2.items) |item| {
-            const abs_path = try u.concat(&.{ cdpath, "/", self.clean_path, "/", item });
+            const abs_path = try std.fs.path.join(gpa, &.{ cdpath, self.clean_path, item });
             const file = try std.fs.cwd().openFile(abs_path, .{});
             defer file.close();
             const input = try file.reader().readAllAlloc(gpa, u.mb * 100);
