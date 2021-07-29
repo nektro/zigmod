@@ -27,6 +27,7 @@ pub fn execute(args: [][]u8) !void {
             \\
             \\The subcommands available are:
             \\  - add       Append this package to your dependencies
+            \\  - showjson  Print debug api data to stdout
             \\  - update    Check your zig.mod dependencies for new versions
             \\  - modile    Print the zig.mod text for a new version
         });
