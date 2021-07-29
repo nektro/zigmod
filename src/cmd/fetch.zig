@@ -112,7 +112,7 @@ pub fn create_depszig(dir: string, top_module: u.Module, list: *std.ArrayList(u.
 
     try w.writeAll("pub const imports = struct {\n");
     try print_imports(w, top_module, dir);
-    try w.writeAll("};\n\n");
+    try w.writeAll("};\n");
 }
 
 fn create_lockfile(list: *std.ArrayList(u.Module), dir: string) !void {
