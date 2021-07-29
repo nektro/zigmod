@@ -35,6 +35,9 @@ dependencies:
   - src: git https://github.com/truemedian/zfetch
   - src: git https://github.com/nektro/zig-json
   - src: git https://github.com/nektro/zig-range
+  - src: git https://github.com/nektro/zig-detect-license
+  - src: git https://github.com/nektro/zig-fs-check
+  - src: git https://github.com/nektro/zig-inquirer
 
 dev_dependencies:
   - src: git https://github.com/marlersoft/zigwin32

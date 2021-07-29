@@ -1,6 +1,6 @@
 2
 git https://github.com/yaml/libyaml tag-0.2.5
-git https://github.com/nektro/zig-ansi commit-8ffadb65efdb424c6fe07a804107a775d55ebfe5
+git https://github.com/nektro/zig-ansi commit-d4a53bcac5b87abecc65491109ec22aaf5f3dc2f
 git https://github.com/ziglibs/known-folders commit-f5e5fb8370de41fbc220c0c0770d62bdf00530ea
 git https://github.com/nektro/zig-licenses commit-c9b8cbf3565675a056ad4e9b57cb4f84020e7680
 git https://github.com/truemedian/zfetch commit-8bbc7b34cd417794841e1432585334bc969dfe83
@@ -10,4 +10,9 @@ git https://github.com/MasterQ32/zig-network commit-b9c91769d8ebd626c8e45b2abb05
 git https://github.com/MasterQ32/zig-uri commit-52cdd2061bec0579519f0d30280597f3a1db8b75
 git https://github.com/nektro/zig-json commit-72e555fbc0776f2600aee19b01e5ab1855ebec7a
 git https://github.com/nektro/zig-range commit-890ca308fe09b3d5c866d5cfb3b3d7a95dbf939f
+git https://github.com/nektro/zig-detect-license commit-0ebd7d7c80b88fd5b606ee2ec57e9c6e23927fbf
+git https://github.com/nektro/zig-licenses-text commit-3c07c6e4eb0965dafd0b029c632f823631b3169c
+git https://github.com/nektro/zig-leven commit-8e9f827117ab1418578b692a2325754cc3ee692d
+git https://github.com/nektro/zig-fs-check commit-dcd8da90fcb8bf3c9887e713bf0ec072bc897dd5
+git https://github.com/nektro/zig-inquirer commit-d36621903868136b2ce347e9be9c937e664e1e74
 git https://github.com/marlersoft/zigwin32 commit-ca6b8e5c378e31655fa11b886b44b62f703ef090
