@@ -43,6 +43,7 @@ pub fn main() !void {
         if (std.mem.eql(u8, args[0], decl.name)) {
             const cmd = @field(available, decl.name);
             try cmd.execute(args[1..]);
+            std.debug.print("\n", .{});
             return;
         }
     }
