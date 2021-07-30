@@ -99,7 +99,6 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *
     if (!nocache and u.list_contains(options.already_fetched.items, p)) return p;
     if (!nocache and u.list_contains(options.already_fetched.items, pv)) return pv;
 
-    const tempdir = try std.fs.path.join(gpa, &.{ basedir, "temp" });
     if (options.log and d.type != .local) {
         u.print("fetch: {s}: {s}: {s}", .{ parent_name, @tagName(d.type), d.path });
     }
@@ -138,13 +137,10 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *
                     }
                     return pv;
                 }
-                try d.type.pull(d.path, tempdir);
-                if ((try u.run_cmd(tempdir, &.{ "git", "checkout", vers.string })) > 0) {
+                try d.type.pull(d.path, pv);
+                if ((try u.run_cmd(pv, &.{ "git", "checkout", vers.string })) > 0) {
                     u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
                 }
-                const td_fd = try std.fs.cwd().openDir(basedir, .{});
-                try std.fs.cwd().makePath(pv);
-                try td_fd.rename("temp", try d.clean_path_v());
                 if (vers.id != .branch) {
                     const pvd = try std.fs.cwd().openDir(pv, .{});
                     try pvd.deleteTree(".git");
