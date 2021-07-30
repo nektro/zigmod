@@ -68,92 +68,74 @@ pub const package_data = struct {
         .c_source_files = &.{ "src/api.c", "src/dumper.c", "src/emitter.c", "src/loader.c", "src/parser.c", "src/reader.c", "src/scanner.c", "src/writer.c" },
         .c_source_flags = &.{ "-DYAML_VERSION_MAJOR=0", "-DYAML_VERSION_MINOR=2", "-DYAML_VERSION_PATCH=5", "-DYAML_VERSION_STRING=\"0.2.5\"", "-DYAML_DECLARE_STATIC=1" },
     };
-
     pub const _s84v9o48ucb0 = Package{
         .directory = dirs._s84v9o48ucb0,
         .pkg = Pkg{ .name = "ansi", .path = .{ .path = dirs._s84v9o48ucb0 ++ "/src/lib.zig" }, .dependencies = null },
     };
-
     pub const _2ta738wrqbaq = Package{
         .directory = dirs._2ta738wrqbaq,
         .pkg = Pkg{ .name = "known-folders", .path = .{ .path = dirs._2ta738wrqbaq ++ "/known-folders.zig" }, .dependencies = null },
     };
-
     pub const _0npcrzfdlrvk = Package{
         .directory = dirs._0npcrzfdlrvk,
         .pkg = Pkg{ .name = "licenses", .path = .{ .path = dirs._0npcrzfdlrvk ++ "/src/lib.zig" }, .dependencies = null },
     };
-
     pub const _9k24gimke1an = Package{
         .directory = dirs._9k24gimke1an,
         .pkg = Pkg{ .name = "hzzp", .path = .{ .path = dirs._9k24gimke1an ++ "/src/main.zig" }, .dependencies = null },
     };
-
     pub const _csbnipaad8n7 = Package{
         .directory = dirs._csbnipaad8n7,
         .pkg = Pkg{ .name = "iguanaTLS", .path = .{ .path = dirs._csbnipaad8n7 ++ "/src/main.zig" }, .dependencies = null },
     };
-
     pub const _yyhw90zkzgmu = Package{
         .directory = dirs._yyhw90zkzgmu,
         .pkg = Pkg{ .name = "network", .path = .{ .path = dirs._yyhw90zkzgmu ++ "/network.zig" }, .dependencies = null },
     };
-
     pub const _u9w9dpp6p804 = Package{
         .directory = dirs._u9w9dpp6p804,
         .pkg = Pkg{ .name = "uri", .path = .{ .path = dirs._u9w9dpp6p804 ++ "/uri.zig" }, .dependencies = null },
     };
-
     pub const _ejw82j2ipa0e = Package{
         .directory = dirs._ejw82j2ipa0e,
         .pkg = Pkg{ .name = "zfetch", .path = .{ .path = dirs._ejw82j2ipa0e ++ "/src/main.zig" }, .dependencies = &.{ _9k24gimke1an.pkg.?, _csbnipaad8n7.pkg.?, _yyhw90zkzgmu.pkg.?, _u9w9dpp6p804.pkg.? } },
     };
-
     pub const _ocmr9rtohgcc = Package{
         .directory = dirs._ocmr9rtohgcc,
         .pkg = Pkg{ .name = "json", .path = .{ .path = dirs._ocmr9rtohgcc ++ "/src/lib.zig" }, .dependencies = null },
     };
-
     pub const _tnj3qf44tpeq = Package{
         .directory = dirs._tnj3qf44tpeq,
         .pkg = Pkg{ .name = "range", .path = .{ .path = dirs._tnj3qf44tpeq ++ "/src/lib.zig" }, .dependencies = null },
     };
-
     pub const _pt88y5d80m25 = Package{
         .directory = dirs._pt88y5d80m25,
         .pkg = Pkg{ .name = "licenses-text", .path = .{ .path = dirs._pt88y5d80m25 ++ "/src/lib.zig" }, .dependencies = null },
     };
-
     pub const _96h80ezrvj7i = Package{
         .directory = dirs._96h80ezrvj7i,
-        .pkg = Pkg{ .name = "leven", .path = .{ .path = dirs._96h80ezrvj7i ++ "/src/lib.zig" }, .dependencies = &.{_tnj3qf44tpeq.pkg.?} },
+        .pkg = Pkg{ .name = "leven", .path = .{ .path = dirs._96h80ezrvj7i ++ "/src/lib.zig" }, .dependencies = &.{ _tnj3qf44tpeq.pkg.? } },
     };
-
     pub const _qyrnfg0iwpzl = Package{
         .directory = dirs._qyrnfg0iwpzl,
         .pkg = Pkg{ .name = "fs-check", .path = .{ .path = dirs._qyrnfg0iwpzl ++ "/src/lib.zig" }, .dependencies = null },
     };
-
     pub const _2ovav391ivak = Package{
         .directory = dirs._2ovav391ivak,
         .pkg = Pkg{ .name = "detect-license", .path = .{ .path = dirs._2ovav391ivak ++ "/src/lib.zig" }, .dependencies = &.{ _pt88y5d80m25.pkg.?, _96h80ezrvj7i.pkg.?, _qyrnfg0iwpzl.pkg.? } },
     };
-
     pub const _c1xirp1ota5p = Package{
         .directory = dirs._c1xirp1ota5p,
         .pkg = Pkg{ .name = "inquirer", .path = .{ .path = dirs._c1xirp1ota5p ++ "/src/lib.zig" }, .dependencies = &.{ _s84v9o48ucb0.pkg.?, _tnj3qf44tpeq.pkg.? } },
     };
-
     pub const _89ujp8gq842x = Package{
         .directory = dirs._89ujp8gq842x,
         .pkg = Pkg{ .name = "zigmod", .path = .{ .path = dirs._89ujp8gq842x ++ "/src/lib.zig" }, .dependencies = &.{ _s84v9o48ucb0.pkg.?, _2ta738wrqbaq.pkg.?, _0npcrzfdlrvk.pkg.?, _ejw82j2ipa0e.pkg.?, _ocmr9rtohgcc.pkg.?, _tnj3qf44tpeq.pkg.?, _2ovav391ivak.pkg.?, _qyrnfg0iwpzl.pkg.?, _c1xirp1ota5p.pkg.? } },
     };
-
     pub const _o6ogpor87xc2 = Package{
         .directory = dirs._o6ogpor87xc2,
         .pkg = Pkg{ .name = "win32", .path = .{ .path = dirs._o6ogpor87xc2 ++ "/win32.zig" }, .dependencies = null },
     };
-
     pub const _root = Package{
         .directory = dirs._root,
     };

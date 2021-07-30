@@ -310,7 +310,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(u.Module), d
                     }
                     try w.writeAll(" },\n");
                 }
-                try w.writeAll("    };\n\n");
+                try w.writeAll("    };\n");
 
                 try done.append(mod);
                 _ = notdone.orderedRemove(i);
