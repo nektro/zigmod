@@ -141,7 +141,7 @@ fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *
                 if ((try u.run_cmd(pv, &.{ "git", "checkout", vers.string })) > 0) {
                     u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
                 }
-                if (vers.id != .branch) {
+                if (std.builtin.os.tag != .windows and vers.id != .branch) {
                     const pvd = try std.fs.cwd().openDir(pv, .{});
                     try pvd.deleteTree(".git");
                 }
