@@ -34,6 +34,8 @@ jobs:
 
       - run: ./zig-out/bin/zigmod ci
 
+      - run: cat deps.zig
+
       - run: zig build
 
       - run: ./zig-out/bin/zigmod version
