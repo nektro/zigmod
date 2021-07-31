@@ -128,7 +128,7 @@ fn create_lockfile(list: *std.ArrayList(u.Module), dir: string) !void {
             }
             if (md.type == .system_lib) continue;
             const mpath = try std.fs.path.join(gpa, &.{ dir, m.clean_path });
-            const version = if (md.version.len > 0) md.version else (try md.type.exact_version(mpath));
+            const version = try md.exact_version(mpath);
             try wl.print("{s} {s} {s}\n", .{ @tagName(md.type), md.path, version });
         }
     }

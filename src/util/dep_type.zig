@@ -94,4 +94,12 @@ pub const GitVersionType = enum {
     branch,
     tag,
     commit,
+
+    pub fn frozen(self: GitVersionType) bool {
+        return switch (self) {
+            .branch => false,
+            .tag => true,
+            .commit => true,
+        };
+    }
 };

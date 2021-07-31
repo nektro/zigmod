@@ -57,4 +57,18 @@ pub const Dep = struct {
         }
         return true;
     }
+
+    pub fn exact_version(self: Dep, dpath: []const u8) ![]const u8 {
+        if (self.version.len == 0) {
+            return try self.type.exact_version(dpath);
+        }
+        return switch (self.type) {
+            .git => blk: {
+                const vers = try u.parse_split(u.GitVersionType, "-").do(self.version);
+                if (vers.id.frozen()) break :blk self.version;
+                break :blk try self.type.exact_version(dpath);
+            },
+            else => self.version,
+        };
+    }
 };
