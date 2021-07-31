@@ -25,3 +25,10 @@ For a full reference on the fields available in `deps.zig` you can check [here](
 +    deps.addAllTo(exe);
      exe.install();
 ```
+
+## Screenshot
+![image](https://user-images.githubusercontent.com/5464072/127753849-53d4f4df-d9de-459a-a9db-6b61e5fb0d17.png)
+
+In addition to fetching your dependencies `fetch` will help you track any updates.
+
+In the event you are using Git, `fetch` will parse the diff of your committed `zigmod.lock` with the new one it just printed and give you a status update on new packages, removed packages, or updated packages. If a dependency happens to be hosted on a major Git provider, then it will also reformat the updates section to print a compare URL so you may visit it in a browser and view the changes directly. Else, it will still print the "from" and "to" commits.
