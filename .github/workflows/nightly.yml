@@ -31,7 +31,7 @@ jobs:
           version: master
 
       - run: zig build -Dbootstrap
-        
+
       - run: ./zig-out/bin/zigmod ci
-        
+
       - run: zig build
