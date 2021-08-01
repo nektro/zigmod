@@ -33,10 +33,7 @@ pub fn execute(args: [][]u8) !void {
     });
 
     const entry = if (ptype == .lib) try inquirer.forString(stdout, stdin, "package entry point:", gpa, u.detct_mainfile(u.try_index([]const u8, args, 1, ""), null, name) catch |err| switch (err) {
-        error.CantFindMain => {
-            u.assert(false, "unable to detect package entry point", .{});
-            unreachable;
-        },
+        error.CantFindMain => null,
         else => return err,
     }) else null;
 
