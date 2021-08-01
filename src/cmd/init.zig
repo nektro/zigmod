@@ -70,15 +70,15 @@ pub fn execute(args: [][]u8) !void {
     }
 }
 
-fn writeExeManifest(w: std.fs.File.Writer, id: []const u8, name: []const u8, license: []const u8, description: []const u8) !void {
+pub fn writeExeManifest(w: std.fs.File.Writer, id: []const u8, name: []const u8, license: ?[]const u8, description: ?[]const u8) !void {
     try w.print("id: {s}\n", .{id});
     try w.print("name: {s}\n", .{name});
-    try w.print("license: {s}\n", .{license});
-    try w.print("description: {s}\n", .{description});
+    if (license) |_| try w.print("license: {s}\n", .{license.?});
+    if (description) |_| try w.print("description: {s}\n", .{description.?});
     try w.print("dev_dependencies:\n", .{});
 }
 
-fn writeLibManifest(w: std.fs.File.Writer, id: []const u8, name: []const u8, entry: []const u8, license: []const u8, description: []const u8) !void {
+pub fn writeLibManifest(w: std.fs.File.Writer, id: []const u8, name: []const u8, entry: []const u8, license: []const u8, description: []const u8) !void {
     try w.print("id: {s}\n", .{id});
     try w.print("name: {s}\n", .{name});
     try w.print("main: {s}\n", .{entry});
