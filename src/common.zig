@@ -91,7 +91,7 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
     }
 }
 
-fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *CollectOptions) ![]const u8 {
+pub fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *CollectOptions) ![]const u8 {
     const p = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path() });
     const pv = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path_v() });
 
@@ -273,7 +273,7 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
     }
 }
 
-fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_name: []const u8) !u.Module {
+pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_name: []const u8) !u.Module {
     const destination = ".zigmod/deps/files";
     const fname = try std.mem.join(gpa, "", &.{ pkg_name, ".zig" });
 
