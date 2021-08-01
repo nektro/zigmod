@@ -11,8 +11,6 @@ const u = @import("./../util/index.zig");
 
 pub const commands = struct {
     pub const add = @import("./aquila/add.zig");
-    pub const update = @import("./aquila/update.zig");
-    pub const modfile = @import("./aquila/modfile.zig");
     pub const showjson = @import("./aquila/showjson.zig");
 };
 
@@ -28,8 +26,6 @@ pub fn execute(args: [][]u8) !void {
             \\The subcommands available are:
             \\  - add       Append this package to your dependencies
             \\  - showjson  Print debug api data to stdout
-            \\  - update    Check your zig.mod dependencies for new versions
-            \\  - modile    Print the zig.mod text for a new version
         });
         return;
     }
