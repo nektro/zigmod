@@ -40,11 +40,10 @@ Check out our [docs](docs/) or the website: https://nektro.github.io/zigmod/.
 ## Prior Art
 - https://golang.org/ref/mod#go-mod-file
 - https://github.com/mattnite/zkg
-- https://github.com/MasterQ32/LoLa
 
-## Contributors
-- https://github.com/nektro
+## Honorable mentions
 - https://github.com/truemedian
+- https://github.com/MasterQ32
 
 ## Contact
 - hello@nektro.net
