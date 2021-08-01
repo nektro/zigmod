@@ -3,10 +3,14 @@ const gpa = std.heap.c_allocator;
 
 const inquirer = @import("inquirer");
 const detectlicense = @import("detect-license");
+const knownfolders = @import("known-folders");
+const ini = @import("ini");
 const u = @import("./../util/index.zig");
 
 //
 //
+
+const s_in_y = std.time.s_per_week * 52;
 
 pub fn execute(args: [][]u8) !void {
     _ = args;
@@ -55,6 +59,7 @@ pub fn execute(args: [][]u8) !void {
     switch (try inquirer.forConfirm(stdout, stdin, "Is this okay?", gpa)) {
         false => {
             std.debug.print("okay. quitting...", .{});
+            return;
         },
         true => {
             const file = try cwd.createFile("zig.mod", .{});
@@ -67,6 +72,50 @@ pub fn execute(args: [][]u8) !void {
             std.debug.print("\n", .{});
             u.print("Successfully initialized new package {s}!\n", .{name});
         },
+    }
+
+    // ask about .gitignore
+    if (try u.does_folder_exist(".git")) {
+        const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitignore?", gpa);
+        if (do) {
+            const exists = try u.does_file_exist(".gitignore", null);
+            const file = try (if (exists) cwd.openFile(".gitignore", .{ .read = true, .write = true }) else cwd.createFile(".gitignore", .{}));
+            defer file.close();
+            try file.seekTo(try file.getEndPos());
+            const w = file.writer();
+
+            if (!exists) try w.writeAll("zig-*\n");
+            try w.writeAll(".zigmod\n");
+            try w.writeAll("deps.zig\n");
+        }
+    }
+
+    // ask about LICENSE
+    if (!(try u.does_file_exist("LICENSE", null))) {
+        if (detectlicense.licenses.find(license)) |text| {
+            if (try inquirer.forConfirm(stdout, stdin, "It appears you don't have a LICENSE file defined, would you like init to add it for you?", gpa)) {
+                var realtext = text;
+                realtext = try std.mem.replaceOwned(u8, gpa, realtext, "<year>", try inquirer.answer(
+                    stdout,
+                    "year:",
+                    []const u8,
+                    "{s}",
+                    try std.fmt.allocPrint(gpa, "{d}", .{1970 + @divFloor(std.time.timestamp(), s_in_y)}),
+                ));
+                realtext = try std.mem.replaceOwned(u8, gpa, realtext, "<copyright holders>", try inquirer.forString(
+                    stdout,
+                    stdin,
+                    "copyright holder's name:",
+                    gpa,
+                    try guessCopyrightName(),
+                ));
+
+                const file = try cwd.createFile("LICENSE", .{});
+                defer file.close();
+                const w = file.writer();
+                try w.writeAll(realtext);
+            }
+        }
     }
 }
 
@@ -85,4 +134,13 @@ pub fn writeLibManifest(w: std.fs.File.Writer, id: []const u8, name: []const u8,
     try w.print("license: {s}\n", .{license});
     try w.print("description: {s}\n", .{description});
     try w.print("dependencies:\n", .{});
+}
+
+fn guessCopyrightName() !?[]const u8 {
+    const home = (try knownfolders.open(gpa, .home, .{})).?;
+    if (!(try u.does_file_exist(".gitconfig", home))) return null;
+    const file = try home.openFile(".gitconfig", .{});
+    const content = try file.reader().readAllAlloc(gpa, 1024 * 1024);
+    var iniO = try ini.parseIntoMap(content, gpa);
+    return iniO.map.get("user.name");
 }
