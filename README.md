@@ -18,6 +18,17 @@ A package manager for the Zig programming language.
 
 ## Built With
 - Zig master `0.9.0-dev.689+507dc1f2e`
+- https://github.com/yaml/libyaml
+- https://github.com/nektro/zig-ansi
+- https://github.com/ziglibs/known-folders
+- https://github.com/nektro/zig-licenses
+- https://github.com/truemedian/zfetch
+- https://github.com/nektro/zig-json
+- https://github.com/nektro/zig-range
+- https://github.com/marlersoft/zigwin32
+- https://github.com/nektro/zig-detect-license
+- https://github.com/nektro/zig-inquirer
+- https://github.com/arqv/ini
 
 ### Build from Source
 Initially,
