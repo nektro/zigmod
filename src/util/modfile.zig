@@ -34,6 +34,14 @@ pub const ModFile = struct {
         return from_mapping(alloc, doc.mapping);
     }
 
+    pub fn from_dir(alloc: *std.mem.Allocator, dir: std.fs.Dir) !Self {
+        const file = try dir.openFile("zig.mod", .{});
+        defer file.close();
+        const input = try file.reader().readAllAlloc(alloc, mb);
+        const doc = try yaml.parse(alloc, input);
+        return from_mapping(alloc, doc.mapping);
+    }
+
     pub fn from_mapping(alloc: *std.mem.Allocator, mapping: yaml.Mapping) !Self {
         const id = mapping.get_string("id");
         const name = mapping.get("name").?.string;
