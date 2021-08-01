@@ -11,5 +11,6 @@ $GOPATH/bin/ghr \
     -u ${CIRCLE_PROJECT_USERNAME} \
     -r ${CIRCLE_PROJECT_REPONAME} \
     -b "$(./changelog.sh)" \
+    -n "$tag" \
     "$tag" \
     "/artifacts/"
