@@ -14,6 +14,6 @@ git https://github.com/nektro/zig-detect-license commit-d4544410f811c402b866f21f
 git https://github.com/nektro/zig-licenses-text commit-3c07c6e4eb0965dafd0b029c632f823631b3169c
 git https://github.com/nektro/zig-leven commit-8e9f827117ab1418578b692a2325754cc3ee692d
 git https://github.com/nektro/zig-fs-check commit-dcd8da90fcb8bf3c9887e713bf0ec072bc897dd5
-git https://github.com/nektro/zig-inquirer commit-d36621903868136b2ce347e9be9c937e664e1e74
+git https://github.com/nektro/zig-inquirer commit-00f5c71e9dda6c35d478aead9da569c02f3f8db0
 git https://github.com/arqv/ini commit-e5296e929513eb3d86a5f815c4a4a5ecd4d8d11c
 git https://github.com/marlersoft/zigwin32 commit-ca6b8e5c378e31655fa11b886b44b62f703ef090
