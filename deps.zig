@@ -135,7 +135,7 @@ pub const package_data = struct {
     };
     pub const _89ujp8gq842x = Package{
         .directory = dirs._89ujp8gq842x,
-        .pkg = Pkg{ .name = "zigmod", .path = .{ .path = dirs._89ujp8gq842x ++ "/src/lib.zig" }, .dependencies = &.{ _s84v9o48ucb0.pkg.?, _2ta738wrqbaq.pkg.?, _0npcrzfdlrvk.pkg.?, _ejw82j2ipa0e.pkg.?, _ocmr9rtohgcc.pkg.?, _tnj3qf44tpeq.pkg.?, _2ovav391ivak.pkg.?, _qyrnfg0iwpzl.pkg.?, _c1xirp1ota5p.pkg.?, _u7sysdckdymi.pkg.? } },
+        .pkg = Pkg{ .name = "zigmod", .path = .{ .path = dirs._89ujp8gq842x ++ "/src/lib.zig" }, .dependencies = &.{ _s84v9o48ucb0.pkg.?, _2ta738wrqbaq.pkg.?, _0npcrzfdlrvk.pkg.?, _ejw82j2ipa0e.pkg.?, _ocmr9rtohgcc.pkg.?, _tnj3qf44tpeq.pkg.?, _2ovav391ivak.pkg.?, _c1xirp1ota5p.pkg.?, _u7sysdckdymi.pkg.? } },
     };
     pub const _o6ogpor87xc2 = Package{
         .directory = dirs._o6ogpor87xc2,
