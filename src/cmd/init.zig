@@ -3,8 +3,6 @@ const gpa = std.heap.c_allocator;
 
 const inquirer = @import("inquirer");
 const detectlicense = @import("detect-license");
-const knownfolders = @import("known-folders");
-const ini = @import("ini");
 const u = @import("./../util/index.zig");
 
 //
@@ -107,7 +105,7 @@ pub fn execute(args: [][]u8) !void {
                     stdin,
                     "copyright holder's name:",
                     gpa,
-                    try guessCopyrightName(),
+                    guessCopyrightName(),
                 ));
 
                 const file = try cwd.createFile("LICENSE", .{});
@@ -136,11 +134,9 @@ pub fn writeLibManifest(w: std.fs.File.Writer, id: []const u8, name: []const u8,
     try w.print("dependencies:\n", .{});
 }
 
-fn guessCopyrightName() !?[]const u8 {
-    const home = (try knownfolders.open(gpa, .home, .{})).?;
-    if (!(try u.does_file_exist(".gitconfig", home))) return null;
-    const file = try home.openFile(".gitconfig", .{});
-    const content = try file.reader().readAllAlloc(gpa, 1024 * 1024);
-    var iniO = try ini.parseIntoMap(content, gpa);
-    return iniO.map.get("user.name");
+fn guessCopyrightName() ?[]const u8 {
+    const result = u.run_cmd_raw(null, &.{ "git", "config", "--get", "user.name" }) catch return null;
+    defer gpa.free(result.stdout);
+    defer gpa.free(result.stderr);
+    return if (result.term.Exited == 0) gpa.dupe(u8, std.mem.trim(u8, result.stdout, " \n\t")) catch null else null;
 }
