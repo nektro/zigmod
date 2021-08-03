@@ -82,9 +82,9 @@ pub fn execute(args: [][]u8) !void {
             try file.seekTo(try file.getEndPos());
             const w = file.writer();
 
-            if (!exists) try w.writeAll("zig-*\n");
-            try w.writeAll(".zigmod\n");
-            try w.writeAll("deps.zig\n");
+            if (!exists) try w.writeAll("/zig-*\n");
+            try w.writeAll("/.zigmod/\n");
+            try w.writeAll("/deps.zig\n");
         }
     }
 
