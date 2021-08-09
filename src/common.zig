@@ -289,7 +289,7 @@ pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_
                 continue;
             }
             const path = try std.mem.dupe(gpa, u8, p.path);
-            try map.put(path[dir_path.len..], path);
+            try map.put(path, try std.fmt.allocPrint(gpa, "{s}/{s}", .{ dir_path, path }));
         }
     }
 
@@ -304,7 +304,7 @@ pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_
     );
     var iter = map.iterator();
     while (iter.next()) |item| {
-        try w.print("    .{{ .@\"0\" = \"{}\", .@\"1\" = @embedFile(\"./../../../{}\") }},\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
+        try w.print("    .{{ .@\"0\" = \"/{}\", .@\"1\" = @embedFile(\"./../../../{}\") }},\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
     }
     try w.writeAll("\n");
     try w.writeAll(
