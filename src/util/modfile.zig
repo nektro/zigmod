@@ -79,7 +79,7 @@ pub const ModFile = struct {
                     var main = item.mapping.get_string("main");
 
                     if (item.mapping.get("src")) |val| {
-                        var src_iter = std.mem.tokenize(val.string, " ");
+                        var src_iter = std.mem.tokenize(u8, val.string, " ");
                         dtype = src_iter.next().?;
                         path = src_iter.next().?;
                         if (src_iter.next()) |dver| {
