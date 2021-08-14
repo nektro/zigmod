@@ -30,7 +30,7 @@ pub const CollectOptions = struct {
 pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: *CollectOptions) !u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     try options.init();
-    const moduledeps = &std.ArrayList(u.Module).init(gpa);
+    var moduledeps = std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
     try std.fs.cwd().makePath(".zigmod/deps/files");
     if (m.root_files.len > 0) {
@@ -56,7 +56,7 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: *CollectOp
 
 pub fn collect_deps(dir: []const u8, mpath: []const u8, options: *CollectOptions) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
-    const moduledeps = &std.ArrayList(u.Module).init(gpa);
+    var moduledeps = std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
     if (m.files.len > 0) {
         try moduledeps.append(try add_files_package(m.id, m.files, m.name));
@@ -336,7 +336,7 @@ pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_
 }
 
 pub fn parse_lockfile(path: []const u8) ![]const [4][]const u8 {
-    const list = &std.ArrayList([4][]const u8).init(gpa);
+    var list = std.ArrayList([4][]const u8).init(gpa);
     const max = std.math.maxInt(usize);
     const f = try std.fs.cwd().openFile(path, .{});
     const r = f.reader();

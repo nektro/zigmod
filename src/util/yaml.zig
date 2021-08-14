@@ -112,7 +112,7 @@ pub const Mapping = struct {
     }
 
     pub fn get_string_array(self: Mapping, alloc: *std.mem.Allocator, k: []const u8) ![][]const u8 {
-        const list = &std.ArrayList([]const u8).init(alloc);
+        var list = std.ArrayList([]const u8).init(alloc);
         defer list.deinit();
         if (self.get(k)) |val| {
             if (val == .sequence) {
@@ -154,7 +154,7 @@ pub fn parse(alloc: *std.mem.Allocator, input: []const u8) !Document {
 
     _ = c.yaml_parser_set_input_string(&parser, input.ptr, input.len);
 
-    const all_events = &std.ArrayList(Token).init(alloc);
+    var all_events = std.ArrayList(Token).init(alloc);
     var event: Token = undefined;
     while (true) {
         const p = c.yaml_parser_parse(&parser, &event);
@@ -220,7 +220,7 @@ fn parse_item(p: *Parser, start: ?Token) Error!Item {
 }
 
 fn parse_stream(p: *Parser) Error!Stream {
-    const res = &std.ArrayList(Document).init(p.alloc);
+    var res = std.ArrayList(Document).init(p.alloc);
     defer res.deinit();
 
     while (true) {
@@ -250,7 +250,7 @@ fn parse_document(p: *Parser) Error!Document {
 }
 
 fn parse_mapping(p: *Parser) Error!Mapping {
-    const res = &std.ArrayList(Key).init(p.alloc);
+    var res = std.ArrayList(Key).init(p.alloc);
     defer res.deinit();
 
     while (true) {
@@ -279,7 +279,7 @@ fn parse_value(p: *Parser) Error!Value {
 }
 
 fn parse_sequence(p: *Parser) Error!Sequence {
-    const res = &std.ArrayList(Item).init(p.alloc);
+    var res = std.ArrayList(Item).init(p.alloc);
     defer res.deinit();
 
     while (true) {

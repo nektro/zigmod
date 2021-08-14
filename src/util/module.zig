@@ -25,7 +25,7 @@ pub const Module = struct {
     dep: ?u.Dep,
 
     pub fn from(dep: u.Dep, dir: []const u8, options: *common.CollectOptions) !Module {
-        const moddeps = &std.ArrayList(Module).init(gpa);
+        var moddeps = std.ArrayList(Module).init(gpa);
         defer moddeps.deinit();
         for (dep.deps) |*d| {
             if (try common.get_module_from_dep(d, dir, dep.name, options)) |founddep| {
@@ -54,11 +54,11 @@ pub const Module = struct {
     }
 
     pub fn get_hash(self: Module, cdpath: []const u8) ![]const u8 {
-        const file_list_1 = &std.ArrayList([]const u8).init(gpa);
+        var file_list_1 = std.ArrayList([]const u8).init(gpa);
         defer file_list_1.deinit();
-        try u.file_list(try u.concat(&.{ cdpath, "/", self.clean_path }), file_list_1);
+        try u.file_list(try u.concat(&.{ cdpath, "/", self.clean_path }), &file_list_1);
 
-        const file_list_2 = &std.ArrayList([]const u8).init(gpa);
+        var file_list_2 = std.ArrayList([]const u8).init(gpa);
         defer file_list_2.deinit();
         for (file_list_1.items) |item| {
             const _a = u.trim_prefix(item, cdpath);

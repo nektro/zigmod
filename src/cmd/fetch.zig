@@ -26,14 +26,14 @@ pub fn execute(args: [][]u8) !void {
     };
     const top_module = try common.collect_deps_deep(dir, "zig.mod", &options);
 
-    const list = &std.ArrayList(u.Module).init(gpa);
-    try common.collect_pkgs(top_module, list);
+    var list = std.ArrayList(u.Module).init(gpa);
+    try common.collect_pkgs(top_module, &list);
 
-    try create_depszig(dir, top_module, list);
+    try create_depszig(dir, top_module, &list);
 
     if (bootstrap) return;
 
-    try create_lockfile(list, dir);
+    try create_lockfile(&list, dir);
 
     try diff_lockfile();
 }
@@ -92,14 +92,14 @@ pub fn create_depszig(dir: string, top_module: u.Module, list: *std.ArrayList(u.
     try w.writeAll("};\n\n");
 
     try w.writeAll("pub const package_data = struct {\n");
-    const duped = &std.ArrayList(u.Module).init(gpa);
+    var duped = std.ArrayList(u.Module).init(gpa);
     for (list.items) |mod| {
         if (mod.is_sys_lib) {
             continue;
         }
         try duped.append(mod);
     }
-    try print_pkg_data_to(w, duped, &std.ArrayList(u.Module).init(gpa));
+    try print_pkg_data_to(w, &duped, &std.ArrayList(u.Module).init(gpa));
     try w.writeAll("};\n\n");
 
     try w.writeAll("pub const packages = ");
@@ -149,15 +149,15 @@ fn diff_lockfile() !void {
             if (std.mem.startsWith(u8, line, "@@")) break;
         }
 
-        const rems = &std.ArrayList(string).init(gpa);
-        const adds = &std.ArrayList(string).init(gpa);
+        var rems = std.ArrayList(string).init(gpa);
+        var adds = std.ArrayList(string).init(gpa);
         while (try r.readUntilDelimiterOrEofAlloc(gpa, '\n', max)) |line| {
             if (line[0] == ' ') continue;
             if (line[0] == '-') try rems.append(line[1..]);
             if (line[0] == '+') if (line[1] == '2') continue else try adds.append(line[1..]);
         }
 
-        const changes = &std.StringHashMap(DiffChange).init(gpa);
+        var changes = std.StringHashMap(DiffChange).init(gpa);
 
         var i: usize = 0;
         while (i < rems.items.len) {

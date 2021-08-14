@@ -24,8 +24,8 @@ pub fn execute(args: [][]u8) !void {
     const w = f.writer();
 
     //
-    const module_list = &std.ArrayList(u.Module).init(gpa);
-    try common.collect_pkgs(top_module, module_list);
+    var module_list = std.ArrayList(u.Module).init(gpa);
+    try common.collect_pkgs(top_module, &module_list);
 
     for (module_list.items) |m| {
         if (m.clean_path.len == 0) {

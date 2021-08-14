@@ -19,7 +19,7 @@ pub fn execute(args: [][]u8) !void {
     const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, "packages" });
     const val = try zpm.server_fetch(url);
 
-    const arr = &std.ArrayList(zpm.Package).init(gpa);
+    var arr = std.ArrayList(zpm.Package).init(gpa);
     defer arr.deinit();
 
     for (val.Array) |item| {

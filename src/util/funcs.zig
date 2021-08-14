@@ -33,7 +33,7 @@ pub fn try_index(comptime T: type, array: []T, n: usize, def: T) T {
 }
 
 pub fn split(in: []const u8, delim: []const u8) ![][]const u8 {
-    const list = &std.ArrayList([]const u8).init(gpa);
+    var list = std.ArrayList([]const u8).init(gpa);
     defer list.deinit();
     const iter = &std.mem.split(in, delim);
     while (iter.next()) |str| {
@@ -90,7 +90,7 @@ pub fn trim_suffix(in: []const u8, suffix: []const u8) []const u8 {
 }
 
 pub fn repeat(s: []const u8, times: i32) ![]const u8 {
-    const list = &std.ArrayList([]const u8).init(gpa);
+    var list = std.ArrayList([]const u8).init(gpa);
     var i: i32 = 0;
     while (i < times) : (i += 1) {
         try list.append(s);
@@ -175,7 +175,7 @@ pub fn run_cmd(dir: ?[]const u8, args: []const []const u8) !u32 {
 }
 
 pub fn list_remove(input: [][]const u8, search: []const u8) ![][]const u8 {
-    const list = &std.ArrayList([]const u8).init(gpa);
+    var list = std.ArrayList([]const u8).init(gpa);
     defer list.deinit();
     for (input) |item| {
         if (!std.mem.eql(u8, item, search)) {

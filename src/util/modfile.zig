@@ -68,7 +68,7 @@ pub const ModFile = struct {
     }
 
     fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: []const u8) anyerror![]u.Dep {
-        const dep_list = &std.ArrayList(u.Dep).init(alloc);
+        var dep_list = std.ArrayList(u.Dep).init(alloc);
         if (mapping.get(prop)) |dep_seq| {
             if (dep_seq == .sequence) {
                 for (dep_seq.sequence) |item| {
