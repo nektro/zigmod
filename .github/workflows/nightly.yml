@@ -30,6 +30,8 @@ jobs:
         with:
           version: master
 
+      - run: zig version
+      - run: zig env
       - run: zig build -Dbootstrap
       - run: ./zig-out/bin/zigmod ci
       - run: cat deps.zig
