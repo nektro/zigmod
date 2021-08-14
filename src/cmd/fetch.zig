@@ -159,6 +159,7 @@ fn diff_lockfile() !void {
 
         var changes = std.StringHashMap(DiffChange).init(gpa);
 
+        var didbreak = false;
         var i: usize = 0;
         while (i < rems.items.len) {
             const it = rems.items[i];
@@ -176,11 +177,13 @@ fn diff_lockfile() !void {
                     });
                     _ = rems.orderedRemove(i);
                     _ = adds.orderedRemove(j);
+                    didbreak = true;
                     break;
                 }
-                j += 1;
+                if (!didbreak) j += 1;
             }
-            i += 1;
+            if (!didbreak) i += 1;
+            if (didbreak) didbreak = false;
         }
 
         if (adds.items.len > 0) {
