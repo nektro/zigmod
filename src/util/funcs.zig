@@ -35,7 +35,7 @@ pub fn try_index(comptime T: type, array: []T, n: usize, def: T) T {
 pub fn split(in: []const u8, delim: []const u8) ![][]const u8 {
     var list = std.ArrayList([]const u8).init(gpa);
     defer list.deinit();
-    const iter = &std.mem.split(in, delim);
+    var iter = std.mem.split(u8, in, delim);
     while (iter.next()) |str| {
         try list.append(str);
     }
@@ -214,7 +214,7 @@ pub fn parse_split(comptime T: type, delim: []const u8) type {
         string: []const u8,
 
         pub fn do(input: []const u8) !Self {
-            const iter = &std.mem.split(input, delim);
+            var iter = std.mem.split(u8, input, delim);
             return Self{
                 .id = std.meta.stringToEnum(T, iter.next() orelse return error.IterEmpty) orelse return error.NoMemberFound,
                 .string = iter.rest(),

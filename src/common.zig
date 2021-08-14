@@ -349,7 +349,7 @@ pub fn parse_lockfile(path: []const u8) ![]const [4][]const u8 {
         }
         switch (v) {
             1 => {
-                var iter = std.mem.split(line, " ");
+                var iter = std.mem.split(u8, line, " ");
                 try list.append([4][]const u8{
                     iter.next().?,
                     iter.next().?,
@@ -358,7 +358,7 @@ pub fn parse_lockfile(path: []const u8) ![]const [4][]const u8 {
                 });
             },
             2 => {
-                var iter = std.mem.split(line, " ");
+                var iter = std.mem.split(u8, line, " ");
                 const asdep = u.Dep{
                     .type = std.meta.stringToEnum(u.DepType, iter.next().?).?,
                     .path = iter.next().?,
