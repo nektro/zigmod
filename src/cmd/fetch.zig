@@ -30,17 +30,17 @@ pub fn execute(args: [][]u8) !void {
     var list = std.ArrayList(u.Module).init(gpa);
     try common.collect_pkgs(top_module, &list);
 
-    try create_depszig(cachepath, top_module, &list);
+    try create_depszig(cachepath, dir, top_module, &list);
 
     if (bootstrap) return;
 
-    try create_lockfile(&list, cachepath);
+    try create_lockfile(&list, cachepath, dir);
 
     try diff_lockfile();
 }
 
-pub fn create_depszig(cachepath: string, top_module: u.Module, list: *std.ArrayList(u.Module)) !void {
-    const f = try std.fs.cwd().createFile("deps.zig", .{});
+pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: u.Module, list: *std.ArrayList(u.Module)) !void {
+    const f = try dir.createFile("deps.zig", .{});
     defer f.close();
 
     const w = f.writer();
@@ -116,8 +116,8 @@ pub fn create_depszig(cachepath: string, top_module: u.Module, list: *std.ArrayL
     try w.writeAll("};\n");
 }
 
-fn create_lockfile(list: *std.ArrayList(u.Module), path: string) !void {
-    const fl = try std.fs.cwd().createFile("zigmod.lock", .{});
+fn create_lockfile(list: *std.ArrayList(u.Module), path: string, dir: std.fs.Dir) !void {
+    const fl = try dir.createFile("zigmod.lock", .{});
     defer fl.close();
 
     const wl = fl.writer();
