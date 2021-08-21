@@ -32,8 +32,8 @@ pub fn collect_deps_deep(cachepath: []const u8, mpath: []const u8, options: *Col
     try options.init();
     var moduledeps = std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
-    try std.fs.cwd().makePath(".zigmod/deps/files");
     if (m.root_files.len > 0) {
+        try std.fs.cwd().makePath(".zigmod/deps/files");
         try moduledeps.append(try add_files_package("root", m.root_files, m.name));
     }
     try moduledeps.append(try collect_deps(cachepath, mpath, options));
@@ -59,6 +59,7 @@ pub fn collect_deps(cachepath: []const u8, mpath: []const u8, options: *CollectO
     var moduledeps = std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
     if (m.files.len > 0) {
+        try std.fs.cwd().makePath(".zigmod/deps/files");
         try moduledeps.append(try add_files_package(m.id, m.files, m.name));
     }
     for (m.deps) |*d| {
