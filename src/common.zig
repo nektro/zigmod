@@ -27,7 +27,7 @@ pub const CollectOptions = struct {
     }
 };
 
-pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: *CollectOptions) !u.Module {
+pub fn collect_deps_deep(cachepath: []const u8, mpath: []const u8, options: *CollectOptions) !u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     try options.init();
     var moduledeps = std.ArrayList(u.Module).init(gpa);
@@ -36,9 +36,9 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: *CollectOp
     if (m.root_files.len > 0) {
         try moduledeps.append(try add_files_package("root", m.root_files, m.name));
     }
-    try moduledeps.append(try collect_deps(dir, mpath, options));
+    try moduledeps.append(try collect_deps(cachepath, mpath, options));
     for (m.devdeps) |*d| {
-        if (try get_module_from_dep(d, dir, m.name, options)) |founddep| {
+        if (try get_module_from_dep(d, cachepath, m.name, options)) |founddep| {
             try moduledeps.append(founddep);
         }
     }
@@ -54,7 +54,7 @@ pub fn collect_deps_deep(dir: []const u8, mpath: []const u8, options: *CollectOp
     };
 }
 
-pub fn collect_deps(dir: []const u8, mpath: []const u8, options: *CollectOptions) anyerror!u.Module {
+pub fn collect_deps(cachepath: []const u8, mpath: []const u8, options: *CollectOptions) anyerror!u.Module {
     const m = try u.ModFile.init(gpa, mpath);
     var moduledeps = std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
@@ -62,7 +62,7 @@ pub fn collect_deps(dir: []const u8, mpath: []const u8, options: *CollectOptions
         try moduledeps.append(try add_files_package(m.id, m.files, m.name));
     }
     for (m.deps) |*d| {
-        if (try get_module_from_dep(d, dir, m.name, options)) |founddep| {
+        if (try get_module_from_dep(d, cachepath, m.name, options)) |founddep| {
             try moduledeps.append(founddep);
         }
     }
@@ -196,7 +196,7 @@ pub fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, option
     }
 }
 
-pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, options: *CollectOptions) anyerror!?u.Module {
+pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []const u8, options: *CollectOptions) anyerror!?u.Module {
     if (options.lock) |lock| {
         for (lock) |item| {
             if (std.mem.eql(u8, item[0], try d.clean_path())) {
@@ -207,7 +207,7 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
             }
         }
     }
-    const moddir = try get_moddir(dir, d.*, parent_name, options);
+    const moddir = try get_moddir(cachepath, d.*, parent_name, options);
 
     const nocache = d.type == .local or d.type == .system_lib;
     if (!nocache) try options.already_fetched.append(moddir);
@@ -228,11 +228,11 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
             };
         },
         else => {
-            var dd = try collect_deps(dir, try u.concat(&.{ moddir, "/zig.mod" }), options) catch |e| switch (e) {
+            var dd = try collect_deps(cachepath, try u.concat(&.{ moddir, "/zig.mod" }), options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
-                        var mod_from = try u.Module.from(d.*, dir, options);
-                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
+                        var mod_from = try u.Module.from(d.*, cachepath, options);
+                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
@@ -245,8 +245,8 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
                     if (trymain) |_| {
                         d.*.name = tryname;
                         d.*.main = trymain.?;
-                        var mod_from = try u.Module.from(d.*, dir, options);
-                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, dir)[1..];
+                        var mod_from = try u.Module.from(d.*, cachepath, options);
+                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
@@ -257,7 +257,7 @@ pub fn get_module_from_dep(d: *u.Dep, dir: []const u8, parent_name: []const u8, 
             };
             dd.dep = d.*;
             const save = dd;
-            if (d.type != .local) dd.clean_path = u.trim_prefix(moddir, dir)[1..];
+            if (d.type != .local) dd.clean_path = u.trim_prefix(moddir, cachepath)[1..];
             if (dd.id.len == 0) dd.id = try u.random_string(48);
             if (d.name.len > 0) dd.name = d.name;
             if (d.main.len > 0) dd.main = d.main;
