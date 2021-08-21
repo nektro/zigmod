@@ -66,7 +66,11 @@ pub fn execute(args: [][]u8) !void {
         }
         std.debug.print(style.ResetIntensity, .{});
         for (entry.value_ptr.*.items) |item| {
-            std.debug.print("- {s}\n", .{if (!std.mem.eql(u8, item.clean_path, "../..")) item.clean_path else "This"});
+            if (std.mem.eql(u8, item.clean_path, "../..")) {
+                std.debug.print("- This\n", .{});
+            } else {
+                std.debug.print("- {s} {s}\n", .{ @tagName(item.dep.?.type), item.dep.?.path });
+            }
         }
         std.debug.print("\n", .{});
     }
@@ -74,7 +78,11 @@ pub fn execute(args: [][]u8) !void {
         std.debug.print(style.Bold ++ "Unspecified:\n", .{});
         std.debug.print(style.ResetIntensity, .{});
         for (unspecified_list.items) |item| {
-            std.debug.print("- {s}\n", .{if (!std.mem.eql(u8, item.clean_path, "../..")) item.clean_path else "This"});
+            if (std.mem.eql(u8, item.clean_path, "../..")) {
+                std.debug.print("- This\n", .{});
+            } else {
+                std.debug.print("- {s} {s}\n", .{ @tagName(item.dep.?.type), item.dep.?.path });
+            }
         }
     }
 }
