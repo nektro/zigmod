@@ -18,13 +18,14 @@ const bootstrap = if (@hasDecl(build_options, "bootstrap")) build_options.bootst
 pub fn execute(args: [][]u8) !void {
     //
     const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const dir = std.fs.cwd();
     const should_update = !(args.len >= 1 and std.mem.eql(u8, args[0], "--no-update"));
 
     var options = common.CollectOptions{
         .log = should_update,
         .update = should_update,
     };
-    const top_module = try common.collect_deps_deep(cachepath, "zig.mod", &options);
+    const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
     var list = std.ArrayList(u.Module).init(gpa);
     try common.collect_pkgs(top_module, &list);

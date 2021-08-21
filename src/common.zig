@@ -27,8 +27,8 @@ pub const CollectOptions = struct {
     }
 };
 
-pub fn collect_deps_deep(cachepath: []const u8, mpath: []const u8, options: *CollectOptions) !u.Module {
-    const m = try u.ModFile.init(gpa, mpath);
+pub fn collect_deps_deep(cachepath: []const u8, mdir: std.fs.Dir, options: *CollectOptions) !u.Module {
+    const m = try u.ModFile.from_dir(gpa, mdir);
     try options.init();
     var moduledeps = std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
@@ -36,7 +36,7 @@ pub fn collect_deps_deep(cachepath: []const u8, mpath: []const u8, options: *Col
         try std.fs.cwd().makePath(".zigmod/deps/files");
         try moduledeps.append(try add_files_package("root", m.root_files, m.name));
     }
-    try moduledeps.append(try collect_deps(cachepath, mpath, options));
+    try moduledeps.append(try collect_deps(cachepath, mdir, options));
     for (m.devdeps) |*d| {
         if (try get_module_from_dep(d, cachepath, m.name, options)) |founddep| {
             try moduledeps.append(founddep);
@@ -54,8 +54,8 @@ pub fn collect_deps_deep(cachepath: []const u8, mpath: []const u8, options: *Col
     };
 }
 
-pub fn collect_deps(cachepath: []const u8, mpath: []const u8, options: *CollectOptions) anyerror!u.Module {
-    const m = try u.ModFile.init(gpa, mpath);
+pub fn collect_deps(cachepath: []const u8, mdir: std.fs.Dir, options: *CollectOptions) anyerror!u.Module {
+    const m = try u.ModFile.from_dir(gpa, mdir);
     var moduledeps = std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
     if (m.files.len > 0) {
@@ -92,9 +92,9 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
     }
 }
 
-pub fn get_modpath(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *CollectOptions) ![]const u8 {
-    const p = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path() });
-    const pv = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path_v() });
+pub fn get_modpath(cachepath: []const u8, d: u.Dep, parent_name: []const u8, options: *CollectOptions) ![]const u8 {
+    const p = try std.fs.path.join(gpa, &.{ cachepath, try d.clean_path() });
+    const pv = try std.fs.path.join(gpa, &.{ cachepath, try d.clean_path_v() });
 
     const nocache = d.type == .local or d.type == .system_lib;
     if (!nocache and u.list_contains(options.already_fetched.items, p)) return p;
@@ -209,6 +209,7 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []cons
         }
     }
     const modpath = try get_modpath(cachepath, d.*, parent_name, options);
+    const moddir = try std.fs.cwd().openDir(modpath, .{});
 
     const nocache = d.type == .local or d.type == .system_lib;
     if (!nocache) try options.already_fetched.append(modpath);
@@ -229,7 +230,7 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []cons
             };
         },
         else => {
-            var dd = try collect_deps(cachepath, try u.concat(&.{ modpath, "/zig.mod" }), options) catch |e| switch (e) {
+            var dd = try collect_deps(cachepath, moddir, options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                         var mod_from = try u.Module.from(d.*, cachepath, options);

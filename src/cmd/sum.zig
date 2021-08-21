@@ -11,15 +11,16 @@ pub fn execute(args: [][]u8) !void {
     _ = args;
 
     const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const dir = std.fs.cwd();
 
     var options = common.CollectOptions{
         .log = false,
         .update = false,
     };
-    const top_module = try common.collect_deps_deep(cachepath, "zig.mod", &options);
+    const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
     //
-    const f = try std.fs.cwd().createFile("zigmod.sum", .{});
+    const f = try dir.createFile("zigmod.sum", .{});
     defer f.close();
     const w = f.writer();
 

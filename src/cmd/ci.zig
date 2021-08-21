@@ -10,15 +10,15 @@ const common = @import("./../common.zig");
 pub fn execute(args: [][]u8) !void {
     _ = args;
 
-    const dir = std.fs.cwd();
     const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const dir = std.fs.cwd();
 
     var options = common.CollectOptions{
         .log = true,
         .update = false,
         .lock = try common.parse_lockfile(dir),
     };
-    const top_module = try common.collect_deps_deep(cachepath, "zig.mod", &options);
+    const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
     var list = std.ArrayList(u.Module).init(gpa);
     try common.collect_pkgs(top_module, &list);
