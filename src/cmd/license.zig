@@ -17,13 +17,13 @@ const Map = std.StringArrayHashMap(*List);
 pub fn execute(args: [][]u8) !void {
     _ = args;
 
-    const dir = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
 
     var options = common.CollectOptions{
         .log = false,
         .update = false,
     };
-    const top_module = try common.collect_deps_deep(dir, "zig.mod", &options);
+    const top_module = try common.collect_deps_deep(cachepath, "zig.mod", &options);
 
     const master_list = &List.init(gpa);
     try common.collect_pkgs(top_module, master_list);

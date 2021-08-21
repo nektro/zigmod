@@ -17,28 +17,28 @@ const bootstrap = if (@hasDecl(build_options, "bootstrap")) build_options.bootst
 
 pub fn execute(args: [][]u8) !void {
     //
-    const dir = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
     const should_update = !(args.len >= 1 and std.mem.eql(u8, args[0], "--no-update"));
 
     var options = common.CollectOptions{
         .log = should_update,
         .update = should_update,
     };
-    const top_module = try common.collect_deps_deep(dir, "zig.mod", &options);
+    const top_module = try common.collect_deps_deep(cachepath, "zig.mod", &options);
 
     var list = std.ArrayList(u.Module).init(gpa);
     try common.collect_pkgs(top_module, &list);
 
-    try create_depszig(dir, top_module, &list);
+    try create_depszig(cachepath, top_module, &list);
 
     if (bootstrap) return;
 
-    try create_lockfile(&list, dir);
+    try create_lockfile(&list, cachepath);
 
     try diff_lockfile();
 }
 
-pub fn create_depszig(dir: string, top_module: u.Module, list: *std.ArrayList(u.Module)) !void {
+pub fn create_depszig(cachepath: string, top_module: u.Module, list: *std.ArrayList(u.Module)) !void {
     const f = try std.fs.cwd().createFile("deps.zig", .{});
     defer f.close();
 
@@ -47,7 +47,7 @@ pub fn create_depszig(dir: string, top_module: u.Module, list: *std.ArrayList(u.
     try w.writeAll("const Pkg = std.build.Pkg;\n");
     try w.writeAll("const string = []const u8;\n");
     try w.writeAll("\n");
-    try w.print("pub const cache = \"{}\";\n", .{std.zig.fmtEscapes(dir)});
+    try w.print("pub const cache = \"{}\";\n", .{std.zig.fmtEscapes(cachepath)});
     try w.writeAll("\n");
     try w.print("{s}\n", .{
         \\pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
@@ -111,11 +111,11 @@ pub fn create_depszig(dir: string, top_module: u.Module, list: *std.ArrayList(u.
     try w.writeAll(";\n\n");
 
     try w.writeAll("pub const imports = struct {\n");
-    try print_imports(w, top_module, dir);
+    try print_imports(w, top_module, cachepath);
     try w.writeAll("};\n");
 }
 
-fn create_lockfile(list: *std.ArrayList(u.Module), dir: string) !void {
+fn create_lockfile(list: *std.ArrayList(u.Module), path: string) !void {
     const fl = try std.fs.cwd().createFile("zigmod.lock", .{});
     defer fl.close();
 
@@ -127,7 +127,7 @@ fn create_lockfile(list: *std.ArrayList(u.Module), dir: string) !void {
                 continue;
             }
             if (md.type == .system_lib) continue;
-            const mpath = try std.fs.path.join(gpa, &.{ dir, m.clean_path });
+            const mpath = try std.fs.path.join(gpa, &.{ path, m.clean_path });
             const version = try md.exact_version(mpath);
             try wl.print("{s} {s} {s}\n", .{ @tagName(md.type), md.path, version });
         }
@@ -350,13 +350,13 @@ fn print_pkgs(w: std.fs.File.Writer, m: u.Module) !void {
     try w.writeAll("}");
 }
 
-fn print_imports(w: std.fs.File.Writer, m: u.Module, dir: string) !void {
+fn print_imports(w: std.fs.File.Writer, m: u.Module, path: string) !void {
     for (m.deps) |d| {
         if (d.main.len == 0) {
             continue;
         }
         const r1 = try std.mem.replaceOwned(u8, gpa, d.name, "-", "_");
         const r2 = try std.mem.replaceOwned(u8, gpa, r1, "/", "_");
-        try w.print("    pub const {s} = @import(\"{}/{}/{s}\");\n", .{ r2, std.zig.fmtEscapes(dir), std.zig.fmtEscapes(d.clean_path), d.main });
+        try w.print("    pub const {s} = @import(\"{}/{}/{s}\");\n", .{ r2, std.zig.fmtEscapes(path), std.zig.fmtEscapes(d.clean_path), d.main });
     }
 }

@@ -10,13 +10,13 @@ const common = @import("./../common.zig");
 pub fn execute(args: [][]u8) !void {
     _ = args;
 
-    const dir = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
 
     var options = common.CollectOptions{
         .log = false,
         .update = false,
     };
-    const top_module = try common.collect_deps_deep(dir, "zig.mod", &options);
+    const top_module = try common.collect_deps_deep(cachepath, "zig.mod", &options);
 
     //
     const f = try std.fs.cwd().createFile("zigmod.sum", .{});
@@ -35,7 +35,7 @@ pub fn execute(args: [][]u8) !void {
             continue;
         }
         if (m.is_sys_lib) continue;
-        const hash = try m.get_hash(dir);
+        const hash = try m.get_hash(cachepath);
         try w.print("{s} {s}\n", .{ hash, m.clean_path });
     }
 }
