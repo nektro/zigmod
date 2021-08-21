@@ -10,17 +10,24 @@ Should one of your dependencies not have a `license` field in their `zig.mod` ma
 Running this command on Zigmod itself (as of this writing) produces such output:
 ```
 MIT:
-= https://opensource.org/licenses/MIT
+= https://spdx.org/licenses/MIT
 - This
-- v/git/github.com/yaml/libyaml/tag-0.2.5
-- git/github.com/nektro/zig-ansi
-- git/github.com/ziglibs/known-folders
-- git/github.com/nektro/zig-licenses
-- git/github.com/truemedian/zfetch
-- git/github.com/truemedian/hzzp
-- git/github.com/alexnask/iguanaTLS
-- git/github.com/MasterQ32/zig-network
-- git/github.com/MasterQ32/zig-uri
-- git/github.com/nektro/zig-json
-- git/github.com/nektro/zig-range
+- git https://github.com/yaml/libyaml
+- git https://github.com/nektro/zig-ansi
+- git https://github.com/ziglibs/known-folders
+- git https://github.com/nektro/zig-licenses
+- git https://github.com/truemedian/zfetch
+- git https://github.com/truemedian/hzzp
+- git https://github.com/alexnask/iguanaTLS
+- git https://github.com/MasterQ32/zig-network
+- git https://github.com/MasterQ32/zig-uri
+- git https://github.com/nektro/zig-json
+- git https://github.com/nektro/zig-range
+- git https://github.com/nektro/zig-detect-license
+- git https://github.com/nektro/zig-licenses-text
+- git https://github.com/nektro/zig-leven
+- git https://github.com/nektro/zig-fs-check
+- git https://github.com/nektro/zig-inquirer
+- git https://github.com/arqv/ini
+- git https://github.com/marlersoft/zigwin32
 ```
