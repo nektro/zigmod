@@ -40,6 +40,8 @@ Check here for the [`zig.mod` reference](./zig.mod.md).
 
 Check here for the [`deps.zig` reference](./deps.zig.md).
 
+There is now also a tutorial-style guide that goes over various use cases that Zigmod provides and caters to. It is [available here](tutorial.md).
+
 ### A new project
 Create a new directory for your project and run these commands to get started:
 ```

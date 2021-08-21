@@ -48,6 +48,8 @@ $ ./zig-out/bin/zigmod
 ## Usage
 Check out our [docs](docs/) or the website: https://nektro.github.io/zigmod/.
 
+There is now also a tutorial-style getting started guide that goes over various use cases that Zigmod provides and caters to. It is [available here](docs/tutorial.md).
+
 ## Prior Art
 - https://golang.org/ref/mod#go-mod-file
 - https://github.com/mattnite/zkg
