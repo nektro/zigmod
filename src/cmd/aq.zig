@@ -12,6 +12,7 @@ const u = @import("./../util/index.zig");
 pub const commands = struct {
     pub const add = @import("./aquila/add.zig");
     pub const showjson = @import("./aquila/showjson.zig");
+    pub const install = @import("./aquila/install.zig");
 };
 
 pub const server_root = "https://aquila.red";
@@ -26,6 +27,7 @@ pub fn execute(args: [][]u8) !void {
             \\The subcommands available are:
             \\  - add       Append this package to your dependencies
             \\  - showjson  Print debug api data to stdout
+            \\  - install   Install a package
         });
         return;
     }

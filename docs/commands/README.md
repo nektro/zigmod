@@ -17,3 +17,4 @@ Running `zigmod` with no commands will print this list.
 - [`aq`](aq.md)
 - [`aq add`](aq_add.md)
 - [`aq showjson`](aq_showjson.md)
+- [`aq install`](aq_install.md)
