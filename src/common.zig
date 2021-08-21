@@ -335,10 +335,10 @@ pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_
     return (try get_module_from_dep(&d, destination, parent_name, &options)).?;
 }
 
-pub fn parse_lockfile(path: []const u8) ![]const [4][]const u8 {
+pub fn parse_lockfile(dir: std.fs.Dir) ![]const [4][]const u8 {
     var list = std.ArrayList([4][]const u8).init(gpa);
     const max = std.math.maxInt(usize);
-    const f = try std.fs.cwd().openFile(path, .{});
+    const f = try dir.openFile("zigmod.lock", .{});
     const r = f.reader();
     var i: usize = 0;
     var v: usize = 1;
