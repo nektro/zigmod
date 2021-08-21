@@ -12,7 +12,10 @@ pub fn execute(args: [][]u8) !void {
 
     const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
     const dir = std.fs.cwd();
+    try do(cachepath, dir);
+}
 
+pub fn do(cachepath: []const u8, dir: std.fs.Dir) !void {
     var options = common.CollectOptions{
         .log = true,
         .update = false,
@@ -23,5 +26,6 @@ pub fn execute(args: [][]u8) !void {
     var list = std.ArrayList(u.Module).init(gpa);
     try common.collect_pkgs(top_module, &list);
 
-    try @import("./fetch.zig").create_depszig(cachepath, top_module, &list);
+    const fetch = @import("./fetch.zig");
+    try fetch.create_depszig(cachepath, dir, top_module, &list);
 }
