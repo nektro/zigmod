@@ -135,3 +135,8 @@ Given the project https://github.com/kristoff-it/bork, at the time of writing th
 ## Verifying dependency integrity
 
 > Ref: See [`zigmod sum`](commands/sum.md) reference for more info.
+
+---
+## Installing online programs to your local machine
+
+> Ref: See [`zigmod aq install`](commands/aq_install.md) reference for more info.
