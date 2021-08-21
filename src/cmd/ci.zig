@@ -10,17 +10,17 @@ const common = @import("./../common.zig");
 pub fn execute(args: [][]u8) !void {
     _ = args;
 
-    const dir = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
 
     var options = common.CollectOptions{
         .log = true,
         .update = false,
         .lock = try common.parse_lockfile("zigmod.lock"),
     };
-    const top_module = try common.collect_deps_deep(dir, "zig.mod", &options);
+    const top_module = try common.collect_deps_deep(cachepath, "zig.mod", &options);
 
-    const list = &std.ArrayList(u.Module).init(gpa);
-    try common.collect_pkgs(top_module, list);
+    var list = std.ArrayList(u.Module).init(gpa);
+    try common.collect_pkgs(top_module, &list);
 
-    try @import("./fetch.zig").create_depszig(dir, top_module, list);
+    try @import("./fetch.zig").create_depszig(cachepath, top_module, &list);
 }
