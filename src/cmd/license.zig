@@ -36,6 +36,9 @@ pub fn execute(args: [][]u8) !void {
         if (item.clean_path.len == 0) {
             continue;
         }
+        if (std.mem.eql(u8, item.clean_path, "files")) {
+            continue;
+        }
         if (item.yaml == null) {
             try unspecified_list.append(item);
             continue;
