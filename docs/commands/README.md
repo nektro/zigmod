@@ -12,6 +12,7 @@ Running `zigmod` with no commands will print this list.
 
 - [`zpm`](zpm.md)
 - [`zpm add`](zpm_add.md)
+- [`zpm showjson`](zpm_showjson.md)
 
 - [`aq`](aq.md)
 - [`aq add`](aq_add.md)
