@@ -3,8 +3,8 @@ git https://github.com/yaml/libyaml tag-0.2.5
 git https://github.com/nektro/zig-ansi commit-d4a53bcac5b87abecc65491109ec22aaf5f3dc2f
 git https://github.com/ziglibs/known-folders commit-234b589d3cd0c00f2f675f98fd9674e208fd2bd0
 git https://github.com/nektro/zig-licenses commit-c9b8cbf3565675a056ad4e9b57cb4f84020e7680
-git https://github.com/truemedian/zfetch commit-8bbc7b34cd417794841e1432585334bc969dfe83
-git https://github.com/truemedian/hzzp commit-ca50ca11c53506ad6c084abbdf082d1d45095222
+git https://github.com/truemedian/zfetch commit-55b3354ae16089b9e1020580e0b93aa9c698eb8f
+git https://github.com/truemedian/hzzp commit-492107d44caa2676c7b5aa4e934e1e937232d652
 git https://github.com/alexnask/iguanaTLS commit-0d39a361639ad5469f8e4dcdaea35446bbe54b48
 git https://github.com/MasterQ32/zig-network commit-b9c91769d8ebd626c8e45b2abb05cbc28ccc50da
 git https://github.com/MasterQ32/zig-uri commit-52cdd2061bec0579519f0d30280597f3a1db8b75
@@ -16,4 +16,4 @@ git https://github.com/nektro/zig-leven commit-8e9f827117ab1418578b692a2325754cc
 git https://github.com/nektro/zig-fs-check commit-dcd8da90fcb8bf3c9887e713bf0ec072bc897dd5
 git https://github.com/nektro/zig-inquirer commit-9a068122c59ac2785f330c37bf4412aed644ed37
 git https://github.com/arqv/ini commit-e5296e929513eb3d86a5f815c4a4a5ecd4d8d11c
-git https://github.com/marlersoft/zigwin32 commit-aa954945e3f78ba149ff3828d151f54b4fc5ce0d
+git https://github.com/marlersoft/zigwin32 commit-b2cdb54fd83caf8679b8370ead57332df40e90df
