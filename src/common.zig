@@ -92,7 +92,7 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
     }
 }
 
-pub fn get_moddir(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *CollectOptions) ![]const u8 {
+pub fn get_modpath(basedir: []const u8, d: u.Dep, parent_name: []const u8, options: *CollectOptions) ![]const u8 {
     const p = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path() });
     const pv = try std.fs.path.join(gpa, &.{ basedir, try d.clean_path_v() });
 
@@ -208,10 +208,10 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []cons
             }
         }
     }
-    const moddir = try get_moddir(cachepath, d.*, parent_name, options);
+    const modpath = try get_modpath(cachepath, d.*, parent_name, options);
 
     const nocache = d.type == .local or d.type == .system_lib;
-    if (!nocache) try options.already_fetched.append(moddir);
+    if (!nocache) try options.already_fetched.append(modpath);
 
     switch (d.type) {
         .system_lib => {
@@ -229,16 +229,16 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []cons
             };
         },
         else => {
-            var dd = try collect_deps(cachepath, try u.concat(&.{ moddir, "/zig.mod" }), options) catch |e| switch (e) {
+            var dd = try collect_deps(cachepath, try u.concat(&.{ modpath, "/zig.mod" }), options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
                         var mod_from = try u.Module.from(d.*, cachepath, options);
-                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, cachepath)[1..];
+                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(modpath, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
-                    const moddirO = try std.fs.cwd().openDir(moddir, .{});
-                    const tryname = try u.detect_pkgname("", moddir);
+                    const moddirO = try std.fs.cwd().openDir(modpath, .{});
+                    const tryname = try u.detect_pkgname("", modpath);
                     const trymain = u.detct_mainfile("", moddirO, tryname) catch |err| switch (err) {
                         error.CantFindMain => null,
                         else => return err,
@@ -247,7 +247,7 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []cons
                         d.*.name = tryname;
                         d.*.main = trymain.?;
                         var mod_from = try u.Module.from(d.*, cachepath, options);
-                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(moddir, cachepath)[1..];
+                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(modpath, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
@@ -258,7 +258,7 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []cons
             };
             dd.dep = d.*;
             const save = dd;
-            if (d.type != .local) dd.clean_path = u.trim_prefix(moddir, cachepath)[1..];
+            if (d.type != .local) dd.clean_path = u.trim_prefix(modpath, cachepath)[1..];
             if (dd.id.len == 0) dd.id = try u.random_string(48);
             if (d.name.len > 0) dd.name = d.name;
             if (d.main.len > 0) dd.main = d.main;
