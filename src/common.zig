@@ -209,7 +209,7 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []cons
         }
     }
     const modpath = try get_modpath(cachepath, d.*, parent_name, options);
-    const moddir = try std.fs.cwd().openDir(modpath, .{});
+    const moddir = if (std.mem.eql(u8, modpath, "files") or modpath.len == 0) try std.fs.cwd().openDir(cachepath, .{}) else try std.fs.cwd().openDir(modpath, .{});
 
     const nocache = d.type == .local or d.type == .system_lib;
     if (!nocache) try options.already_fetched.append(modpath);
@@ -269,6 +269,7 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []cons
             if (d.only_os.len > 0) dd.only_os = d.only_os;
             if (d.except_os.len > 0) dd.except_os = d.except_os;
             if (d.type == .local) dd.main = try std.fs.path.join(gpa, &.{ d.main, save.main });
+            if (std.mem.eql(u8, modpath, "files")) dd.clean_path = modpath;
             if (dd.is_for_this()) return dd;
             return null;
         },
