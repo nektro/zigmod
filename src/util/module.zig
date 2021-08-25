@@ -28,7 +28,7 @@ pub const Module = struct {
         var moddeps = std.ArrayList(Module).init(gpa);
         defer moddeps.deinit();
         for (dep.deps) |*d| {
-            if (try common.get_module_from_dep(d, dir, dep.name, options)) |founddep| {
+            if (try common.get_module_from_dep(d, dir, options)) |founddep| {
                 try moddeps.append(founddep);
             }
         }

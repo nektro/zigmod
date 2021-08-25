@@ -46,7 +46,7 @@ pub fn execute(args: [][]u8) !void {
         .update = false,
     };
     try fetchoptions.init();
-    const modpath = try common.get_modpath(cachepath, dep, "install", &fetchoptions);
+    const modpath = try common.get_modpath(cachepath, dep, &fetchoptions);
     const moddir = try std.fs.cwd().openDir(modpath, .{});
 
     // zigmod ci

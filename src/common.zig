@@ -34,11 +34,11 @@ pub fn collect_deps_deep(cachepath: []const u8, mdir: std.fs.Dir, options: *Coll
     defer moduledeps.deinit();
     if (m.root_files.len > 0) {
         try std.fs.cwd().makePath(".zigmod/deps/files");
-        try moduledeps.append(try add_files_package("root", m.root_files, m.name));
+        try moduledeps.append(try add_files_package("root", m.root_files));
     }
     try moduledeps.append(try collect_deps(cachepath, mdir, options));
     for (m.devdeps) |*d| {
-        if (try get_module_from_dep(d, cachepath, m.name, options)) |founddep| {
+        if (try get_module_from_dep(d, cachepath, options)) |founddep| {
             try moduledeps.append(founddep);
         }
     }
@@ -60,10 +60,10 @@ pub fn collect_deps(cachepath: []const u8, mdir: std.fs.Dir, options: *CollectOp
     defer moduledeps.deinit();
     if (m.files.len > 0) {
         try std.fs.cwd().makePath(".zigmod/deps/files");
-        try moduledeps.append(try add_files_package(m.id, m.files, m.name));
+        try moduledeps.append(try add_files_package(m.id, m.files));
     }
     for (m.deps) |*d| {
-        if (try get_module_from_dep(d, cachepath, m.name, options)) |founddep| {
+        if (try get_module_from_dep(d, cachepath, options)) |founddep| {
             try moduledeps.append(founddep);
         }
     }
@@ -92,7 +92,7 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
     }
 }
 
-pub fn get_modpath(cachepath: []const u8, d: u.Dep, parent_name: []const u8, options: *CollectOptions) ![]const u8 {
+pub fn get_modpath(cachepath: []const u8, d: u.Dep, options: *CollectOptions) ![]const u8 {
     const p = try std.fs.path.join(gpa, &.{ cachepath, try d.clean_path() });
     const pv = try std.fs.path.join(gpa, &.{ cachepath, try d.clean_path_v() });
 
@@ -101,7 +101,7 @@ pub fn get_modpath(cachepath: []const u8, d: u.Dep, parent_name: []const u8, opt
     if (!nocache and u.list_contains(options.already_fetched.items, pv)) return pv;
 
     if (options.log and d.type != .local) {
-        u.print("fetch: {s}: {s}: {s}", .{ parent_name, @tagName(d.type), d.path });
+        u.print("fetch: {s}: {s}", .{ @tagName(d.type), d.path });
     }
     defer {
         if (!bootstrap and options.log and d.type != .local) {
@@ -197,7 +197,7 @@ pub fn get_modpath(cachepath: []const u8, d: u.Dep, parent_name: []const u8, opt
     }
 }
 
-pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []const u8, options: *CollectOptions) anyerror!?u.Module {
+pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, options: *CollectOptions) anyerror!?u.Module {
     if (options.lock) |lock| {
         for (lock) |item| {
             if (std.mem.eql(u8, item[0], try d.clean_path())) {
@@ -208,7 +208,7 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []cons
             }
         }
     }
-    const modpath = try get_modpath(cachepath, d.*, parent_name, options);
+    const modpath = try get_modpath(cachepath, d.*, options);
     const moddir = if (std.mem.eql(u8, modpath, "files") or modpath.len == 0) try std.fs.cwd().openDir(cachepath, .{}) else try std.fs.cwd().openDir(modpath, .{});
 
     const nocache = d.type == .local or d.type == .system_lib;
@@ -276,7 +276,7 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, parent_name: []cons
     }
 }
 
-pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_name: []const u8) !u.Module {
+pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8) !u.Module {
     const destination = ".zigmod/deps/files";
     const fname = try std.mem.join(gpa, "", &.{ pkg_name, ".zig" });
 
@@ -335,7 +335,7 @@ pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8, parent_
         .log = false,
         .update = false,
     };
-    return (try get_module_from_dep(&d, destination, parent_name, &options)).?;
+    return (try get_module_from_dep(&d, destination, &options)).?;
 }
 
 pub fn parse_lockfile(dir: std.fs.Dir) ![]const [4][]const u8 {
