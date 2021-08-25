@@ -79,11 +79,14 @@ pub fn execute(args: [][]u8) !void {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitignore?", gpa);
         if (do) {
             const exists = try u.does_file_exist(".gitignore", null);
-            const file = try (if (exists) cwd.openFile(".gitignore", .{ .read = true, .write = true }) else cwd.createFile(".gitignore", .{}));
+            const file: std.fs.File = try (if (exists) cwd.openFile(".gitignore", .{ .read = true, .write = true }) else cwd.createFile(".gitignore", .{}));
             defer file.close();
-            try file.seekTo(try file.getEndPos());
+            const len = try file.getEndPos();
+            if (len > 0) try file.seekTo(len - 1);
             const w = file.writer();
-
+            if (len > 0 and (try file.reader().readByte()) != '\n') {
+                try w.writeAll("\n");
+            }
             if (!exists) try w.writeAll("zig-*\n");
             try w.writeAll(".zigmod\n");
             try w.writeAll("deps.zig\n");
