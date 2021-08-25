@@ -138,5 +138,6 @@ Given the project https://github.com/kristoff-it/bork, at the time of writing th
 
 ---
 ## Installing online programs to your local machine
+Adding `~/.zigmod/bin` to your `$PATH` enables you to install Zig-written command line utilities to your machine with Zigmod.
 
 > Ref: See [`zigmod aq install`](commands/aq_install.md) reference for more info.
