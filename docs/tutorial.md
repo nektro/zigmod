@@ -88,7 +88,7 @@ pub fn build(b: *Builder) void {
 ```
 
 ---
-## Contributing to dependency upstream\
+## Contributing to dependency upstream
 When using Git dependencies, Zigmod streamlines the process of contributing back fixes and improvements to your upstream. This is due to the fact that Zigmod will preserve the `.git` folder when cloning so that you may work with it.
 
 Suppose we have the package https://github.com/octocat/zig-hello.
@@ -97,7 +97,7 @@ Zigmod will `git clone` its contents to `.zigmod/deps/git/github.com/octocat/zig
 
 Then fork the repository on `github.com` or wherever it is hosted and add a local remote so that you have something to push to. `git remote add fork https://github.com/you/zig-hello`.
 
-Then push your local changes with `git push origin master` and create your pull request.
+Then push your local changes with `git push fork master` and create your pull request.
 
 ---
 ## Using Zigmod in Github Actions
