@@ -15,9 +15,11 @@ pub fn build(b: *std.build.Builder) void {
     const exe = b.addExecutable(exe_name, "src/main.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
-    exe.addBuildOption([]const u8, "version", b.option([]const u8, "tag", "") orelse "dev");
+    const opts = b.addOptions();
+    opts.addOption([]const u8, "version", b.option([]const u8, "tag", "") orelse "dev");
     const bootstrap = b.option(bool, "bootstrap", "bootstrapping with just the zig compiler");
-    exe.addBuildOption(bool, "bootstrap", bootstrap != null);
+    opts.addOption(bool, "bootstrap", bootstrap != null);
+    exe.addOptions("build_options", opts);
 
     if (bootstrap != null) {
         exe.linkLibC();
