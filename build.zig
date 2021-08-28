@@ -19,7 +19,7 @@ pub fn build(b: *std.build.Builder) void {
 
     const exe_options = b.addOptions();
     exe.addOptions("build_options", exe_options);
-    exe_options.addOption([]const u8, "version", b.option([]const u8, "version", "") orelse "dev");
+    exe_options.addOption([]const u8, "version", b.option([]const u8, "tag", "") orelse "dev");
     exe_options.addOption(bool, "bootstrap", bootstrap != null);
 
     if (bootstrap != null) {
