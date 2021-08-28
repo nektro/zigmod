@@ -22,7 +22,6 @@ jobs:
       - run: ./zig-out/bin/zigmod ci
       - run: zig build
       - run: ./build_all_zig.sh
-      - run: rm ./zig-out/bin/zigmod
       - store_artifacts:
           path: ./zig-out/bin/
           destination: /artifacts/

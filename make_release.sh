@@ -6,6 +6,7 @@ date=$(date +'%Y.%m.%d')
 version=${CIRCLE_BUILD_NUM-$date}
 tag=v$version
 ./zig-out/bin/zigmod aq install 1/nektro/ghr
+rm ./zig-out/bin/zigmod
 ~/.zigmod/bin/ghr \
     -t ${GITHUB_TOKEN} \
     -u ${CIRCLE_PROJECT_USERNAME} \
