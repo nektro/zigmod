@@ -205,6 +205,20 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             try std.fs.deleteFileAbsolute(file_path);
             return p;
         },
+        .fossil => {
+            const dpath = if (d.version.len > 0) pv else p;
+            if (!try u.does_folder_exist(dpath)) {
+                try d.type.pull(d.path, dpath);
+            } else {
+                if (options.update) {
+                    try d.type.update(dpath, d.path);
+                }
+            }
+            if (d.version.len > 0) {
+                u.assert((try u.run_cmd(dpath, &.{ "fossil", "checkout", d.version })) == 0, "can't fossil checkout version {s}", .{ d.version });
+            }
+            return dpath;
+        },
     }
 }
 
