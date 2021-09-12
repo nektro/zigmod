@@ -34,7 +34,7 @@ pub fn collect_deps_deep(cachepath: []const u8, mdir: std.fs.Dir, options: *Coll
     defer moduledeps.deinit();
     if (m.root_files.len > 0) {
         try std.fs.cwd().makePath(".zigmod/deps/files");
-        try moduledeps.append(try add_files_package("root", m.root_files));
+        try moduledeps.append(try add_files_package("root", mdir, m.root_files));
     }
     try moduledeps.append(try collect_deps(cachepath, mdir, options));
     for (m.devdeps) |*d| {
@@ -60,7 +60,7 @@ pub fn collect_deps(cachepath: []const u8, mdir: std.fs.Dir, options: *CollectOp
     defer moduledeps.deinit();
     if (m.files.len > 0) {
         try std.fs.cwd().makePath(".zigmod/deps/files");
-        try moduledeps.append(try add_files_package(m.id, m.files));
+        try moduledeps.append(try add_files_package(m.id, mdir, m.files));
     }
     for (m.deps) |*d| {
         if (try get_module_from_dep(d, cachepath, options)) |founddep| {
@@ -276,7 +276,7 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, options: *CollectOp
     }
 }
 
-pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8) !u.Module {
+pub fn add_files_package(pkg_name: []const u8, mdir: std.fs.Dir, dirs: []const []const u8) !u.Module {
     const destination = ".zigmod/deps/files";
     const fname = try std.mem.join(gpa, "", &.{ pkg_name, ".zig" });
 
@@ -284,7 +284,7 @@ pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8) !u.Modu
     defer map.deinit();
 
     for (dirs) |dir_path| {
-        const dir = try std.fs.cwd().openDir(dir_path, .{ .iterate = true });
+        const dir = try mdir.openDir(dir_path, .{ .iterate = true });
         var walker = try dir.walk(gpa);
         defer walker.deinit();
         while (try walker.next()) |p| {
@@ -296,18 +296,27 @@ pub fn add_files_package(pkg_name: []const u8, dirs: []const []const u8) !u.Modu
         }
     }
 
+    const cwdpath = try std.fs.cwd().realpathAlloc(gpa, ".");
+    const mpath = try mdir.realpathAlloc(gpa, ".");
+    var fpath = u.trim_prefix(mpath, cwdpath);
+    if (fpath.len == 0) fpath = std.fs.path.sep_str;
+
     const rff = try (try std.fs.cwd().openDir(destination, .{})).createFile(fname, .{});
     defer rff.close();
     const w = rff.writer();
     try w.writeAll(
         \\const std = @import("std");
         \\
+        \\
+    );
+    try w.print("const srcpath = \"../../../{}\";\n\n", .{std.zig.fmtEscapes(fpath[1..])});
+    try w.writeAll(
         \\const files = std.ComptimeStringMap([]const u8, .{
         \\
     );
     var iter = map.iterator();
     while (iter.next()) |item| {
-        try w.print("    .{{ .@\"0\" = \"/{}\", .@\"1\" = @embedFile(\"./../../../{}\") }},\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
+        try w.print("    .{{ .@\"0\" = \"/{}\", .@\"1\" = @embedFile(srcpath ++ \"/{}\") }},\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
     }
     try w.writeAll("\n");
     try w.writeAll(
