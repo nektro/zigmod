@@ -5,6 +5,8 @@ pub const build_options = @import("build_options");
 const zigmod = @import("zigmod");
 const win32 = @import("win32");
 
+extern "kernel32" fn SetConsoleOutputCP(std.os.windows.UINT) callconv(std.os.windows.WINAPI) std.os.windows.BOOL;
+
 pub const u = @import("./util/index.zig");
 pub const common = @import("./common.zig");
 
@@ -36,6 +38,7 @@ pub fn main() !void {
 
     if (!build_options.bootstrap and builtin.os.tag == .windows) {
         const console = win32.system.console;
+        _ = SetConsoleOutputCP(65001);
         const h_out = console.GetStdHandle(console.STD_OUTPUT_HANDLE);
         _ = console.SetConsoleMode(h_out, console.CONSOLE_MODE.initFlags(.{
             .ENABLE_PROCESSED_INPUT = 1, //ENABLE_PROCESSED_OUTPUT
