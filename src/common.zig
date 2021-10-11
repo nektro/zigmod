@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const gpa = std.heap.c_allocator;
 
 const ansi = @import("ansi");
@@ -142,7 +143,7 @@ pub fn get_modpath(cachepath: []const u8, d: u.Dep, options: *CollectOptions) ![
                 if ((try u.run_cmd(pv, &.{ "git", "checkout", vers.string })) > 0) {
                     u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
                 }
-                if (std.builtin.os.tag != .windows and vers.id != .branch) {
+                if (builtin.os.tag != .windows and vers.id != .branch) {
                     const pvd = try std.fs.cwd().openDir(pv, .{});
                     try pvd.deleteTree(".git");
                 }

@@ -1,6 +1,6 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
-const builtin = std.builtin;
+const builtin = @import("builtin");
 
 const u = @import("./../util/index.zig");
 

@@ -1,5 +1,5 @@
 const std = @import("std");
-const builtin = std.builtin;
+const builtin = @import("builtin");
 
 pub const build_options = @import("build_options");
 const zigmod = @import("zigmod");
