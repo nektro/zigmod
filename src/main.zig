@@ -44,6 +44,9 @@ pub fn main() !void {
         }));
     }
 
+    try zigmod.init();
+    defer zigmod.deinit();
+
     inline for (std.meta.declarations(available)) |decl| {
         if (std.mem.eql(u8, args[0], decl.name)) {
             const cmd = @field(available, decl.name);
