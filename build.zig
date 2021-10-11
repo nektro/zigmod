@@ -42,7 +42,13 @@ pub fn build(b: *std.build.Builder) void {
         exe.addCSourceFile("./libs/yaml/src/scanner.c", &.{});
         exe.addCSourceFile("./libs/yaml/src/writer.c", &.{});
 
-        exe.addPackagePath("zigmod", "./src/lib.zig");
+        exe.addPackage(.{
+            .name = "zigmod",
+            .path = .{ .path = "./src/lib.zig" },
+            .dependencies = &[_]std.build.Pkg{
+                .{ .name = "zfetch", .path = .{ .path = "src/zfetch_stub.zig" } },
+            },
+        });
     } else {
         deps.addAllTo(exe);
     }
