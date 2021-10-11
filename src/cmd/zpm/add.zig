@@ -28,8 +28,7 @@ pub fn execute(args: [][]u8) !void {
                 break :blk pkg;
             }
         }
-        u.assert(false, "no package with name '{s}' found", .{args[0]});
-        unreachable;
+        u.fail("no package with name '{s}' found", .{args[0]});
     };
 
     u.assert(found.root_file != null, "package must have an entry point to be able to be added to your dependencies", .{});

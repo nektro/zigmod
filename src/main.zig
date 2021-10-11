@@ -63,8 +63,7 @@ pub fn main() !void {
     const result = std.ChildProcess.exec(.{ .allocator = gpa, .argv = sub_cmd_args.items }) catch |e| switch (e) {
         else => return e,
         error.FileNotFound => {
-            u.assert(false, "unknown command \"{s}\" for \"zigmod\"", .{args[0]});
-            unreachable;
+            u.fail("unknown command \"{s}\" for \"zigmod\"", .{args[0]});
         },
     };
     try std.io.getStdOut().writeAll(result.stdout);

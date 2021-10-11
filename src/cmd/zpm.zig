@@ -50,7 +50,7 @@ pub fn execute(args: [][]u8) !void {
             return;
         }
     }
-    u.assert(false, "unknown command \"{s}\" for \"zigmod zpm\"", .{args[0]});
+    u.fail("unknown command \"{s}\" for \"zigmod zpm\"", .{args[0]});
 }
 
 pub fn server_fetch(url: []const u8) !json.Value {

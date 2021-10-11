@@ -127,8 +127,7 @@ pub fn get_modpath(cachepath: []const u8, d: u.Dep, options: *CollectOptions) ![
                     error.IterEmpty => unreachable,
                     error.NoMemberFound => {
                         const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];
-                        u.assert(false, "fetch: git: version type '{s}' is invalid.", .{vtype});
-                        unreachable;
+                        u.fail("fetch: git: version type '{s}' is invalid.", .{vtype});
                     },
                 };
                 if (try u.does_folder_exist(pv)) {
@@ -141,7 +140,7 @@ pub fn get_modpath(cachepath: []const u8, d: u.Dep, options: *CollectOptions) ![
                 }
                 try d.type.pull(d.path, pv);
                 if ((try u.run_cmd(pv, &.{ "git", "checkout", vers.string })) > 0) {
-                    u.assert(false, "fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
+                    u.fail("fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
                 }
                 if (builtin.os.tag != .windows and vers.id != .branch) {
                     const pvd = try std.fs.cwd().openDir(pv, .{});
@@ -184,7 +183,7 @@ pub fn get_modpath(cachepath: []const u8, d: u.Dep, options: *CollectOptions) ![
                     return pv;
                 }
                 try std.fs.cwd().deleteTree(pv);
-                u.assert(false, "{s} does not match hash {s}", .{ d.path, d.version });
+                u.fail("{s} does not match hash {s}", .{ d.path, d.version });
                 return p;
             }
             if (try u.does_folder_exist(p)) {
@@ -253,8 +252,7 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, options: *CollectOp
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
-                    u.assert(false, "no zig.mod found and no override props defined. unable to use add this dependency!", .{});
-                    unreachable;
+                    u.fail("no zig.mod found and no override props defined. unable to use add this dependency!", .{});
                 },
                 else => e,
             };
@@ -390,7 +388,7 @@ pub fn parse_lockfile(dir: std.fs.Dir) ![]const [4][]const u8 {
                 });
             },
             else => {
-                u.assert(false, "invalid zigmod.lock version: {d}", .{v});
+                u.fail("invalid zigmod.lock version: {d}", .{v});
             },
         }
     }

@@ -31,8 +31,7 @@ pub fn execute(args: [][]u8) !void {
 
     const name = try inquirer.forString(stdout, stdin, "package name:", gpa, u.detect_pkgname(u.try_index([]const u8, args, 0, ""), "") catch |err| switch (err) {
         error.NoBuildZig => {
-            u.assert(false, "init requires a build.zig file", .{});
-            unreachable;
+            u.fail("init requires a build.zig file", .{});
         },
         else => return err,
     });

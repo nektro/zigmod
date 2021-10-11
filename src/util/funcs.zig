@@ -25,6 +25,11 @@ pub fn assert(ok: bool, comptime fmt: []const u8, args: anytype) void {
     }
 }
 
+pub fn fail(comptime fmt: []const u8, args: anytype) noreturn {
+    assert(false, fmt, args);
+    unreachable;
+}
+
 pub fn try_index(comptime T: type, array: []T, n: usize, def: T) T {
     if (array.len <= n) {
         return def;
@@ -160,8 +165,7 @@ pub fn file_list(dpath: []const u8, list: *std.ArrayList([]const u8)) !void {
 pub fn run_cmd_raw(dir: ?[]const u8, args: []const []const u8) !std.ChildProcess.ExecResult {
     return std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
         error.FileNotFound => {
-            u.assert(false, "\"{s}\" command not found", .{args[0]});
-            unreachable;
+            u.fail("\"{s}\" command not found", .{args[0]});
         },
         else => return e,
     };

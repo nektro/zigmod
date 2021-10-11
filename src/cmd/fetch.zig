@@ -322,7 +322,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(u.Module), d
             }
         }
         if (notdone.items.len == len) {
-            u.assert(false, "notdone still has {d} items", .{len});
+            u.fail("notdone still has {d} items", .{len});
         }
         len = notdone.items.len;
     }

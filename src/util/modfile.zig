@@ -48,7 +48,7 @@ pub const ModFile = struct {
         const main = mapping.get_string("main");
 
         if (std.mem.indexOf(u8, name, "/")) |_| {
-            u.assert(false, "name may not contain any '/'", .{});
+            u.fail("name may not contain any '/'", .{});
         }
 
         return Self{
