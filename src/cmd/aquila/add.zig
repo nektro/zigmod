@@ -29,7 +29,10 @@ pub fn do(dir: std.fs.Dir, pkg_id: []const u8) ![]const u8 {
         }
     }
 
-    const file = try dir.openFile("zig.mod", .{ .read = true, .write = true });
+    const file = dir.openFile("zig.mod", .{ .read = true, .write = true }) catch |err| switch (err) {
+        error.FileNotFound => u.fail("error: zig.mod manifest not found! must run from project root.", .{}),
+        else => return err,
+    };
     defer file.close();
     try file.seekTo(try file.getEndPos());
 
