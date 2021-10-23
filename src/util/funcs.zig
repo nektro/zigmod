@@ -116,19 +116,6 @@ pub fn concat(items: []string) !string {
     return std.mem.join(gpa, "", items);
 }
 
-pub fn print_all(w: std.fs.File.Writer, items: anytype, ln: bool) !void {
-    inline for (items) |x, i| {
-        if (i == 0) {
-            try w.print("{s}", .{x});
-        } else {
-            try w.print(" {s}", .{x});
-        }
-    }
-    if (ln) {
-        try w.print("\n", .{});
-    }
-}
-
 pub fn list_contains(haystack: []const string, needle: string) bool {
     for (haystack) |item| {
         if (std.mem.eql(u8, item, needle)) {

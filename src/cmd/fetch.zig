@@ -237,7 +237,7 @@ fn print_dirs(w: std.fs.File.Writer, list: []const u.Module) !void {
 }
 
 fn print_deps(w: std.fs.File.Writer, m: u.Module) !void {
-    try u.print_all(w, .{"&[_]Package{"}, true);
+    try w.writeAll("&[_]Package{\n");
     for (m.deps) |d| {
         if (d.main.len == 0) {
             continue;
