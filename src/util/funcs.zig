@@ -101,11 +101,7 @@ pub fn repeat(s: string, times: i32) !string {
     while (i < times) : (i += 1) {
         try list.append(s);
     }
-    return try concat(list.items);
-}
-
-pub fn concat(items: []string) !string {
-    return std.mem.join(gpa, "", items);
+    return try std.mem.join(gpa, "", list.items);
 }
 
 pub fn list_contains(haystack: []const string, needle: string) bool {
