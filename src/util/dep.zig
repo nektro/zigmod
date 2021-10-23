@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const gpa = std.heap.c_allocator;
 const builtin = std.builtin;
 
@@ -12,21 +13,21 @@ pub const Dep = struct {
     const Self = @This();
 
     type: u.DepType,
-    path: []const u8,
+    path: string,
 
-    id: []const u8,
-    name: []const u8,
-    main: []const u8,
-    version: []const u8,
-    c_include_dirs: []const []const u8 = &.{},
-    c_source_flags: []const []const u8 = &.{},
-    c_source_files: []const []const u8 = &.{},
-    only_os: []const []const u8 = &.{},
-    except_os: []const []const u8 = &.{},
+    id: string,
+    name: string,
+    main: string,
+    version: string,
+    c_include_dirs: []const string = &.{},
+    c_source_flags: []const string = &.{},
+    c_source_files: []const string = &.{},
+    only_os: []const string = &.{},
+    except_os: []const string = &.{},
     yaml: ?yaml.Mapping,
     deps: []u.Dep,
 
-    pub fn clean_path(self: Dep) ![]const u8 {
+    pub fn clean_path(self: Dep) !string {
         if (self.type == .local) {
             return if (self.path.len == 0) "../.." else self.path;
         }
@@ -39,7 +40,7 @@ pub const Dep = struct {
         return p;
     }
 
-    pub fn clean_path_v(self: Dep) ![]const u8 {
+    pub fn clean_path_v(self: Dep) !string {
         if (self.type == .http and self.version.len > 0) {
             const i = std.mem.indexOf(u8, self.version, "-").?;
             return std.mem.join(gpa, "/", &.{ "v", try self.clean_path(), self.version[i + 1 .. 15] });
@@ -58,7 +59,7 @@ pub const Dep = struct {
         return true;
     }
 
-    pub fn exact_version(self: Dep, dpath: []const u8) ![]const u8 {
+    pub fn exact_version(self: Dep, dpath: string) !string {
         if (self.version.len == 0) {
             return try self.type.exact_version(dpath);
         }

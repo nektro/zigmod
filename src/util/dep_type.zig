@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const gpa = std.heap.c_allocator;
 
 const u = @import("./index.zig");
@@ -32,7 +33,7 @@ pub const DepType = enum {
     // hypercore,  // https://hypercore-protocol.org/
 
     // zig fmt: on
-    pub fn pull(self: DepType, rpath: []const u8, dpath: []const u8) !void {
+    pub fn pull(self: DepType, rpath: string, dpath: string) !void {
         switch (self) {
             .local => {},
             .system_lib => {},
@@ -57,7 +58,7 @@ pub const DepType = enum {
     }
 
     // zig fmt: on
-    pub fn update(self: DepType, dpath: []const u8, rpath: []const u8) !void {
+    pub fn update(self: DepType, dpath: string, rpath: string) !void {
         _ = rpath;
 
         switch (self) {
@@ -77,7 +78,7 @@ pub const DepType = enum {
     }
 
     // zig fmt: on
-    pub fn exact_version(self: DepType, mpath: []const u8) ![]const u8 {
+    pub fn exact_version(self: DepType, mpath: string) !string {
         var mdir = try std.fs.cwd().openDir(mpath, .{});
         defer mdir.close();
         return switch (self) {

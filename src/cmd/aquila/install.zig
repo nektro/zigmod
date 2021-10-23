@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const gpa = std.heap.c_allocator;
 
 const knownfolders = @import("known-folders");
@@ -54,7 +55,7 @@ pub fn execute(args: [][]u8) !void {
     try ci.do(modpath, moddir);
 
     // zig build
-    const argv: []const []const u8 = &.{
+    const argv: []const string = &.{
         "zig",         "build",
         "--prefix",    try std.fs.path.join(gpa, &.{ homepath, ".zigmod" }),
         "--cache-dir", try std.fs.path.join(gpa, &.{ cache.?, "zigmod", "zig" }),

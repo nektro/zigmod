@@ -1,5 +1,4 @@
 const std = @import("std");
-const string = []const u8;
 const gpa = std.heap.c_allocator;
 const builtin = @import("builtin");
 

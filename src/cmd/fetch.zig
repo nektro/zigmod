@@ -1,7 +1,6 @@
 const std = @import("std");
-const gpa = std.heap.c_allocator;
-
 const string = []const u8;
+const gpa = std.heap.c_allocator;
 
 const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
@@ -360,7 +359,7 @@ fn print_imports(w: std.fs.File.Writer, m: u.Module, path: string) !void {
     }
 }
 
-fn zig_name_from_pkg_name(name: []const u8) ![]const u8 {
+fn zig_name_from_pkg_name(name: string) !string {
     var legal = name;
     legal = try std.mem.replaceOwned(u8, gpa, legal, "-", "_");
     legal = try std.mem.replaceOwned(u8, gpa, legal, "/", "_");

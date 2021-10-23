@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const gpa = std.heap.c_allocator;
 
 const u = @import("./../util/index.zig");
@@ -15,7 +16,7 @@ pub fn execute(args: [][]u8) !void {
     try do(cachepath, dir);
 }
 
-pub fn do(cachepath: []const u8, dir: std.fs.Dir) !void {
+pub fn do(cachepath: string, dir: std.fs.Dir) !void {
     var options = common.CollectOptions{
         .log = true,
         .update = false,

@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const gpa = std.heap.c_allocator;
 
 const zfetch = @import("zfetch");
@@ -19,12 +20,12 @@ pub const commands = struct {
 pub const server_root = "https://zpm.random-projects.net/api";
 
 pub const Package = struct {
-    author: []const u8,
-    name: []const u8,
-    tags: [][]const u8,
-    git: []const u8,
-    root_file: ?[]const u8,
-    description: []const u8,
+    author: string,
+    name: string,
+    tags: []string,
+    git: string,
+    root_file: ?string,
+    description: string,
 };
 
 pub fn execute(args: [][]u8) !void {
@@ -53,7 +54,7 @@ pub fn execute(args: [][]u8) !void {
     u.fail("unknown command \"{s}\" for \"zigmod zpm\"", .{args[0]});
 }
 
-pub fn server_fetch(url: []const u8) !json.Value {
+pub fn server_fetch(url: string) !json.Value {
     const req = try zfetch.Request.init(gpa, url, null);
     defer req.deinit();
     try req.do(.GET, null, null);

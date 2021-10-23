@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const builtin = @import("builtin");
 const deps = @import("./deps.zig");
 
@@ -19,7 +20,7 @@ pub fn build(b: *std.build.Builder) void {
 
     const exe_options = b.addOptions();
     exe.addOptions("build_options", exe_options);
-    exe_options.addOption([]const u8, "version", b.option([]const u8, "tag", "") orelse "dev");
+    exe_options.addOption(string, "version", b.option(string, "tag", "") orelse "dev");
     exe_options.addOption(bool, "bootstrap", bootstrap != null);
 
     if (bootstrap != null) {

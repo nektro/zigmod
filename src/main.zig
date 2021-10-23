@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const builtin = @import("builtin");
 
 pub const build_options = @import("build_options");
@@ -55,7 +56,7 @@ pub fn main() !void {
         }
     }
 
-    var sub_cmd_args = std.ArrayList([]const u8).init(gpa);
+    var sub_cmd_args = std.ArrayList(string).init(gpa);
     try sub_cmd_args.append(try std.fmt.allocPrint(gpa, "zigmod-{s}", .{args[0]}));
     for (args[1..]) |item| {
         try sub_cmd_args.append(item);

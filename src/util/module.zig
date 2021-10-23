@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const gpa = std.heap.c_allocator;
 const builtin = @import("builtin");
 
@@ -11,20 +12,20 @@ const common = @import("./../common.zig");
 
 pub const Module = struct {
     is_sys_lib: bool,
-    id: []const u8,
-    name: []const u8,
-    main: []const u8,
-    c_include_dirs: []const []const u8 = &.{},
-    c_source_flags: []const []const u8 = &.{},
-    c_source_files: []const []const u8 = &.{},
-    only_os: []const []const u8 = &.{},
-    except_os: []const []const u8 = &.{},
+    id: string,
+    name: string,
+    main: string,
+    c_include_dirs: []const string = &.{},
+    c_source_flags: []const string = &.{},
+    c_source_files: []const string = &.{},
+    only_os: []const string = &.{},
+    except_os: []const string = &.{},
     yaml: ?yaml.Mapping,
     deps: []Module,
-    clean_path: []const u8,
+    clean_path: string,
     dep: ?u.Dep,
 
-    pub fn from(dep: u.Dep, dir: []const u8, options: *common.CollectOptions) !Module {
+    pub fn from(dep: u.Dep, dir: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(gpa);
         defer moddeps.deinit();
         for (dep.deps) |*d| {
@@ -53,12 +54,12 @@ pub const Module = struct {
         return std.mem.eql(u8, self.id, another.id);
     }
 
-    pub fn get_hash(self: Module, cdpath: []const u8) ![]const u8 {
-        var file_list_1 = std.ArrayList([]const u8).init(gpa);
+    pub fn get_hash(self: Module, cdpath: string) !string {
+        var file_list_1 = std.ArrayList(string).init(gpa);
         defer file_list_1.deinit();
         try u.file_list(try u.concat(&.{ cdpath, "/", self.clean_path }), &file_list_1);
 
-        var file_list_2 = std.ArrayList([]const u8).init(gpa);
+        var file_list_2 = std.ArrayList(string).init(gpa);
         defer file_list_2.deinit();
         for (file_list_1.items) |item| {
             const _a = u.trim_prefix(item, cdpath);
@@ -67,8 +68,8 @@ pub const Module = struct {
             try file_list_2.append(_b);
         }
 
-        std.sort.sort([]const u8, file_list_2.items, void{}, struct {
-            pub fn lt(context: void, lhs: []const u8, rhs: []const u8) bool {
+        std.sort.sort(string, file_list_2.items, void{}, struct {
+            pub fn lt(context: void, lhs: string, rhs: string) bool {
                 _ = context;
                 return std.mem.lessThan(u8, lhs, rhs);
             }
@@ -117,7 +118,7 @@ pub const Module = struct {
         return false;
     }
 
-    pub fn short_id(self: Module) []const u8 {
+    pub fn short_id(self: Module) string {
         return u.slice(u8, self.id, 0, 12);
     }
 };

@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const gpa = std.heap.c_allocator;
 
 const u = @import("./../../util/index.zig");
@@ -13,7 +14,7 @@ pub fn execute(args: [][]u8) !void {
     std.log.info("Successfully added package {s}", .{pkg_id});
 }
 
-pub fn do(dir: std.fs.Dir, pkg_id: []const u8) ![]const u8 {
+pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
     const url = try std.mem.join(gpa, "/", &.{ aq.server_root, pkg_id });
     const val = try aq.server_fetch(url);
 

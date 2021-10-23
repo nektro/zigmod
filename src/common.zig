@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const builtin = @import("builtin");
 const gpa = std.heap.c_allocator;
 
@@ -6,7 +7,6 @@ const ansi = @import("ansi");
 
 const u = @import("./util/index.zig");
 const yaml = @import("./util/yaml.zig");
-const string = []const u8;
 
 const root = @import("root");
 const build_options = if (@hasDecl(root, "build_options")) root.build_options else struct {};
@@ -18,7 +18,7 @@ const bootstrap = if (@hasDecl(build_options, "bootstrap")) build_options.bootst
 pub const CollectOptions = struct {
     log: bool,
     update: bool,
-    lock: ?[]const [4][]const u8 = null,
+    lock: ?[]const [4]string = null,
     alloc: *std.mem.Allocator = gpa,
     already_fetched: *std.ArrayList(string) = undefined,
 
@@ -28,7 +28,7 @@ pub const CollectOptions = struct {
     }
 };
 
-pub fn collect_deps_deep(cachepath: []const u8, mdir: std.fs.Dir, options: *CollectOptions) !u.Module {
+pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) !u.Module {
     const m = try u.ModFile.from_dir(gpa, mdir);
     try options.init();
     var moduledeps = std.ArrayList(u.Module).init(gpa);
@@ -55,7 +55,7 @@ pub fn collect_deps_deep(cachepath: []const u8, mdir: std.fs.Dir, options: *Coll
     };
 }
 
-pub fn collect_deps(cachepath: []const u8, mdir: std.fs.Dir, options: *CollectOptions) anyerror!u.Module {
+pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) anyerror!u.Module {
     const m = try u.ModFile.from_dir(gpa, mdir);
     var moduledeps = std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
@@ -93,7 +93,7 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
     }
 }
 
-pub fn get_modpath(cachepath: []const u8, d: u.Dep, options: *CollectOptions) ![]const u8 {
+pub fn get_modpath(cachepath: string, d: u.Dep, options: *CollectOptions) !string {
     const p = try std.fs.path.join(gpa, &.{ cachepath, try d.clean_path() });
     const pv = try std.fs.path.join(gpa, &.{ cachepath, try d.clean_path_v() });
 
@@ -197,7 +197,7 @@ pub fn get_modpath(cachepath: []const u8, d: u.Dep, options: *CollectOptions) ![
     }
 }
 
-pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, options: *CollectOptions) anyerror!?u.Module {
+pub fn get_module_from_dep(d: *u.Dep, cachepath: string, options: *CollectOptions) anyerror!?u.Module {
     if (options.lock) |lock| {
         for (lock) |item| {
             if (std.mem.eql(u8, item[0], try d.clean_path())) {
@@ -275,11 +275,11 @@ pub fn get_module_from_dep(d: *u.Dep, cachepath: []const u8, options: *CollectOp
     }
 }
 
-pub fn add_files_package(pkg_name: []const u8, mdir: std.fs.Dir, dirs: []const []const u8) !u.Module {
+pub fn add_files_package(pkg_name: string, mdir: std.fs.Dir, dirs: []const string) !u.Module {
     const destination = ".zigmod/deps/files";
     const fname = try std.mem.join(gpa, "", &.{ pkg_name, ".zig" });
 
-    const map = &std.StringHashMap([]const u8).init(gpa);
+    const map = &std.StringHashMap(string).init(gpa);
     defer map.deinit();
 
     for (dirs) |dir_path| {
@@ -310,7 +310,7 @@ pub fn add_files_package(pkg_name: []const u8, mdir: std.fs.Dir, dirs: []const [
     );
     try w.print("const srcpath = \"../../../{}\";\n\n", .{std.zig.fmtEscapes(fpath[1..])});
     try w.writeAll(
-        \\const files = std.ComptimeStringMap([]const u8, .{
+        \\const files = std.ComptimeStringMap(string, .{
         \\
     );
     var iter = map.iterator();
@@ -321,7 +321,7 @@ pub fn add_files_package(pkg_name: []const u8, mdir: std.fs.Dir, dirs: []const [
     try w.writeAll(
         \\});
         \\
-        \\pub fn open(comptime path: []const u8) ?[]const u8 {
+        \\pub fn open(comptime path: string) ?string {
         \\    if (path.len == 0) return null;
         \\    if (path[0] != '/') return null;
         \\    return files.get(path);
@@ -346,8 +346,8 @@ pub fn add_files_package(pkg_name: []const u8, mdir: std.fs.Dir, dirs: []const [
     return (try get_module_from_dep(&d, destination, &options)).?;
 }
 
-pub fn parse_lockfile(dir: std.fs.Dir) ![]const [4][]const u8 {
-    var list = std.ArrayList([4][]const u8).init(gpa);
+pub fn parse_lockfile(dir: std.fs.Dir) ![]const [4]string {
+    var list = std.ArrayList([4]string).init(gpa);
     const max = std.math.maxInt(usize);
     const f = try dir.openFile("zigmod.lock", .{});
     const r = f.reader();
@@ -361,7 +361,7 @@ pub fn parse_lockfile(dir: std.fs.Dir) ![]const [4][]const u8 {
         switch (v) {
             1 => {
                 var iter = std.mem.split(u8, line, " ");
-                try list.append([4][]const u8{
+                try list.append([4]string{
                     iter.next().?,
                     iter.next().?,
                     iter.next().?,
@@ -380,7 +380,7 @@ pub fn parse_lockfile(dir: std.fs.Dir) ![]const [4][]const u8 {
                     .yaml = null,
                     .deps = &.{},
                 };
-                try list.append([4][]const u8{
+                try list.append([4]string{
                     try asdep.clean_path(),
                     @tagName(asdep.type),
                     asdep.path,

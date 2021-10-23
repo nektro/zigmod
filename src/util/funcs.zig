@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const gpa = std.heap.c_allocator;
 
 const u = @import("index.zig");
@@ -11,21 +12,21 @@ pub const kb = b * 1024;
 pub const mb = kb * 1024;
 pub const gb = mb * 1024;
 
-pub fn print(comptime fmt: []const u8, args: anytype) void {
+pub fn print(comptime fmt: string, args: anytype) void {
     std.debug.print(fmt ++ "\n", args);
 }
 
 const ansi_red = "\x1B[31m";
 const ansi_reset = "\x1B[39m";
 
-pub fn assert(ok: bool, comptime fmt: []const u8, args: anytype) void {
+pub fn assert(ok: bool, comptime fmt: string, args: anytype) void {
     if (!ok) {
         print(ansi_red ++ fmt ++ ansi_reset, args);
         std.os.exit(1);
     }
 }
 
-pub fn fail(comptime fmt: []const u8, args: anytype) noreturn {
+pub fn fail(comptime fmt: string, args: anytype) noreturn {
     assert(false, fmt, args);
     unreachable;
 }
@@ -37,8 +38,8 @@ pub fn try_index(comptime T: type, array: []T, n: usize, def: T) T {
     return array[n];
 }
 
-pub fn split(in: []const u8, delim: []const u8) ![][]const u8 {
-    var list = std.ArrayList([]const u8).init(gpa);
+pub fn split(in: string, delim: string) ![]string {
+    var list = std.ArrayList(string).init(gpa);
     defer list.deinit();
     var iter = std.mem.split(u8, in, delim);
     while (iter.next()) |str| {
@@ -47,14 +48,14 @@ pub fn split(in: []const u8, delim: []const u8) ![][]const u8 {
     return list.toOwnedSlice();
 }
 
-pub fn trim_prefix(in: []const u8, prefix: []const u8) []const u8 {
+pub fn trim_prefix(in: string, prefix: string) string {
     if (std.mem.startsWith(u8, in, prefix)) {
         return in[prefix.len..];
     }
     return in;
 }
 
-pub fn does_file_exist(fpath: []const u8, dir: ?std.fs.Dir) !bool {
+pub fn does_file_exist(fpath: string, dir: ?std.fs.Dir) !bool {
     const file = (dir orelse std.fs.cwd()).openFile(fpath, .{}) catch |e| switch (e) {
         error.FileNotFound => return false,
         error.IsDir => return true,
@@ -64,7 +65,7 @@ pub fn does_file_exist(fpath: []const u8, dir: ?std.fs.Dir) !bool {
     return true;
 }
 
-pub fn does_folder_exist(fpath: []const u8) !bool {
+pub fn does_folder_exist(fpath: string) !bool {
     const file = std.fs.cwd().openFile(fpath, .{}) catch |e| switch (e) {
         error.FileNotFound => return false,
         error.IsDir => return true,
@@ -78,8 +79,8 @@ pub fn does_folder_exist(fpath: []const u8) !bool {
     return true;
 }
 
-pub fn _join(comptime delim: []const u8, comptime xs: [][]const u8) []const u8 {
-    var buf: []const u8 = "";
+pub fn _join(comptime delim: string, comptime xs: []string) string {
+    var buf: string = "";
     for (xs) |x, i| {
         buf = buf ++ x;
         if (i < xs.len - 1) buf = buf ++ delim;
@@ -87,15 +88,15 @@ pub fn _join(comptime delim: []const u8, comptime xs: [][]const u8) []const u8 {
     return buf;
 }
 
-pub fn trim_suffix(in: []const u8, suffix: []const u8) []const u8 {
+pub fn trim_suffix(in: string, suffix: string) string {
     if (std.mem.endsWith(u8, in, suffix)) {
         return in[0 .. in.len - suffix.len];
     }
     return in;
 }
 
-pub fn repeat(s: []const u8, times: i32) ![]const u8 {
-    var list = std.ArrayList([]const u8).init(gpa);
+pub fn repeat(s: string, times: i32) !string {
+    var list = std.ArrayList(string).init(gpa);
     var i: i32 = 0;
     while (i < times) : (i += 1) {
         try list.append(s);
@@ -103,15 +104,15 @@ pub fn repeat(s: []const u8, times: i32) ![]const u8 {
     return join(list.items, "");
 }
 
-pub fn join(xs: [][]const u8, delim: []const u8) ![]const u8 {
-    var res: []const u8 = "";
+pub fn join(xs: []string, delim: string) !string {
+    var res: string = "";
     for (xs) |x, i| {
         res = try std.fmt.allocPrint(gpa, "{s}{s}{s}", .{ res, x, if (i < xs.len - 1) delim else "" });
     }
     return res;
 }
 
-pub fn concat(items: [][]const u8) ![]const u8 {
+pub fn concat(items: []string) !string {
     return std.mem.join(gpa, "", items);
 }
 
@@ -128,7 +129,7 @@ pub fn print_all(w: std.fs.File.Writer, items: anytype, ln: bool) !void {
     }
 }
 
-pub fn list_contains(haystack: []const []const u8, needle: []const u8) bool {
+pub fn list_contains(haystack: []const string, needle: string) bool {
     for (haystack) |item| {
         if (std.mem.eql(u8, item, needle)) {
             return true;
@@ -146,7 +147,7 @@ pub fn list_contains_gen(comptime T: type, haystack: []const T, needle: T) bool 
     return false;
 }
 
-pub fn file_list(dpath: []const u8, list: *std.ArrayList([]const u8)) !void {
+pub fn file_list(dpath: string, list: *std.ArrayList(string)) !void {
     const dir = try std.fs.cwd().openDir(dpath, .{ .iterate = true });
     var walk = try dir.walk(gpa);
     defer walk.deinit();
@@ -162,7 +163,7 @@ pub fn file_list(dpath: []const u8, list: *std.ArrayList([]const u8)) !void {
     }
 }
 
-pub fn run_cmd_raw(dir: ?[]const u8, args: []const []const u8) !std.ChildProcess.ExecResult {
+pub fn run_cmd_raw(dir: ?string, args: []const string) !std.ChildProcess.ExecResult {
     return std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
         error.FileNotFound => {
             u.fail("\"{s}\" command not found", .{args[0]});
@@ -171,15 +172,15 @@ pub fn run_cmd_raw(dir: ?[]const u8, args: []const []const u8) !std.ChildProcess
     };
 }
 
-pub fn run_cmd(dir: ?[]const u8, args: []const []const u8) !u32 {
+pub fn run_cmd(dir: ?string, args: []const string) !u32 {
     const result = try run_cmd_raw(dir, args);
     gpa.free(result.stdout);
     gpa.free(result.stderr);
     return result.term.Exited;
 }
 
-pub fn list_remove(input: [][]const u8, search: []const u8) ![][]const u8 {
-    var list = std.ArrayList([]const u8).init(gpa);
+pub fn list_remove(input: []string, search: string) ![]string {
+    var list = std.ArrayList(string).init(gpa);
     defer list.deinit();
     for (input) |item| {
         if (!std.mem.eql(u8, item, search)) {
@@ -189,7 +190,7 @@ pub fn list_remove(input: [][]const u8, search: []const u8) ![][]const u8 {
     return list.toOwnedSlice();
 }
 
-pub fn last(in: [][]const u8) ![]const u8 {
+pub fn last(in: []string) !string {
     if (in.len == 0) {
         return error.EmptyArray;
     }
@@ -198,7 +199,7 @@ pub fn last(in: [][]const u8) ![]const u8 {
 
 const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-pub fn random_string(len: usize) ![]const u8 {
+pub fn random_string(len: usize) !string {
     const now = @intCast(u64, std.time.nanoTimestamp());
     var rand = std.rand.DefaultPrng.init(now);
     const r = &rand.random;
@@ -210,14 +211,14 @@ pub fn random_string(len: usize) ![]const u8 {
     return buf;
 }
 
-pub fn parse_split(comptime T: type, delim: []const u8) type {
+pub fn parse_split(comptime T: type, delim: string) type {
     return struct {
         const Self = @This();
 
         id: T,
-        string: []const u8,
+        string: string,
 
-        pub fn do(input: []const u8) !Self {
+        pub fn do(input: string) !Self {
             var iter = std.mem.split(u8, input, delim);
             return Self{
                 .id = std.meta.stringToEnum(T, iter.next() orelse return error.IterEmpty) orelse return error.NoMemberFound,
@@ -233,7 +234,7 @@ pub const HashFn = enum {
     sha512,
 };
 
-pub fn validate_hash(input: []const u8, file_path: []const u8) !bool {
+pub fn validate_hash(input: string, file_path: string) !bool {
     const hash = parse_split(HashFn, "-").do(input) catch return false;
     const file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
@@ -251,7 +252,7 @@ pub fn validate_hash(input: []const u8, file_path: []const u8) !bool {
     return result;
 }
 
-pub fn do_hash(comptime algo: type, data: []const u8) ![]const u8 {
+pub fn do_hash(comptime algo: type, data: string) !string {
     const h = &algo.init(.{});
     var out: [algo.digest_length]u8 = undefined;
     h.update(data);
@@ -261,7 +262,7 @@ pub fn do_hash(comptime algo: type, data: []const u8) ![]const u8 {
 }
 
 /// Returns the result of running `git rev-parse HEAD`
-pub fn git_rev_HEAD(alloc: *std.mem.Allocator, dir: std.fs.Dir) ![]const u8 {
+pub fn git_rev_HEAD(alloc: *std.mem.Allocator, dir: std.fs.Dir) !string {
     const max = std.math.maxInt(usize);
     const dirg = try dir.openDir(".git", .{});
     const h = std.mem.trim(u8, try dirg.readFileAlloc(alloc, "HEAD", max), "\n");
@@ -275,7 +276,7 @@ pub fn slice(comptime T: type, input: []const T, from: usize, to: usize) []const
     return input[f..t];
 }
 
-pub fn detect_pkgname(override: []const u8, dir: []const u8) ![]const u8 {
+pub fn detect_pkgname(override: string, dir: string) !string {
     if (override.len > 0) {
         return override;
     }
@@ -291,7 +292,7 @@ pub fn detect_pkgname(override: []const u8, dir: []const u8) ![]const u8 {
     return name;
 }
 
-pub fn detct_mainfile(override: []const u8, dir: ?std.fs.Dir, name: []const u8) ![]const u8 {
+pub fn detct_mainfile(override: string, dir: ?std.fs.Dir, name: string) !string {
     if (override.len > 0) {
         if (try does_file_exist(override, dir)) {
             if (std.mem.endsWith(u8, override, ".zig")) {
@@ -312,7 +313,7 @@ pub fn detct_mainfile(override: []const u8, dir: ?std.fs.Dir, name: []const u8) 
     return error.CantFindMain;
 }
 
-pub fn indexOfN(haystack: []const u8, needle: u8, n: usize) ?usize {
+pub fn indexOfN(haystack: string, needle: u8, n: usize) ?usize {
     var i: usize = 0;
     var c: usize = 0;
     while (c < n) {
@@ -322,7 +323,7 @@ pub fn indexOfN(haystack: []const u8, needle: u8, n: usize) ?usize {
     return i;
 }
 
-pub fn indexOfAfter(haystack: []const u8, needle: u8, after: usize) ?usize {
+pub fn indexOfAfter(haystack: string, needle: u8, after: usize) ?usize {
     for (haystack) |c, i| {
         if (i <= after) continue;
         if (c == needle) return i;

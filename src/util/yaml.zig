@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const yaml = @import("yaml");
 
 const c = @cImport({
@@ -9,7 +10,7 @@ const u = @import("./index.zig");
 //
 //
 
-const Array = []const []const u8;
+const Array = []const string;
 
 pub const Stream = struct {
     docs: []const Document,
@@ -25,10 +26,10 @@ pub const Item = union(enum) {
     mapping: Mapping,
     sequence: Sequence,
     document: Document,
-    string: []const u8,
+    string: string,
     stream: Stream,
 
-    pub fn format(self: Item, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
+    pub fn format(self: Item, comptime fmt: string, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
         _ = fmt;
         _ = options;
 
@@ -62,16 +63,16 @@ pub const Item = union(enum) {
 pub const Sequence = []const Item;
 
 pub const Key = struct {
-    key: []const u8,
+    key: string,
     value: Value,
 };
 
 pub const Value = union(enum) {
-    string: []const u8,
+    string: string,
     mapping: Mapping,
     sequence: Sequence,
 
-    pub fn format(self: Value, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
+    pub fn format(self: Value, comptime fmt: string, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
         _ = fmt;
         _ = options;
 
@@ -98,7 +99,7 @@ pub const Value = union(enum) {
 pub const Mapping = struct {
     items: []const Key,
 
-    pub fn get(self: Mapping, k: []const u8) ?Value {
+    pub fn get(self: Mapping, k: string) ?Value {
         for (self.items) |item| {
             if (std.mem.eql(u8, item.key, k)) {
                 return item.value;
@@ -107,12 +108,12 @@ pub const Mapping = struct {
         return null;
     }
 
-    pub fn get_string(self: Mapping, k: []const u8) []const u8 {
+    pub fn get_string(self: Mapping, k: string) string {
         return if (self.get(k)) |v| v.string else "";
     }
 
-    pub fn get_string_array(self: Mapping, alloc: *std.mem.Allocator, k: []const u8) ![][]const u8 {
-        var list = std.ArrayList([]const u8).init(alloc);
+    pub fn get_string_array(self: Mapping, alloc: *std.mem.Allocator, k: string) ![]string {
+        var list = std.ArrayList(string).init(alloc);
         defer list.deinit();
         if (self.get(k)) |val| {
             if (val == .sequence) {
@@ -127,7 +128,7 @@ pub const Mapping = struct {
         return list.toOwnedSlice();
     }
 
-    pub fn format(self: Mapping, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
+    pub fn format(self: Mapping, comptime fmt: string, options: std.fmt.FormatOptions, writer: anytype) @TypeOf(writer).Error!void {
         _ = fmt;
         _ = options;
 
@@ -146,7 +147,7 @@ pub const TokenList = []const Token;
 //
 //
 
-pub fn parse(alloc: *std.mem.Allocator, input: []const u8) !Document {
+pub fn parse(alloc: *std.mem.Allocator, input: string) !Document {
     var parser: c.yaml_parser_t = undefined;
     _ = c.yaml_parser_initialize(&parser);
 
@@ -291,7 +292,7 @@ fn parse_sequence(p: *Parser) Error!Sequence {
     }
 }
 
-fn get_event_string(event: Token, lines: Array) []const u8 {
+fn get_event_string(event: Token, lines: Array) string {
     const sm = event.start_mark;
     const em = event.end_mark;
     return lines[sm.line][sm.column..em.column];

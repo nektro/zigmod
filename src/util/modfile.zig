@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 
 const u = @import("index.zig");
 const yaml = @import("./yaml.zig");
@@ -14,19 +15,19 @@ pub const ModFile = struct {
     const Self = @This();
 
     alloc: *std.mem.Allocator,
-    id: []const u8,
-    name: []const u8,
-    main: []const u8,
-    c_include_dirs: []const []const u8,
-    c_source_flags: []const []const u8,
-    c_source_files: []const []const u8,
+    id: string,
+    name: string,
+    main: string,
+    c_include_dirs: []const string,
+    c_source_flags: []const string,
+    c_source_files: []const string,
     deps: []u.Dep,
     yaml: yaml.Mapping,
     devdeps: []u.Dep,
-    root_files: []const []const u8,
-    files: []const []const u8,
+    root_files: []const string,
+    files: []const string,
 
-    pub fn init(alloc: *std.mem.Allocator, mpath: []const u8) !Self {
+    pub fn init(alloc: *std.mem.Allocator, mpath: string) !Self {
         const file = try std.fs.cwd().openFile(mpath, .{});
         defer file.close();
         const input = try file.reader().readAllAlloc(alloc, mb);
@@ -67,14 +68,14 @@ pub const ModFile = struct {
         };
     }
 
-    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: []const u8) anyerror![]u.Dep {
+    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: string) anyerror![]u.Dep {
         var dep_list = std.ArrayList(u.Dep).init(alloc);
         if (mapping.get(prop)) |dep_seq| {
             if (dep_seq == .sequence) {
                 for (dep_seq.sequence) |item| {
-                    var dtype: []const u8 = undefined;
-                    var path: []const u8 = undefined;
-                    var version: ?[]const u8 = null;
+                    var dtype: string = undefined;
+                    var path: string = undefined;
+                    var version: ?string = null;
                     var name = item.mapping.get_string("name");
                     var main = item.mapping.get_string("main");
 

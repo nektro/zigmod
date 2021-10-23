@@ -1,4 +1,5 @@
 const std = @import("std");
+const string = []const u8;
 const gpa = std.heap.c_allocator;
 
 const zfetch = @import("zfetch");
@@ -42,7 +43,7 @@ pub fn execute(args: [][]u8) !void {
     u.fail("unknown command \"{s}\" for \"zigmod aq\"", .{args[0]});
 }
 
-pub fn server_fetch(url: []const u8) !json.Value {
+pub fn server_fetch(url: string) !json.Value {
     const req = try zfetch.Request.init(gpa, url, null);
     defer req.deinit();
 
