@@ -101,15 +101,7 @@ pub fn repeat(s: string, times: i32) !string {
     while (i < times) : (i += 1) {
         try list.append(s);
     }
-    return join(list.items, "");
-}
-
-pub fn join(xs: []string, delim: string) !string {
-    var res: string = "";
-    for (xs) |x, i| {
-        res = try std.fmt.allocPrint(gpa, "{s}{s}{s}", .{ res, x, if (i < xs.len - 1) delim else "" });
-    }
-    return res;
+    return try concat(list.items);
 }
 
 pub fn concat(items: []string) !string {
