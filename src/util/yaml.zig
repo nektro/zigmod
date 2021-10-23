@@ -10,8 +10,6 @@ const u = @import("./index.zig");
 //
 //
 
-const Array = []const string;
-
 pub const Stream = struct {
     docs: []const Document,
 };
@@ -187,7 +185,7 @@ pub fn parse(alloc: *std.mem.Allocator, input: string) !Document {
 pub const Parser = struct {
     alloc: *std.mem.Allocator,
     tokens: TokenList,
-    lines: Array,
+    lines: []const string,
     index: usize,
 
     pub fn parse(self: *Parser) !Stream {
@@ -292,7 +290,7 @@ fn parse_sequence(p: *Parser) Error!Sequence {
     }
 }
 
-fn get_event_string(event: Token, lines: Array) string {
+fn get_event_string(event: Token, lines: []const string) string {
     const sm = event.start_mark;
     const em = event.end_mark;
     return lines[sm.line][sm.column..em.column];
