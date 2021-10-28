@@ -243,8 +243,8 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                         return null;
                     }
                     const moddirO = try std.fs.cwd().openDir(modpath, .{});
-                    const tryname = try u.detect_pkgname("", modpath);
-                    const trymain = u.detct_mainfile("", moddirO, tryname) catch |err| switch (err) {
+                    const tryname = try u.detect_pkgname(gpa, "", modpath);
+                    const trymain = u.detct_mainfile(gpa, "", moddirO, tryname) catch |err| switch (err) {
                         error.CantFindMain => null,
                         else => return err,
                     };

@@ -30,14 +30,14 @@ pub fn execute(args: [][]u8) !void {
 
     const ptype = try inquirer.forEnum(stdout, stdin, "Are you making an application or a library?", gpa, enum { exe, lib }, null);
 
-    const name = try inquirer.forString(stdout, stdin, "package name:", gpa, u.detect_pkgname(u.try_index(string, args, 0, ""), "") catch |err| switch (err) {
+    const name = try inquirer.forString(stdout, stdin, "package name:", gpa, u.detect_pkgname(gpa, u.try_index(string, args, 0, ""), "") catch |err| switch (err) {
         error.NoBuildZig => {
             u.fail("init requires a build.zig file", .{});
         },
         else => return err,
     });
 
-    const entry = if (ptype == .lib) try inquirer.forString(stdout, stdin, "package entry point:", gpa, u.detct_mainfile(u.try_index(string, args, 1, ""), null, name) catch |err| switch (err) {
+    const entry = if (ptype == .lib) try inquirer.forString(stdout, stdin, "package entry point:", gpa, u.detct_mainfile(gpa, u.try_index(string, args, 1, ""), null, name) catch |err| switch (err) {
         error.CantFindMain => null,
         else => return err,
     }) else null;
