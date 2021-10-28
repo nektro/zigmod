@@ -214,9 +214,9 @@ pub fn validate_hash(alloc: *std.mem.Allocator, input: string, file_path: string
     const data = try file.reader().readAllAlloc(alloc, gb);
     const expected = hash.string;
     const actual = switch (hash.id) {
-        .blake3 => try do_hash(std.crypto.hash.Blake3, data),
-        .sha256 => try do_hash(std.crypto.hash.sha2.Sha256, data),
-        .sha512 => try do_hash(std.crypto.hash.sha2.Sha512, data),
+        .blake3 => try do_hash(alloc, std.crypto.hash.Blake3, data),
+        .sha256 => try do_hash(alloc, std.crypto.hash.sha2.Sha256, data),
+        .sha512 => try do_hash(alloc, std.crypto.hash.sha2.Sha512, data),
     };
     const result = std.mem.startsWith(u8, actual, expected);
     if (!result) {
@@ -225,12 +225,12 @@ pub fn validate_hash(alloc: *std.mem.Allocator, input: string, file_path: string
     return result;
 }
 
-pub fn do_hash(comptime algo: type, data: string) !string {
+pub fn do_hash(alloc: *std.mem.Allocator, comptime algo: type, data: string) !string {
     const h = &algo.init(.{});
     var out: [algo.digest_length]u8 = undefined;
     h.update(data);
     h.final(&out);
-    const hex = try std.fmt.allocPrint(gpa, "{x}", .{std.fmt.fmtSliceHexLower(out[0..])});
+    const hex = try std.fmt.allocPrint(alloc, "{x}", .{std.fmt.fmtSliceHexLower(out[0..])});
     return hex;
 }
 
