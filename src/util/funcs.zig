@@ -96,16 +96,6 @@ pub fn trim_suffix(in: string, suffix: string) string {
     return in;
 }
 
-pub fn repeat(s: string, times: i32) !string {
-    var list = std.ArrayList(u8).init(gpa);
-    defer list.deinit();
-    var i: i32 = 0;
-    while (i < times) : (i += 1) {
-        try list.appendSlice(s);
-    }
-    return list.toOwnedSlice();
-}
-
 pub fn list_contains(haystack: []const string, needle: string) bool {
     for (haystack) |item| {
         if (std.mem.eql(u8, item, needle)) {
