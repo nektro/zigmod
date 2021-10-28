@@ -55,7 +55,7 @@ pub fn trim_prefix(in: string, prefix: string) string {
     return in;
 }
 
-pub fn does_file_exist(fpath: string, dir: ?std.fs.Dir) !bool {
+pub fn does_file_exist(dir: ?std.fs.Dir, fpath: string) !bool {
     const file = (dir orelse std.fs.cwd()).openFile(fpath, .{}) catch |e| switch (e) {
         error.FileNotFound => return false,
         error.IsDir => return true,
@@ -263,7 +263,7 @@ pub fn detect_pkgname(override: string, dir: string) !string {
         return override;
     }
     const dirO = if (dir.len == 0) std.fs.cwd() else try std.fs.cwd().openDir(dir, .{});
-    if (!(try does_file_exist("build.zig", dirO))) {
+    if (!(try does_file_exist(dirO, "build.zig"))) {
         return error.NoBuildZig;
     }
     const dpath = try std.fs.realpathAlloc(gpa, try std.mem.concat(gpa, u8, &.{ dir, "build.zig" }));
@@ -276,20 +276,20 @@ pub fn detect_pkgname(override: string, dir: string) !string {
 
 pub fn detct_mainfile(override: string, dir: ?std.fs.Dir, name: string) !string {
     if (override.len > 0) {
-        if (try does_file_exist(override, dir)) {
+        if (try does_file_exist(dir, override)) {
             if (std.mem.endsWith(u8, override, ".zig")) {
                 return override;
             }
         }
     }
     const namedotzig = try std.mem.concat(gpa, u8, &.{ name, ".zig" });
-    if (try does_file_exist(namedotzig, dir)) {
+    if (try does_file_exist(dir, namedotzig)) {
         return namedotzig;
     }
-    if (try does_file_exist(try std.fs.path.join(gpa, &.{ "src", "lib.zig" }), dir)) {
+    if (try does_file_exist(dir, try std.fs.path.join(gpa, &.{ "src", "lib.zig" }))) {
         return "src/lib.zig";
     }
-    if (try does_file_exist(try std.fs.path.join(gpa, &.{ "src", "main.zig" }), dir)) {
+    if (try does_file_exist(dir, try std.fs.path.join(gpa, &.{ "src", "main.zig" }))) {
         return "src/main.zig";
     }
     return error.CantFindMain;

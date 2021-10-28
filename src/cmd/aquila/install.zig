@@ -13,7 +13,7 @@ pub fn execute(args: [][]u8) !void {
     const homepath = home.?;
     const homedir = try std.fs.cwd().openDir(homepath, .{});
 
-    if (!(try u.does_file_exist("zig.mod", homedir))) {
+    if (!(try u.does_file_exist(homedir, "zig.mod"))) {
         const f = try homedir.createFile("zig.mod", .{});
         defer f.close();
         const w = f.writer();
