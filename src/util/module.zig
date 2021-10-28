@@ -3,6 +3,7 @@ const string = []const u8;
 const gpa = std.heap.c_allocator;
 const builtin = @import("builtin");
 
+const zigmod = @import("../lib.zig");
 const u = @import("index.zig");
 const yaml = @import("./yaml.zig");
 const common = @import("./../common.zig");
@@ -23,9 +24,9 @@ pub const Module = struct {
     yaml: ?yaml.Mapping,
     deps: []Module,
     clean_path: string,
-    dep: ?u.Dep,
+    dep: ?zigmod.Dep,
 
-    pub fn from(dep: u.Dep, dir: string, options: *common.CollectOptions) !Module {
+    pub fn from(dep: zigmod.Dep, dir: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(gpa);
         defer moddeps.deinit();
         for (dep.deps) |*d| {

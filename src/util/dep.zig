@@ -26,7 +26,7 @@ pub const Dep = struct {
     only_os: []const string = &.{},
     except_os: []const string = &.{},
     yaml: ?yaml.Mapping,
-    deps: []u.Dep,
+    deps: []zigmod.Dep,
 
     pub fn clean_path(self: Dep) !string {
         if (self.type == .local) {

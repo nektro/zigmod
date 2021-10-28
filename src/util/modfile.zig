@@ -21,9 +21,9 @@ pub const ModFile = struct {
     c_include_dirs: []const string,
     c_source_flags: []const string,
     c_source_files: []const string,
-    deps: []u.Dep,
+    deps: []zigmod.Dep,
     yaml: yaml.Mapping,
-    devdeps: []u.Dep,
+    devdeps: []zigmod.Dep,
     root_files: []const string,
     files: []const string,
 
@@ -67,8 +67,8 @@ pub const ModFile = struct {
         };
     }
 
-    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: string) anyerror![]u.Dep {
-        var dep_list = std.ArrayList(u.Dep).init(alloc);
+    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: string) anyerror![]zigmod.Dep {
+        var dep_list = std.ArrayList(zigmod.Dep).init(alloc);
         if (mapping.get(prop)) |dep_seq| {
             if (dep_seq == .sequence) {
                 for (dep_seq.sequence) |item| {
@@ -107,7 +107,7 @@ pub const ModFile = struct {
                         }
                     }
 
-                    try dep_list.append(u.Dep{
+                    try dep_list.append(zigmod.Dep{
                         .type = dep_type,
                         .path = path,
                         .id = item.mapping.get_string("id"),

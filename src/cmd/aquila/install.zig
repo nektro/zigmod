@@ -4,6 +4,7 @@ const gpa = std.heap.c_allocator;
 
 const knownfolders = @import("known-folders");
 
+const zigmod = @import("../../lib.zig");
 const u = @import("./../../util/index.zig");
 const common = @import("./../../common.zig");
 
@@ -29,7 +30,7 @@ pub fn execute(args: [][]u8) !void {
 
     // get modfile and dep
     const m = try u.ModFile.from_dir(gpa, homedir);
-    var dep: u.Dep = undefined;
+    var dep: zigmod.Dep = undefined;
     for (m.devdeps) |d| {
         if (std.mem.eql(u8, d.path, pkgurl)) {
             dep = d;

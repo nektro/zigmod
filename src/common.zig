@@ -94,7 +94,7 @@ pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void
     }
 }
 
-pub fn get_modpath(cachepath: string, d: u.Dep, options: *CollectOptions) !string {
+pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !string {
     const p = try std.fs.path.join(gpa, &.{ cachepath, try d.clean_path() });
     const pv = try std.fs.path.join(gpa, &.{ cachepath, try d.clean_path_v() });
 
@@ -198,7 +198,7 @@ pub fn get_modpath(cachepath: string, d: u.Dep, options: *CollectOptions) !strin
     }
 }
 
-pub fn get_module_from_dep(d: *u.Dep, cachepath: string, options: *CollectOptions) anyerror!?u.Module {
+pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectOptions) anyerror!?u.Module {
     if (options.lock) |lock| {
         for (lock) |item| {
             if (std.mem.eql(u8, item[0], try d.clean_path())) {
@@ -326,7 +326,7 @@ pub fn add_files_package(pkg_name: string, mdir: std.fs.Dir, dirs: []const strin
         \\
     );
 
-    var d: u.Dep = .{
+    var d: zigmod.Dep = .{
         .type = .local,
         .path = "files",
         .id = "",
@@ -367,7 +367,7 @@ pub fn parse_lockfile(dir: std.fs.Dir) ![]const [4]string {
             },
             2 => {
                 var iter = std.mem.split(u8, line, " ");
-                const asdep = u.Dep{
+                const asdep = zigmod.Dep{
                     .type = std.meta.stringToEnum(zigmod.DepType, iter.next().?).?,
                     .path = iter.next().?,
                     .version = iter.next().?,
