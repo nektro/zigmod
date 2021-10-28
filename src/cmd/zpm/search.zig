@@ -27,9 +27,9 @@ pub fn execute(args: [][]u8) !void {
             continue;
         }
         try arr.append(zpm.Package{
-            .name = item.get("name").?.String,
-            .author = item.get("author").?.String,
-            .description = item.get("description").?.String,
+            .name = item.getT("name", .String).?,
+            .author = item.getT("author", .String).?,
+            .description = item.getT("description", .String).?,
             .tags = &.{},
             .git = "",
             .root_file = "",

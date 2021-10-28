@@ -8,7 +8,8 @@ git https://github.com/truemedian/zfetch commit-77fdd34e90db02f1224cdc7e5231ecd0
 git https://github.com/truemedian/hzzp commit-91ab8e741992e8db30b3ee1cd9e7cd5a072ca294
 git https://github.com/MasterQ32/zig-network commit-0439bd7127ecb8f927a5cecb0beeb1569db2fb95
 git https://github.com/MasterQ32/zig-uri commit-52cdd2061bec0579519f0d30280597f3a1db8b75
-git https://github.com/nektro/zig-json commit-3ea23e8ae3798d3929b4c4b54ce739a67914f3ec
+git https://github.com/nektro/zig-json commit-7f0e661371d41cfdc8b1649ed00e7a750c82e57a
+git https://github.com/nektro/zig-extras commit-090ee5f1834af4ed7714101b24d7daec84572390
 git https://github.com/nektro/zig-range commit-890ca308fe09b3d5c866d5cfb3b3d7a95dbf939f
 git https://github.com/nektro/zig-detect-license commit-d4544410f811c402b866f21f63588d1aae1b2d90
 git https://github.com/nektro/zig-licenses-text commit-3c07c6e4eb0965dafd0b029c632f823631b3169c

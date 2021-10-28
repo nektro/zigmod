@@ -57,8 +57,8 @@ pub fn server_fetch(url: string) !json.Value {
     const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
     const val = try json.parse(gpa, body_content);
 
-    if (val.get("message")) |msg| {
-        std.log.err("server: {s}", .{msg.String});
+    if (val.getT("message", .String)) |msg| {
+        std.log.err("server: {s}", .{msg});
         return error.AquilaBadResponse;
     }
     return val;

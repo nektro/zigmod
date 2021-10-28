@@ -52,6 +52,7 @@ const dirs = struct {
     pub const _yyhw90zkzgmu = cache ++ "/git/github.com/MasterQ32/zig-network";
     pub const _u9w9dpp6p804 = cache ++ "/git/github.com/MasterQ32/zig-uri";
     pub const _ocmr9rtohgcc = cache ++ "/git/github.com/nektro/zig-json";
+    pub const _f7dubzb7cyqe = cache ++ "/git/github.com/nektro/zig-extras";
     pub const _tnj3qf44tpeq = cache ++ "/git/github.com/nektro/zig-range";
     pub const _2ovav391ivak = cache ++ "/git/github.com/nektro/zig-detect-license";
     pub const _pt88y5d80m25 = cache ++ "/git/github.com/nektro/zig-licenses-text";
@@ -101,13 +102,17 @@ pub const package_data = struct {
         .directory = dirs._ejw82j2ipa0e,
         .pkg = Pkg{ .name = "zfetch", .path = .{ .path = dirs._ejw82j2ipa0e ++ "/src/main.zig" }, .dependencies = &.{ _9k24gimke1an.pkg.?, _csbnipaad8n7.pkg.?, _yyhw90zkzgmu.pkg.?, _u9w9dpp6p804.pkg.? } },
     };
-    pub const _ocmr9rtohgcc = Package{
-        .directory = dirs._ocmr9rtohgcc,
-        .pkg = Pkg{ .name = "json", .path = .{ .path = dirs._ocmr9rtohgcc ++ "/src/lib.zig" }, .dependencies = null },
-    };
     pub const _tnj3qf44tpeq = Package{
         .directory = dirs._tnj3qf44tpeq,
         .pkg = Pkg{ .name = "range", .path = .{ .path = dirs._tnj3qf44tpeq ++ "/src/lib.zig" }, .dependencies = null },
+    };
+    pub const _f7dubzb7cyqe = Package{
+        .directory = dirs._f7dubzb7cyqe,
+        .pkg = Pkg{ .name = "extras", .path = .{ .path = dirs._f7dubzb7cyqe ++ "/src/lib.zig" }, .dependencies = &.{ _tnj3qf44tpeq.pkg.? } },
+    };
+    pub const _ocmr9rtohgcc = Package{
+        .directory = dirs._ocmr9rtohgcc,
+        .pkg = Pkg{ .name = "json", .path = .{ .path = dirs._ocmr9rtohgcc ++ "/src/lib.zig" }, .dependencies = &.{ _f7dubzb7cyqe.pkg.? } },
     };
     pub const _pt88y5d80m25 = Package{
         .directory = dirs._pt88y5d80m25,

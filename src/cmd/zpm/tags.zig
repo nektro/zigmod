@@ -22,7 +22,7 @@ pub fn execute(args: [][]u8) !void {
     const name_col_width = blk: {
         var w: usize = 4;
         for (val.Array) |tag| {
-            const len = tag.get("name").?.String.len;
+            const len = tag.getT("name", .String).?.len;
             if (len > w) {
                 w = len;
             }
@@ -35,10 +35,10 @@ pub fn execute(args: [][]u8) !void {
     try out.writeAll("DESCRIPTION\n");
 
     for (val.Array) |tag| {
-        const name = tag.get("name").?.String;
+        const name = tag.getT("name", .String).?;
         try out.writeAll(name);
         try print_c_n(out, ' ', name_col_width - name.len);
-        try out.writeAll(tag.get("description").?.String);
+        try out.writeAll(tag.getT("description", .String).?);
         try out.writeAll("\n");
     }
 }
