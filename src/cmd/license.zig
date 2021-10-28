@@ -4,11 +4,12 @@ const gpa = std.heap.c_allocator;
 const style = @import("ansi").style;
 const licenses = @import("licenses");
 
+const zigmod = @import("../lib.zig");
 const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
 
-const Module = u.Module;
-const List = std.ArrayList(u.Module);
+const Module = zigmod.Module;
+const List = std.ArrayList(zigmod.Module);
 const Map = std.StringArrayHashMap(*List);
 
 // Inspired by:

@@ -2,6 +2,7 @@ const std = @import("std");
 const string = []const u8;
 const gpa = std.heap.c_allocator;
 
+const zigmod = @import("../lib.zig");
 const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
 
@@ -26,7 +27,7 @@ pub fn execute(args: [][]u8) !void {
     };
     const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
-    var list = std.ArrayList(u.Module).init(gpa);
+    var list = std.ArrayList(zigmod.Module).init(gpa);
     try common.collect_pkgs(top_module, &list);
 
     try create_depszig(cachepath, dir, top_module, &list);
@@ -38,7 +39,7 @@ pub fn execute(args: [][]u8) !void {
     try diff_lockfile();
 }
 
-pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: u.Module, list: *std.ArrayList(u.Module)) !void {
+pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: zigmod.Module, list: *std.ArrayList(zigmod.Module)) !void {
     const f = try dir.createFile("deps.zig", .{});
     defer f.close();
 
@@ -92,14 +93,14 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: u.Module, 
     try w.writeAll("};\n\n");
 
     try w.writeAll("pub const package_data = struct {\n");
-    var duped = std.ArrayList(u.Module).init(gpa);
+    var duped = std.ArrayList(zigmod.Module).init(gpa);
     for (list.items) |mod| {
         if (mod.is_sys_lib) {
             continue;
         }
         try duped.append(mod);
     }
-    try print_pkg_data_to(w, &duped, &std.ArrayList(u.Module).init(gpa));
+    try print_pkg_data_to(w, &duped, &std.ArrayList(zigmod.Module).init(gpa));
     try w.writeAll("};\n\n");
 
     try w.writeAll("pub const packages = ");
@@ -115,7 +116,7 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: u.Module, 
     try w.writeAll("};\n");
 }
 
-fn create_lockfile(list: *std.ArrayList(u.Module), path: string, dir: std.fs.Dir) !void {
+fn create_lockfile(list: *std.ArrayList(zigmod.Module), path: string, dir: std.fs.Dir) !void {
     const fl = try dir.createFile("zigmod.lock", .{});
     defer fl.close();
 
@@ -225,7 +226,7 @@ fn diff_printchange(comptime testt: string, comptime replacement: string, item: 
     return false;
 }
 
-fn print_dirs(w: std.fs.File.Writer, list: []const u.Module) !void {
+fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module) !void {
     for (list) |mod| {
         if (mod.is_sys_lib) continue;
         if (std.mem.eql(u8, mod.id, "root")) {
@@ -236,7 +237,7 @@ fn print_dirs(w: std.fs.File.Writer, list: []const u.Module) !void {
     }
 }
 
-fn print_deps(w: std.fs.File.Writer, m: u.Module) !void {
+fn print_deps(w: std.fs.File.Writer, m: zigmod.Module) !void {
     try w.writeAll("&[_]Package{\n");
     for (m.deps) |d| {
         if (d.main.len == 0) {
@@ -247,7 +248,7 @@ fn print_deps(w: std.fs.File.Writer, m: u.Module) !void {
     try w.writeAll("}");
 }
 
-fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(u.Module), done: *std.ArrayList(u.Module)) !void {
+fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Module), done: *std.ArrayList(zigmod.Module)) !void {
     var len: usize = notdone.items.len;
     while (notdone.items.len > 0) {
         for (notdone.items) |mod, i| {
@@ -328,16 +329,16 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(u.Module), d
 }
 
 /// returns if all of the zig modules in needles are in haystack
-fn contains_all(needles: []u.Module, haystack: []const u.Module) bool {
+fn contains_all(needles: []zigmod.Module, haystack: []const zigmod.Module) bool {
     for (needles) |item| {
-        if (item.main.len > 0 and !u.list_contains_gen(u.Module, haystack, item)) {
+        if (item.main.len > 0 and !u.list_contains_gen(zigmod.Module, haystack, item)) {
             return false;
         }
     }
     return true;
 }
 
-fn print_pkgs(w: std.fs.File.Writer, m: u.Module) !void {
+fn print_pkgs(w: std.fs.File.Writer, m: zigmod.Module) !void {
     try w.writeAll("struct {\n");
     for (m.deps) |d| {
         if (d.main.len == 0) {
@@ -349,7 +350,7 @@ fn print_pkgs(w: std.fs.File.Writer, m: u.Module) !void {
     try w.writeAll("}");
 }
 
-fn print_imports(w: std.fs.File.Writer, m: u.Module, path: string) !void {
+fn print_imports(w: std.fs.File.Writer, m: zigmod.Module, path: string) !void {
     for (m.deps) |d| {
         if (d.main.len == 0) {
             continue;

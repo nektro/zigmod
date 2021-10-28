@@ -29,10 +29,10 @@ pub const CollectOptions = struct {
     }
 };
 
-pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) !u.Module {
+pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) !zigmod.Module {
     const m = try zigmod.ModFile.from_dir(gpa, mdir);
     try options.init();
-    var moduledeps = std.ArrayList(u.Module).init(gpa);
+    var moduledeps = std.ArrayList(zigmod.Module).init(gpa);
     defer moduledeps.deinit();
     if (m.root_files.len > 0) {
         try std.fs.cwd().makePath(".zigmod/deps/files");
@@ -44,7 +44,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
             try moduledeps.append(founddep);
         }
     }
-    return u.Module{
+    return zigmod.Module{
         .is_sys_lib = false,
         .id = "root",
         .name = "root",
@@ -56,9 +56,9 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
     };
 }
 
-pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) anyerror!u.Module {
+pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) anyerror!zigmod.Module {
     const m = try zigmod.ModFile.from_dir(gpa, mdir);
-    var moduledeps = std.ArrayList(u.Module).init(gpa);
+    var moduledeps = std.ArrayList(zigmod.Module).init(gpa);
     defer moduledeps.deinit();
     if (m.files.len > 0) {
         try std.fs.cwd().makePath(".zigmod/deps/files");
@@ -69,7 +69,7 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOption
             try moduledeps.append(founddep);
         }
     }
-    return u.Module{
+    return zigmod.Module{
         .is_sys_lib = false,
         .id = m.id,
         .name = m.name,
@@ -84,8 +84,8 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOption
     };
 }
 
-pub fn collect_pkgs(mod: u.Module, list: *std.ArrayList(u.Module)) anyerror!void {
-    if (u.list_contains_gen(u.Module, list.items, mod)) {
+pub fn collect_pkgs(mod: zigmod.Module, list: *std.ArrayList(zigmod.Module)) anyerror!void {
+    if (u.list_contains_gen(zigmod.Module, list.items, mod)) {
         return;
     }
     try list.append(mod);
@@ -198,7 +198,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
     }
 }
 
-pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectOptions) anyerror!?u.Module {
+pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectOptions) anyerror!?zigmod.Module {
     if (options.lock) |lock| {
         for (lock) |item| {
             if (std.mem.eql(u8, item[0], try d.clean_path())) {
@@ -217,14 +217,14 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
 
     switch (d.type) {
         .system_lib => {
-            return u.Module{
+            return zigmod.Module{
                 .is_sys_lib = true,
                 .id = try u.do_hash(std.crypto.hash.sha3.Sha3_384, d.path),
                 .name = d.path,
                 .only_os = d.only_os,
                 .except_os = d.except_os,
                 .main = "",
-                .deps = &[_]u.Module{},
+                .deps = &[_]zigmod.Module{},
                 .clean_path = d.path,
                 .yaml = null,
                 .dep = d.*,
@@ -234,7 +234,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
             var dd = try collect_deps(cachepath, moddir, options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
-                        var mod_from = try u.Module.from(d.*, cachepath, options);
+                        var mod_from = try zigmod.Module.from(d.*, cachepath, options);
                         if (d.type != .local) mod_from.clean_path = u.trim_prefix(modpath, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
@@ -248,7 +248,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                     if (trymain) |_| {
                         d.*.name = tryname;
                         d.*.main = trymain.?;
-                        var mod_from = try u.Module.from(d.*, cachepath, options);
+                        var mod_from = try zigmod.Module.from(d.*, cachepath, options);
                         if (d.type != .local) mod_from.clean_path = u.trim_prefix(modpath, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
@@ -276,7 +276,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
     }
 }
 
-pub fn add_files_package(pkg_name: string, mdir: std.fs.Dir, dirs: []const string) !u.Module {
+pub fn add_files_package(pkg_name: string, mdir: std.fs.Dir, dirs: []const string) !zigmod.Module {
     const destination = ".zigmod/deps/files";
     const fname = try std.mem.join(gpa, "", &.{ pkg_name, ".zig" });
 

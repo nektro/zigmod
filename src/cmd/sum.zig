@@ -1,6 +1,7 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 
+const zigmod = @import("../lib.zig");
 const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
 
@@ -25,7 +26,7 @@ pub fn execute(args: [][]u8) !void {
     const w = f.writer();
 
     //
-    var module_list = std.ArrayList(u.Module).init(gpa);
+    var module_list = std.ArrayList(zigmod.Module).init(gpa);
     try common.collect_pkgs(top_module, &module_list);
 
     for (module_list.items) |m| {
