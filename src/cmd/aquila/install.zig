@@ -46,6 +46,7 @@ pub fn execute(args: [][]u8) !void {
     var fetchoptions = common.CollectOptions{
         .log = true,
         .update = false,
+        .alloc = gpa,
     };
     try fetchoptions.init();
     const modpath = try common.get_modpath(cachepath, dep, &fetchoptions);

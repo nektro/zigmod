@@ -19,7 +19,7 @@ pub const CollectOptions = struct {
     log: bool,
     update: bool,
     lock: ?[]const [4]string = null,
-    alloc: *std.mem.Allocator = std.heap.c_allocator,
+    alloc: *std.mem.Allocator,
     already_fetched: *std.ArrayList(string) = undefined,
 
     pub fn init(self: *CollectOptions) !void {

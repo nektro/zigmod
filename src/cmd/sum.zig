@@ -17,6 +17,7 @@ pub fn execute(args: [][]u8) !void {
     var options = common.CollectOptions{
         .log = false,
         .update = false,
+        .alloc = gpa,
     };
     const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 

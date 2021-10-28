@@ -22,6 +22,7 @@ pub fn do(cachepath: string, dir: std.fs.Dir) !void {
         .log = true,
         .update = false,
         .lock = try common.parse_lockfile(gpa, dir),
+        .alloc = gpa,
     };
     const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
