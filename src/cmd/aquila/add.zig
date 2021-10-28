@@ -2,6 +2,7 @@ const std = @import("std");
 const string = []const u8;
 const gpa = std.heap.c_allocator;
 
+const zigmod = @import("../../lib.zig");
 const u = @import("./../../util/index.zig");
 const aq = @import("./../aq.zig");
 
@@ -23,7 +24,7 @@ pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
         val.getT(.{ "pkg", "RemoteName" }, .String).?,
     });
 
-    const m = try u.ModFile.from_dir(gpa, dir);
+    const m = try zigmod.ModFile.from_dir(gpa, dir);
     for (m.devdeps) |d| {
         if (std.mem.eql(u8, d.path, pkg_url)) {
             return pkg_url;

@@ -30,7 +30,7 @@ pub const CollectOptions = struct {
 };
 
 pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) !u.Module {
-    const m = try u.ModFile.from_dir(gpa, mdir);
+    const m = try zigmod.ModFile.from_dir(gpa, mdir);
     try options.init();
     var moduledeps = std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
@@ -57,7 +57,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
 }
 
 pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) anyerror!u.Module {
-    const m = try u.ModFile.from_dir(gpa, mdir);
+    const m = try zigmod.ModFile.from_dir(gpa, mdir);
     var moduledeps = std.ArrayList(u.Module).init(gpa);
     defer moduledeps.deinit();
     if (m.files.len > 0) {
