@@ -58,7 +58,7 @@ pub const Module = struct {
     }
 
     pub fn get_hash(self: Module, cdpath: string) !string {
-        const file_list_1 = try u.file_list(try std.mem.concat(self.alloc, u8, &.{ cdpath, "/", self.clean_path }));
+        const file_list_1 = try u.file_list(self.alloc, try std.mem.concat(self.alloc, u8, &.{ cdpath, "/", self.clean_path }));
 
         var file_list_2 = std.ArrayList(string).init(self.alloc);
         defer file_list_2.deinit();
