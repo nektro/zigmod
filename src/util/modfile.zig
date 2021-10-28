@@ -14,7 +14,6 @@ const mb = kb * 1024;
 pub const ModFile = struct {
     const Self = @This();
 
-    alloc: *std.mem.Allocator,
     id: string,
     name: string,
     main: string,
@@ -53,7 +52,6 @@ pub const ModFile = struct {
         }
 
         return Self{
-            .alloc = alloc,
             .id = if (id.len == 0) try u.random_string(48) else id,
             .name = name,
             .main = main,
