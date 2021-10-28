@@ -263,7 +263,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
             dd.dep = d.*;
             const save = dd;
             if (d.type != .local) dd.clean_path = u.trim_prefix(modpath, cachepath)[1..];
-            if (dd.id.len == 0) dd.id = try u.random_string(48);
+            if (dd.id.len == 0) dd.id = try u.random_string(gpa, 48);
             if (d.name.len > 0) dd.name = d.name;
             if (d.main.len > 0) dd.main = d.main;
             if (d.c_include_dirs.len > 0) dd.c_include_dirs = d.c_include_dirs;
