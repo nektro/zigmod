@@ -1,6 +1,5 @@
 const std = @import("std");
 const string = []const u8;
-const gpa = std.heap.c_allocator;
 
 const u = @import("./index.zig");
 
@@ -78,13 +77,13 @@ pub const DepType = enum {
     }
 
     // zig fmt: on
-    pub fn exact_version(self: DepType, mpath: string) !string {
+    pub fn exact_version(self: DepType, alloc: *std.mem.Allocator, mpath: string) !string {
         var mdir = try std.fs.cwd().openDir(mpath, .{});
         defer mdir.close();
         return switch (self) {
             .local => "",
             .system_lib => "",
-            .git => try std.fmt.allocPrint(gpa, "commit-{s}", .{(try u.git_rev_HEAD(gpa, mdir))}),
+            .git => try std.fmt.allocPrint(alloc, "commit-{s}", .{(try u.git_rev_HEAD(alloc, mdir))}),
             .hg => "",
             .http => "",
         };

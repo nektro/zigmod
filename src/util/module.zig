@@ -1,6 +1,5 @@
 const std = @import("std");
 const string = []const u8;
-const gpa = std.heap.c_allocator;
 const builtin = @import("builtin");
 
 const zigmod = @import("../lib.zig");
@@ -12,6 +11,7 @@ const common = @import("./../common.zig");
 //
 
 pub const Module = struct {
+    alloc: *std.mem.Allocator,
     is_sys_lib: bool,
     id: string,
     name: string,
@@ -26,15 +26,17 @@ pub const Module = struct {
     clean_path: string,
     dep: ?zigmod.Dep,
 
-    pub fn from(dep: zigmod.Dep, dir: string, options: *common.CollectOptions) !Module {
-        var moddeps = std.ArrayList(Module).init(gpa);
+    pub fn from(alloc: *std.mem.Allocator, dep: zigmod.Dep, dir: string, options: *common.CollectOptions) !Module {
+        var moddeps = std.ArrayList(Module).init(alloc);
         defer moddeps.deinit();
+
         for (dep.deps) |*d| {
             if (try common.get_module_from_dep(d, dir, options)) |founddep| {
                 try moddeps.append(founddep);
             }
         }
         return Module{
+            .alloc = alloc,
             .is_sys_lib = false,
             .id = if (dep.id.len > 0) dep.id else try u.random_string(48),
             .name = dep.name,
@@ -56,9 +58,9 @@ pub const Module = struct {
     }
 
     pub fn get_hash(self: Module, cdpath: string) !string {
-        const file_list_1 = try u.file_list(try std.mem.concat(gpa, u8, &.{ cdpath, "/", self.clean_path }));
+        const file_list_1 = try u.file_list(try std.mem.concat(self.alloc, u8, &.{ cdpath, "/", self.clean_path }));
 
-        var file_list_2 = std.ArrayList(string).init(gpa);
+        var file_list_2 = std.ArrayList(string).init(self.alloc);
         defer file_list_2.deinit();
         for (file_list_1) |item| {
             const _a = u.trim_prefix(item, cdpath);
@@ -76,15 +78,15 @@ pub const Module = struct {
 
         const h = &std.crypto.hash.Blake3.init(.{});
         for (file_list_2.items) |item| {
-            const abs_path = try std.fs.path.join(gpa, &.{ cdpath, self.clean_path, item });
+            const abs_path = try std.fs.path.join(self.alloc, &.{ cdpath, self.clean_path, item });
             const file = try std.fs.cwd().openFile(abs_path, .{});
             defer file.close();
-            const input = try file.reader().readAllAlloc(gpa, u.mb * 100);
+            const input = try file.reader().readAllAlloc(self.alloc, u.mb * 100);
             h.update(input);
         }
         var out: [32]u8 = undefined;
         h.final(&out);
-        const hex = try std.fmt.allocPrint(gpa, "blake3-{x}", .{std.fmt.fmtSliceHexLower(out[0..])});
+        const hex = try std.fmt.allocPrint(self.alloc, "blake3-{x}", .{std.fmt.fmtSliceHexLower(out[0..])});
         return hex;
     }
 

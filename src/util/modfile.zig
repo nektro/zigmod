@@ -108,6 +108,7 @@ pub const ModFile = struct {
                     }
 
                     try dep_list.append(zigmod.Dep{
+                        .alloc = alloc,
                         .type = dep_type,
                         .path = path,
                         .id = item.mapping.get_string("id"),

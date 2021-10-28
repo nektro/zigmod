@@ -45,6 +45,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
         }
     }
     return zigmod.Module{
+        .alloc = gpa,
         .is_sys_lib = false,
         .id = "root",
         .name = "root",
@@ -70,6 +71,7 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOption
         }
     }
     return zigmod.Module{
+        .alloc = gpa,
         .is_sys_lib = false,
         .id = m.id,
         .name = m.name,
@@ -218,6 +220,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
     switch (d.type) {
         .system_lib => {
             return zigmod.Module{
+                .alloc = gpa,
                 .is_sys_lib = true,
                 .id = try u.do_hash(std.crypto.hash.sha3.Sha3_384, d.path),
                 .name = d.path,
@@ -234,7 +237,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
             var dd = try collect_deps(cachepath, moddir, options) catch |e| switch (e) {
                 error.FileNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
-                        var mod_from = try zigmod.Module.from(d.*, cachepath, options);
+                        var mod_from = try zigmod.Module.from(gpa, d.*, cachepath, options);
                         if (d.type != .local) mod_from.clean_path = u.trim_prefix(modpath, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
@@ -248,7 +251,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                     if (trymain) |_| {
                         d.*.name = tryname;
                         d.*.main = trymain.?;
-                        var mod_from = try zigmod.Module.from(d.*, cachepath, options);
+                        var mod_from = try zigmod.Module.from(gpa, d.*, cachepath, options);
                         if (d.type != .local) mod_from.clean_path = u.trim_prefix(modpath, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
@@ -327,6 +330,7 @@ pub fn add_files_package(pkg_name: string, mdir: std.fs.Dir, dirs: []const strin
     );
 
     var d: zigmod.Dep = .{
+        .alloc = gpa,
         .type = .local,
         .path = "files",
         .id = "",
@@ -368,6 +372,7 @@ pub fn parse_lockfile(dir: std.fs.Dir) ![]const [4]string {
             2 => {
                 var iter = std.mem.split(u8, line, " ");
                 const asdep = zigmod.Dep{
+                    .alloc = gpa,
                     .type = std.meta.stringToEnum(zigmod.DepType, iter.next().?).?,
                     .path = iter.next().?,
                     .version = iter.next().?,
