@@ -21,7 +21,7 @@ pub fn do(cachepath: string, dir: std.fs.Dir) !void {
     var options = common.CollectOptions{
         .log = true,
         .update = false,
-        .lock = try common.parse_lockfile(dir),
+        .lock = try common.parse_lockfile(gpa, dir),
     };
     const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
