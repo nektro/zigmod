@@ -150,8 +150,8 @@ pub fn run_cmd(alloc: *std.mem.Allocator, dir: ?string, args: []const string) !u
     return result.term.Exited;
 }
 
-pub fn list_remove(input: []string, search: string) ![]string {
-    var list = std.ArrayList(string).init(gpa);
+pub fn list_remove(alloc: *std.mem.Allocator, input: []string, search: string) ![]string {
+    var list = std.ArrayList(string).init(alloc);
     defer list.deinit();
     for (input) |item| {
         if (!std.mem.eql(u8, item, search)) {
