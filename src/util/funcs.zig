@@ -134,8 +134,8 @@ pub fn file_list(alloc: *std.mem.Allocator, dpath: string) ![]const string {
     return list.toOwnedSlice();
 }
 
-pub fn run_cmd_raw(dir: ?string, args: []const string) !std.ChildProcess.ExecResult {
-    return std.ChildProcess.exec(.{ .allocator = gpa, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
+pub fn run_cmd_raw(alloc: *std.mem.Allocator, dir: ?string, args: []const string) !std.ChildProcess.ExecResult {
+    return std.ChildProcess.exec(.{ .allocator = alloc, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
         error.FileNotFound => {
             u.fail("\"{s}\" command not found", .{args[0]});
         },
@@ -143,10 +143,10 @@ pub fn run_cmd_raw(dir: ?string, args: []const string) !std.ChildProcess.ExecRes
     };
 }
 
-pub fn run_cmd(dir: ?string, args: []const string) !u32 {
-    const result = try run_cmd_raw(dir, args);
-    gpa.free(result.stdout);
-    gpa.free(result.stderr);
+pub fn run_cmd(alloc: *std.mem.Allocator, dir: ?string, args: []const string) !u32 {
+    const result = try run_cmd_raw(alloc, dir, args);
+    alloc.free(result.stdout);
+    alloc.free(result.stderr);
     return result.term.Exited;
 }
 

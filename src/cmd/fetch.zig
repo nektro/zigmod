@@ -144,7 +144,7 @@ fn diff_lockfile() !void {
     const max = std.math.maxInt(usize);
 
     if (try u.does_folder_exist(".git")) {
-        const result = try u.run_cmd_raw(null, &.{ "git", "diff", "zigmod.lock" });
+        const result = try u.run_cmd_raw(gpa, null, &.{ "git", "diff", "zigmod.lock" });
         const r = std.io.fixedBufferStream(result.stdout).reader();
         while (try r.readUntilDelimiterOrEofAlloc(gpa, '\n', max)) |line| {
             if (std.mem.startsWith(u8, line, "@@")) break;

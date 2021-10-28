@@ -32,43 +32,43 @@ pub const DepType = enum {
     // hypercore,  // https://hypercore-protocol.org/
 
     // zig fmt: on
-    pub fn pull(self: DepType, rpath: string, dpath: string) !void {
+    pub fn pull(self: DepType, alloc: *std.mem.Allocator, rpath: string, dpath: string) !void {
         switch (self) {
             .local => {},
             .system_lib => {},
             .git => {
-                u.assert((try u.run_cmd(null, &.{ "git", "clone", "--recurse-submodules", rpath, dpath })) == 0, "git clone {s} failed", .{rpath});
+                u.assert((try u.run_cmd(alloc, null, &.{ "git", "clone", "--recurse-submodules", rpath, dpath })) == 0, "git clone {s} failed", .{rpath});
             },
             .hg => {
-                u.assert((try u.run_cmd(null, &.{ "hg", "clone", rpath, dpath })) == 0, "hg clone {s} failed", .{rpath});
+                u.assert((try u.run_cmd(alloc, null, &.{ "hg", "clone", rpath, dpath })) == 0, "hg clone {s} failed", .{rpath});
             },
             .http => {
                 try std.fs.cwd().makePath(dpath);
-                u.assert((try u.run_cmd(dpath, &.{ "wget", rpath })) == 0, "wget {s} failed", .{rpath});
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "wget", rpath })) == 0, "wget {s} failed", .{rpath});
                 const f = rpath[std.mem.lastIndexOf(u8, rpath, "/").? + 1 ..];
                 if (std.mem.endsWith(u8, f, ".zip")) {
-                    u.assert((try u.run_cmd(dpath, &.{ "unzip", f, "-d", "." })) == 0, "unzip {s} failed", .{f});
+                    u.assert((try u.run_cmd(alloc, dpath, &.{ "unzip", f, "-d", "." })) == 0, "unzip {s} failed", .{f});
                 }
                 if (std.mem.endsWith(u8, f, ".tar") or std.mem.endsWith(u8, f, ".tar.gz") or std.mem.endsWith(u8, f, ".tar.xz") or std.mem.endsWith(u8, f, ".tar.zst")) {
-                    u.assert((try u.run_cmd(dpath, &.{ "tar", "-xf", f, "-C", "." })) == 0, "un-tar {s} failed", .{f});
+                    u.assert((try u.run_cmd(alloc, dpath, &.{ "tar", "-xf", f, "-C", "." })) == 0, "un-tar {s} failed", .{f});
                 }
             },
         }
     }
 
     // zig fmt: on
-    pub fn update(self: DepType, dpath: string, rpath: string) !void {
+    pub fn update(self: DepType, alloc: *std.mem.Allocator, dpath: string, rpath: string) !void {
         _ = rpath;
 
         switch (self) {
             .local => {},
             .system_lib => {},
             .git => {
-                u.assert((try u.run_cmd(dpath, &.{ "git", "fetch" })) == 0, "git fetch failed", .{});
-                u.assert((try u.run_cmd(dpath, &.{ "git", "pull" })) == 0, "git pull failed", .{});
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "git", "fetch" })) == 0, "git fetch failed", .{});
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "git", "pull" })) == 0, "git pull failed", .{});
             },
             .hg => {
-                u.assert((try u.run_cmd(dpath, &.{ "hg", "pull" })) == 0, "hg pull failed", .{});
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "hg", "pull" })) == 0, "hg pull failed", .{});
             },
             .http => {
                 //

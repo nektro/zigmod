@@ -136,13 +136,13 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 if (try u.does_folder_exist(pv)) {
                     if (vers.id == .branch) {
                         if (options.update) {
-                            try d.type.update(pv, d.path);
+                            try d.type.update(gpa, pv, d.path);
                         }
                     }
                     return pv;
                 }
-                try d.type.pull(d.path, pv);
-                if ((try u.run_cmd(pv, &.{ "git", "checkout", vers.string })) > 0) {
+                try d.type.pull(gpa, d.path, pv);
+                if ((try u.run_cmd(gpa, pv, &.{ "git", "checkout", vers.string })) > 0) {
                     u.fail("fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
                 }
                 if (builtin.os.tag != .windows and vers.id != .branch) {
@@ -152,20 +152,20 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 return pv;
             }
             if (!try u.does_folder_exist(p)) {
-                try d.type.pull(d.path, p);
+                try d.type.pull(gpa, d.path, p);
             } else {
                 if (options.update) {
-                    try d.type.update(p, d.path);
+                    try d.type.update(gpa, p, d.path);
                 }
             }
             return p;
         },
         .hg => {
             if (!try u.does_folder_exist(p)) {
-                try d.type.pull(d.path, p);
+                try d.type.pull(gpa, d.path, p);
             } else {
                 if (options.update) {
-                    try d.type.update(p, d.path);
+                    try d.type.update(gpa, p, d.path);
                 }
             }
             return p;
@@ -180,7 +180,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                     return pv;
                 }
                 const file_path = try std.fs.path.join(gpa, &.{ pv, file_name });
-                try d.type.pull(d.path, pv);
+                try d.type.pull(gpa, d.path, pv);
                 if (try u.validate_hash(d.version, file_path)) {
                     try std.fs.cwd().deleteFile(file_path);
                     return pv;
@@ -193,7 +193,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 try std.fs.cwd().deleteTree(p);
             }
             const file_path = try std.fs.path.join(gpa, &.{ p, file_name });
-            try d.type.pull(d.path, p);
+            try d.type.pull(gpa, d.path, p);
             try std.fs.deleteFileAbsolute(file_path);
             return p;
         },
