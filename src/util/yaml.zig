@@ -150,7 +150,7 @@ pub fn parse(alloc: *std.mem.Allocator, input: string) !Document {
     _ = c.yaml_parser_initialize(&parser);
     defer c.yaml_parser_delete(&parser);
 
-    const lines = try u.split(input, "\n");
+    const lines = try u.split(alloc, input, "\n");
 
     _ = c.yaml_parser_set_input_string(&parser, input.ptr, input.len);
 

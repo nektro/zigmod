@@ -38,9 +38,10 @@ pub fn try_index(comptime T: type, array: []T, n: usize, def: T) T {
     return array[n];
 }
 
-pub fn split(in: string, delim: string) ![]string {
-    var list = std.ArrayList(string).init(gpa);
+pub fn split(alloc: *std.mem.Allocator, in: string, delim: string) ![]string {
+    var list = std.ArrayList(string).init(alloc);
     defer list.deinit();
+
     var iter = std.mem.split(u8, in, delim);
     while (iter.next()) |str| {
         try list.append(str);
@@ -267,7 +268,7 @@ pub fn detect_pkgname(override: string, dir: string) !string {
         return error.NoBuildZig;
     }
     const dpath = try std.fs.realpathAlloc(gpa, try std.mem.concat(gpa, u8, &.{ dir, "build.zig" }));
-    const splitP = try split(dpath, std.fs.path.sep_str);
+    const splitP = try split(gpa, dpath, std.fs.path.sep_str);
     var name = splitP[splitP.len - 2];
     name = trim_prefix(name, "zig-");
     assert(name.len > 0, "package name must not be an empty string", .{});
