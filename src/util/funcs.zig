@@ -207,11 +207,11 @@ pub const HashFn = enum {
     sha512,
 };
 
-pub fn validate_hash(input: string, file_path: string) !bool {
+pub fn validate_hash(alloc: *std.mem.Allocator, input: string, file_path: string) !bool {
     const hash = parse_split(HashFn, "-").do(input) catch return false;
     const file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
-    const data = try file.reader().readAllAlloc(gpa, gb);
+    const data = try file.reader().readAllAlloc(alloc, gb);
     const expected = hash.string;
     const actual = switch (hash.id) {
         .blake3 => try do_hash(std.crypto.hash.Blake3, data),

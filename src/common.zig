@@ -181,7 +181,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 }
                 const file_path = try std.fs.path.join(gpa, &.{ pv, file_name });
                 try d.type.pull(gpa, d.path, pv);
-                if (try u.validate_hash(d.version, file_path)) {
+                if (try u.validate_hash(gpa, d.version, file_path)) {
                     try std.fs.cwd().deleteFile(file_path);
                     return pv;
                 }
