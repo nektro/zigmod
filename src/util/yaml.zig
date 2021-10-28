@@ -148,6 +148,7 @@ pub const TokenList = []const Token;
 pub fn parse(alloc: *std.mem.Allocator, input: string) !Document {
     var parser: c.yaml_parser_t = undefined;
     _ = c.yaml_parser_initialize(&parser);
+    defer c.yaml_parser_delete(&parser);
 
     const lines = try u.split(input, "\n");
 
@@ -169,8 +170,6 @@ pub fn parse(alloc: *std.mem.Allocator, input: string) !Document {
             break;
         }
     }
-
-    c.yaml_parser_delete(&parser);
 
     const p = &Parser{
         .alloc = alloc,
