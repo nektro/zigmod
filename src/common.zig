@@ -123,7 +123,7 @@ pub fn get_modpath(cachepath: string, d: u.Dep, options: *CollectOptions) !strin
         },
         .git => {
             if (d.version.len > 0) {
-                const vers = u.parse_split(u.GitVersionType, "-").do(d.version) catch |e| switch (e) {
+                const vers = u.parse_split(u.DepType.GitVersion, "-").do(d.version) catch |e| switch (e) {
                     error.IterEmpty => unreachable,
                     error.NoMemberFound => {
                         const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];

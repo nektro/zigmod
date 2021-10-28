@@ -89,18 +89,18 @@ pub const DepType = enum {
             .http => "",
         };
     }
-};
 
-pub const GitVersionType = enum {
-    branch,
-    tag,
-    commit,
+    pub const GitVersion = enum {
+        branch,
+        tag,
+        commit,
 
-    pub fn frozen(self: GitVersionType) bool {
-        return switch (self) {
-            .branch => false,
-            .tag => true,
-            .commit => true,
-        };
-    }
+        pub fn frozen(self: GitVersion) bool {
+            return switch (self) {
+                .branch => false,
+                .tag => true,
+                .commit => true,
+            };
+        }
+    };
 };

@@ -65,7 +65,7 @@ pub const Dep = struct {
         }
         return switch (self.type) {
             .git => blk: {
-                const vers = try u.parse_split(u.GitVersionType, "-").do(self.version);
+                const vers = try u.parse_split(u.DepType.GitVersion, "-").do(self.version);
                 if (vers.id.frozen()) break :blk self.version;
                 break :blk try self.type.exact_version(dpath);
             },
