@@ -22,3 +22,5 @@ pub fn init() !void {
 pub fn deinit() void {
     zfetch.deinit();
 }
+
+pub const DepType = @import("./util/dep_type.zig").DepType;

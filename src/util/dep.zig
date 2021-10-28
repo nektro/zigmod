@@ -3,6 +3,7 @@ const string = []const u8;
 const gpa = std.heap.c_allocator;
 const builtin = std.builtin;
 
+const zigmod = @import("../lib.zig");
 const u = @import("index.zig");
 const yaml = @import("./yaml.zig");
 
@@ -12,7 +13,7 @@ const yaml = @import("./yaml.zig");
 pub const Dep = struct {
     const Self = @This();
 
-    type: u.DepType,
+    type: zigmod.DepType,
     path: string,
 
     id: string,
@@ -65,7 +66,7 @@ pub const Dep = struct {
         }
         return switch (self.type) {
             .git => blk: {
-                const vers = try u.parse_split(u.DepType.GitVersion, "-").do(self.version);
+                const vers = try u.parse_split(zigmod.DepType.GitVersion, "-").do(self.version);
                 if (vers.id.frozen()) break :blk self.version;
                 break :blk try self.type.exact_version(dpath);
             },

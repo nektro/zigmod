@@ -1,6 +1,7 @@
 const std = @import("std");
 const string = []const u8;
 
+const zigmod = @import("../lib.zig");
 const u = @import("index.zig");
 const yaml = @import("./yaml.zig");
 
@@ -94,7 +95,7 @@ pub const ModFile = struct {
                     if (version == null) {
                         version = "";
                     }
-                    const dep_type = std.meta.stringToEnum(u.DepType, dtype).?;
+                    const dep_type = std.meta.stringToEnum(zigmod.DepType, dtype).?;
                     if (dep_type == .local) {
                         if (path.len > 0) {
                             name = path;
