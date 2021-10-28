@@ -310,22 +310,17 @@ pub fn add_files_package(pkg_name: string, mdir: std.fs.Dir, dirs: []const strin
         \\
     );
     try w.print("const srcpath = \"../../../{}\";\n\n", .{std.zig.fmtEscapes(fpath[1..])});
-    try w.writeAll(
-        \\const files = std.ComptimeStringMap(string, .{
-        \\
-    );
     var iter = map.iterator();
     while (iter.next()) |item| {
-        try w.print("    .{{ .@\"0\" = \"/{}\", .@\"1\" = @embedFile(srcpath ++ \"/{}\") }},\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
+        try w.print("pub const @\"/{}\" = @embedFile(srcpath ++ \"/{}\");\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
     }
     try w.writeAll("\n");
     try w.writeAll(
-        \\});
-        \\
         \\pub fn open(comptime path: string) ?string {
         \\    if (path.len == 0) return null;
         \\    if (path[0] != '/') return null;
-        \\    return files.get(path);
+        \\    if (!@hasDecl(@This(), path)) return null;
+        \\    return @field(@This(), path);
         \\}
         \\
     );
