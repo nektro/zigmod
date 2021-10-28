@@ -79,7 +79,7 @@ pub fn does_folder_exist(fpath: string) !bool {
     return true;
 }
 
-pub fn _join(comptime delim: string, comptime xs: []string) string {
+pub fn _join(comptime delim: string, comptime xs: []const string) string {
     var buf: string = "";
     for (xs) |x, i| {
         buf = buf ++ x;
@@ -96,12 +96,13 @@ pub fn trim_suffix(in: string, suffix: string) string {
 }
 
 pub fn repeat(s: string, times: i32) !string {
-    var list = std.ArrayList(string).init(gpa);
+    var list = std.ArrayList(u8).init(gpa);
+    defer list.deinit();
     var i: i32 = 0;
     while (i < times) : (i += 1) {
-        try list.append(s);
+        try list.appendSlice(s);
     }
-    return try std.mem.join(gpa, "", list.items);
+    return list.toOwnedSlice();
 }
 
 pub fn list_contains(haystack: []const string, needle: string) bool {
@@ -122,7 +123,10 @@ pub fn list_contains_gen(comptime T: type, haystack: []const T, needle: T) bool 
     return false;
 }
 
-pub fn file_list(dpath: string, list: *std.ArrayList(string)) !void {
+pub fn file_list(dpath: string) ![]const string {
+    var list = std.ArrayList(string).init(gpa);
+    defer list.deinit();
+
     const dir = try std.fs.cwd().openDir(dpath, .{ .iterate = true });
     var walk = try dir.walk(gpa);
     defer walk.deinit();
@@ -136,6 +140,7 @@ pub fn file_list(dpath: string, list: *std.ArrayList(string)) !void {
             break;
         }
     }
+    return list.toOwnedSlice();
 }
 
 pub fn run_cmd_raw(dir: ?string, args: []const string) !std.ChildProcess.ExecResult {
@@ -186,7 +191,7 @@ pub fn random_string(len: usize) !string {
     return buf;
 }
 
-pub fn parse_split(comptime T: type, delim: string) type {
+pub fn parse_split(comptime T: type, comptime delim: string) type {
     return struct {
         const Self = @This();
 
@@ -195,8 +200,10 @@ pub fn parse_split(comptime T: type, delim: string) type {
 
         pub fn do(input: string) !Self {
             var iter = std.mem.split(u8, input, delim);
+            const start = iter.next() orelse return error.IterEmpty;
+            const id = std.meta.stringToEnum(T, start) orelse return error.NoMemberFound;
             return Self{
-                .id = std.meta.stringToEnum(T, iter.next() orelse return error.IterEmpty) orelse return error.NoMemberFound,
+                .id = id,
                 .string = iter.rest(),
             };
         }
