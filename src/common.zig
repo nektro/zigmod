@@ -305,6 +305,7 @@ pub fn add_files_package(pkg_name: string, mdir: std.fs.Dir, dirs: []const strin
     const w = rff.writer();
     try w.writeAll(
         \\const std = @import("std");
+        \\const string = []const u8;
         \\
         \\
     );
