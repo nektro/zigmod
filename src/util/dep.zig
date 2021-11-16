@@ -1,6 +1,6 @@
 const std = @import("std");
 const string = []const u8;
-const builtin = std.builtin;
+const builtin = @import("builtin");
 
 const zigmod = @import("../lib.zig");
 const u = @import("index.zig");
