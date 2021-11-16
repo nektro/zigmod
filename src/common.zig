@@ -317,16 +317,6 @@ pub fn add_files_package(alloc: *std.mem.Allocator, pkg_name: string, mdir: std.
     while (iter.next()) |item| {
         try w.print("pub const @\"/{}\" = @embedFile(srcpath ++ \"/{}\");\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
     }
-    try w.writeAll("\n");
-    try w.writeAll(
-        \\pub fn open(comptime path: string) ?string {
-        \\    if (path.len == 0) return null;
-        \\    if (path[0] != '/') return null;
-        \\    if (!@hasDecl(@This(), path)) return null;
-        \\    return @field(@This(), path);
-        \\}
-        \\
-    );
 
     var d: zigmod.Dep = .{
         .alloc = alloc,
