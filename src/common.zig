@@ -210,6 +210,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
             }
         }
     }
+    if (!d.is_for_this()) return null;
     const modpath = try get_modpath(cachepath, d.*, options);
     const moddir = if (std.mem.eql(u8, modpath, "files") or modpath.len == 0) try std.fs.cwd().openDir(cachepath, .{}) else try std.fs.cwd().openDir(modpath, .{});
 
