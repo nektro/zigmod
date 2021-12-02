@@ -59,18 +59,21 @@ pub const ModFile = struct {
             .c_include_dirs = try mapping.get_string_array(alloc, "c_include_dirs"),
             .c_source_flags = try mapping.get_string_array(alloc, "c_source_flags"),
             .c_source_files = try mapping.get_string_array(alloc, "c_source_files"),
-            .deps = try dep_list_by_name(alloc, mapping, "dependencies"),
+            .deps = try dep_list_by_name(alloc, mapping, &.{"dependencies"}),
             .yaml = mapping,
-            .devdeps = try dep_list_by_name(alloc, mapping, "dev_dependencies"),
+            .devdeps = try dep_list_by_name(alloc, mapping, &.{"dev_dependencies"}),
             .root_files = try mapping.get_string_array(alloc, "root_files"),
             .files = try mapping.get_string_array(alloc, "files"),
         };
     }
 
-    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, prop: string) anyerror![]zigmod.Dep {
+    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, props: []const string) anyerror![]zigmod.Dep {
         var dep_list = std.ArrayList(zigmod.Dep).init(alloc);
-        if (mapping.get(prop)) |dep_seq| {
-            if (dep_seq == .sequence) {
+        defer dep_list.deinit();
+
+        for (props) |prop| {
+            if (mapping.get(prop)) |dep_seq| {
+                if (dep_seq != .sequence) continue;
                 for (dep_seq.sequence) |item| {
                     var dtype: string = undefined;
                     var path: string = undefined;
@@ -121,7 +124,7 @@ pub const ModFile = struct {
                         .only_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("only_os"), ","), ""),
                         .except_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("except_os"), ","), ""),
                         .yaml = item.mapping,
-                        .deps = try dep_list_by_name(alloc, item.mapping, "dependencies"),
+                        .deps = try dep_list_by_name(alloc, item.mapping, &.{"dependencies"}),
                     });
                 }
             }
