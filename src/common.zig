@@ -34,8 +34,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
     var moduledeps = std.ArrayList(zigmod.Module).init(options.alloc);
     defer moduledeps.deinit();
     if (m.root_files.len > 0) {
-        try std.fs.cwd().makePath(".zigmod/deps/files");
-        try moduledeps.append(try add_files_package(options.alloc, "root", mdir, m.root_files));
+        try moduledeps.append(try add_files_package(options.alloc, cachepath, "root", mdir, m.root_files));
     }
     try moduledeps.append(try collect_deps(cachepath, mdir, options));
     for (m.devdeps) |*d| {
@@ -61,8 +60,7 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOption
     var moduledeps = std.ArrayList(zigmod.Module).init(options.alloc);
     defer moduledeps.deinit();
     if (m.files.len > 0) {
-        try std.fs.cwd().makePath(".zigmod/deps/files");
-        try moduledeps.append(try add_files_package(options.alloc, m.id, mdir, m.files));
+        try moduledeps.append(try add_files_package(options.alloc, cachepath, m.id, mdir, m.files));
     }
     for (m.deps) |*d| {
         if (try get_module_from_dep(d, cachepath, options)) |founddep| {
@@ -279,8 +277,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
     }
 }
 
-pub fn add_files_package(alloc: *std.mem.Allocator, pkg_name: string, mdir: std.fs.Dir, dirs: []const string) !zigmod.Module {
-    const destination = ".zigmod/deps/files";
+pub fn add_files_package(alloc: *std.mem.Allocator, cachepath: string, pkg_name: string, mdir: std.fs.Dir, dirs: []const string) !zigmod.Module {
     const fname = try std.mem.join(alloc, "", &.{ pkg_name, ".zig" });
 
     const map = &std.StringHashMap(string).init(alloc);
@@ -304,7 +301,12 @@ pub fn add_files_package(alloc: *std.mem.Allocator, pkg_name: string, mdir: std.
     var fpath = u.trim_prefix(mpath, cwdpath);
     if (fpath.len == 0) fpath = std.fs.path.sep_str;
 
-    const rff = try (try std.fs.cwd().openDir(destination, .{})).createFile(fname, .{});
+    var cachedir = try std.fs.cwd().openDir(cachepath, .{});
+    defer cachedir.close();
+    try cachedir.makePath("files");
+    var destdir = try cachedir.openDir("files", .{});
+    defer destdir.close();
+    const rff = try destdir.createFile(fname, .{});
     defer rff.close();
     const w = rff.writer();
     try w.writeAll(
@@ -335,7 +337,8 @@ pub fn add_files_package(alloc: *std.mem.Allocator, pkg_name: string, mdir: std.
         .update = false,
         .alloc = alloc,
     };
-    return (try get_module_from_dep(&d, destination, &options)).?;
+    const filesdestpath = try std.fs.path.join(alloc, &.{ cachepath, "files" });
+    return (try get_module_from_dep(&d, filesdestpath, &options)).?;
 }
 
 pub fn parse_lockfile(alloc: *std.mem.Allocator, dir: std.fs.Dir) ![]const [4]string {
