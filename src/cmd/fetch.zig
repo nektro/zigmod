@@ -46,6 +46,7 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: zigmod.Mod
 
     const w = f.writer();
     try w.writeAll("const std = @import(\"std\");\n");
+    try w.writeAll("const builtin = @import(\"builtin\");\n");
     try w.writeAll("const Pkg = std.build.Pkg;\n");
     try w.writeAll("const string = []const u8;\n");
     try w.writeAll("\n");
@@ -58,6 +59,7 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: zigmod.Mod
         \\        exe.addPackage(pkg.pkg.?);
         \\    }
         \\    var llc = false;
+        \\    var vcpkg = false;
         \\    inline for (std.meta.declarations(package_data)) |decl| {
         \\        const pkg = @as(Package, @field(package_data, decl.name));
         \\        inline for (pkg.system_libs) |item| {
@@ -74,6 +76,7 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: zigmod.Mod
         \\        }
         \\    }
         \\    if (llc) exe.linkLibC();
+        \\    if (builtin.os.tag == .windows and vcpkg) exe.addVcpkgPaths(.static) catch |err| @panic(@errorName(err));
         \\}
         \\
         \\pub const Package = struct {
@@ -83,6 +86,7 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: zigmod.Mod
         \\    c_source_files: []const string = &.{},
         \\    c_source_flags: []const string = &.{},
         \\    system_libs: []const string = &.{},
+        \\    vcpkg: bool = false,
         \\};
         \\
         \\
@@ -313,6 +317,9 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                         if (j != mod.deps.len - 1) try w.writeAll(",");
                     }
                     try w.writeAll(" },\n");
+                }
+                if (mod.has_vcpkg_deps()) {
+                    try w.writeAll("        .vcpkg = true,\n");
                 }
                 try w.writeAll("    };\n");
 

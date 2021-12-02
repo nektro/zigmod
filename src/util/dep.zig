@@ -27,6 +27,7 @@ pub const Dep = struct {
     yaml: ?yaml.Mapping,
     deps: []zigmod.Dep,
     keep: bool = false,
+    vcpkg: bool = false,
 
     pub fn clean_path(self: Dep) !string {
         if (self.type == .local) {

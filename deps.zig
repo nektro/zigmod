@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const Pkg = std.build.Pkg;
 const string = []const u8;
 
@@ -10,6 +11,7 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
         exe.addPackage(pkg.pkg.?);
     }
     var llc = false;
+    var vcpkg = false;
     inline for (std.meta.declarations(package_data)) |decl| {
         const pkg = @as(Package, @field(package_data, decl.name));
         inline for (pkg.system_libs) |item| {
@@ -26,6 +28,7 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
         }
     }
     if (llc) exe.linkLibC();
+    if (builtin.os.tag == .windows and vcpkg) exe.addVcpkgPaths(.static) catch |err| @panic(@errorName(err));
 }
 
 pub const Package = struct {
@@ -35,6 +38,7 @@ pub const Package = struct {
     c_source_files: []const string = &.{},
     c_source_flags: []const string = &.{},
     system_libs: []const string = &.{},
+    vcpkg: bool = false,
 };
 
 const dirs = struct {

@@ -126,6 +126,7 @@ pub const ModFile = struct {
                         .yaml = item.mapping,
                         .deps = try dep_list_by_name(alloc, item.mapping, &.{"dependencies"}),
                         .keep = std.mem.eql(u8, "true", item.mapping.get_string("keep")),
+                        .vcpkg = std.mem.eql(u8, "true", item.mapping.get_string("vcpkg")),
                     });
                 }
             }

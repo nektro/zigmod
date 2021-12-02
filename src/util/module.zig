@@ -119,6 +119,16 @@ pub const Module = struct {
         return false;
     }
 
+    pub fn has_vcpkg_deps(self: Module) bool {
+        for (self.deps) |d| {
+            const dd = d.dep orelse continue;
+            if (dd.vcpkg) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     pub fn short_id(self: Module) string {
         return u.slice(u8, self.id, 0, 12);
     }
