@@ -51,7 +51,7 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: zigmod.Mod
     try w.writeAll("\n");
     try w.print("pub const cache = \"{}\";\n", .{std.zig.fmtEscapes(cachepath)});
     try w.writeAll("\n");
-    try w.print("{s}\n", .{
+    try w.writeAll(
         \\pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
@@ -87,7 +87,8 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: zigmod.Mod
         \\    system_libs: []const string = &.{},
         \\};
         \\
-    });
+        \\
+    );
 
     try w.writeAll("const dirs = struct {\n");
     try print_dirs(w, list.items);
