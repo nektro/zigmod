@@ -57,9 +57,9 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: zigmod.Mod
         \\    for (packages) |pkg| {
         \\        exe.addPackage(pkg.pkg.?);
         \\    }
+        \\    var llc = false;
         \\    inline for (std.meta.declarations(package_data)) |decl| {
         \\        const pkg = @as(Package, @field(package_data, decl.name));
-        \\        var llc = false;
         \\        inline for (pkg.system_libs) |item| {
         \\            exe.linkSystemLibrary(item);
         \\            llc = true;
@@ -72,10 +72,8 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: zigmod.Mod
         \\            exe.addCSourceFile(@field(dirs, decl.name) ++ "/" ++ item, pkg.c_source_flags);
         \\            llc = true;
         \\        }
-        \\        if (llc) {
-        \\            exe.linkLibC();
-        \\        }
         \\    }
+        \\    if (llc) exe.linkLibC();
         \\}
         \\
         \\pub const Package = struct {
