@@ -329,7 +329,6 @@ pub fn add_files_package(alloc: *std.mem.Allocator, pkg_name: string, mdir: std.
         .version = "absolute",
         .yaml = null,
         .deps = &.{},
-        .keep = false,
     };
     var options = CollectOptions{
         .log = false,
@@ -373,7 +372,6 @@ pub fn parse_lockfile(alloc: *std.mem.Allocator, dir: std.fs.Dir) ![]const [4]st
                     .main = "",
                     .yaml = null,
                     .deps = &.{},
-                    .keep = false,
                 };
                 try list.append([4]string{
                     try asdep.clean_path(),
