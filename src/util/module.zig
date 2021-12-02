@@ -26,12 +26,12 @@ pub const Module = struct {
     clean_path: string,
     dep: ?zigmod.Dep,
 
-    pub fn from(alloc: *std.mem.Allocator, dep: zigmod.Dep, dir: string, options: *common.CollectOptions) !Module {
+    pub fn from(alloc: *std.mem.Allocator, dep: zigmod.Dep, modpath: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(alloc);
         defer moddeps.deinit();
 
         for (dep.deps) |*d| {
-            if (try common.get_module_from_dep(d, dir, options)) |founddep| {
+            if (try common.get_module_from_dep(d, modpath, options)) |founddep| {
                 try moddeps.append(founddep);
             }
         }
