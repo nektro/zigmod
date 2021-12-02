@@ -23,9 +23,10 @@ pub const ModFile = struct {
     c_source_files: []const string,
     deps: []zigmod.Dep,
     yaml: yaml.Mapping,
-    devdeps: []zigmod.Dep,
     root_files: []const string,
     files: []const string,
+    rootdeps: []zigmod.Dep,
+    builddeps: []zigmod.Dep,
 
     pub fn init(alloc: *std.mem.Allocator, mpath: string) !Self {
         const file = try std.fs.cwd().openFile(mpath, .{});
@@ -59,15 +60,16 @@ pub const ModFile = struct {
             .c_include_dirs = try mapping.get_string_array(alloc, "c_include_dirs"),
             .c_source_flags = try mapping.get_string_array(alloc, "c_source_flags"),
             .c_source_files = try mapping.get_string_array(alloc, "c_source_files"),
-            .deps = try dep_list_by_name(alloc, mapping, &.{"dependencies"}),
+            .deps = try dep_list_by_name(alloc, mapping, &.{"dependencies"}, false),
             .yaml = mapping,
-            .devdeps = try dep_list_by_name(alloc, mapping, &.{"dev_dependencies"}),
             .root_files = try mapping.get_string_array(alloc, "root_files"),
             .files = try mapping.get_string_array(alloc, "files"),
+            .rootdeps = try dep_list_by_name(alloc, mapping, &.{ "dev_dependencies", "root_dependencies" }, false),
+            .builddeps = try dep_list_by_name(alloc, mapping, &.{ "dev_dependencies", "build_dependencies" }, true),
         };
     }
 
-    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, props: []const string) anyerror![]zigmod.Dep {
+    fn dep_list_by_name(alloc: *std.mem.Allocator, mapping: yaml.Mapping, props: []const string, for_build: bool) anyerror![]zigmod.Dep {
         var dep_list = std.ArrayList(zigmod.Dep).init(alloc);
         defer dep_list.deinit();
 
@@ -124,9 +126,10 @@ pub const ModFile = struct {
                         .only_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("only_os"), ","), ""),
                         .except_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("except_os"), ","), ""),
                         .yaml = item.mapping,
-                        .deps = try dep_list_by_name(alloc, item.mapping, &.{"dependencies"}),
+                        .deps = try dep_list_by_name(alloc, item.mapping, &.{"dependencies"}, for_build),
                         .keep = std.mem.eql(u8, "true", item.mapping.get_string("keep")),
                         .vcpkg = std.mem.eql(u8, "true", item.mapping.get_string("vcpkg")),
+                        .for_build = for_build,
                     });
                 }
             }

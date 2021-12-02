@@ -31,7 +31,13 @@ pub fn execute(args: [][]u8) !void {
     // get modfile and dep
     const m = try zigmod.ModFile.from_dir(gpa, homedir);
     var dep: zigmod.Dep = undefined;
-    for (m.devdeps) |d| {
+    for (m.rootdeps) |d| {
+        if (std.mem.eql(u8, d.path, pkgurl)) {
+            dep = d;
+            break;
+        }
+    }
+    for (m.builddeps) |d| {
         if (std.mem.eql(u8, d.path, pkgurl)) {
             dep = d;
             break;

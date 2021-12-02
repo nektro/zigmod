@@ -37,7 +37,12 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
         try moduledeps.append(try add_files_package(options.alloc, cachepath, "root", mdir, m.root_files));
     }
     try moduledeps.append(try collect_deps(cachepath, mdir, options));
-    for (m.devdeps) |*d| {
+    for (m.rootdeps) |*d| {
+        if (try get_module_from_dep(d, cachepath, options)) |founddep| {
+            try moduledeps.append(founddep);
+        }
+    }
+    for (m.builddeps) |*d| {
         if (try get_module_from_dep(d, cachepath, options)) |founddep| {
             try moduledeps.append(founddep);
         }
@@ -229,6 +234,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                 .clean_path = d.path,
                 .yaml = null,
                 .dep = d.*,
+                .for_build = d.for_build,
             };
         },
         else => {
@@ -259,6 +265,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                 else => e,
             };
             dd.dep = d.*;
+            dd.for_build = d.for_build;
             const save = dd;
             if (d.type != .local) dd.clean_path = u.trim_prefix(modpath, cachepath)[1..];
             if (dd.id.len == 0) dd.id = try u.random_string(options.alloc, 48);

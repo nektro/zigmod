@@ -25,7 +25,12 @@ pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
     });
 
     const m = try zigmod.ModFile.from_dir(gpa, dir);
-    for (m.devdeps) |d| {
+    for (m.rootdeps) |d| {
+        if (std.mem.eql(u8, d.path, pkg_url)) {
+            return pkg_url;
+        }
+    }
+    for (m.builddeps) |d| {
         if (std.mem.eql(u8, d.path, pkg_url)) {
             return pkg_url;
         }

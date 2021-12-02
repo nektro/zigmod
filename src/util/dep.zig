@@ -28,6 +28,7 @@ pub const Dep = struct {
     deps: []zigmod.Dep,
     keep: bool = false,
     vcpkg: bool = false,
+    for_build: bool = false,
 
     pub fn clean_path(self: Dep) !string {
         if (self.type == .local) {

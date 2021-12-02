@@ -40,9 +40,14 @@ pub fn execute(args: [][]u8) !void {
             std.log.warn("dependency with name '{s}' already exists in your dependencies", .{found.name});
         }
     }
-    for (self_module.devdeps) |dep| {
+    for (self_module.rootdeps) |dep| {
         if (std.mem.eql(u8, dep.name, found.name)) {
-            std.log.warn("dependency with name '{s}' already exists in your dev_dependencies", .{found.name});
+            std.log.warn("dependency with name '{s}' already exists in your root_dependencies", .{found.name});
+        }
+    }
+    for (self_module.builddeps) |dep| {
+        if (std.mem.eql(u8, dep.name, found.name)) {
+            std.log.warn("dependency with name '{s}' already exists in your build_dependencies", .{found.name});
         }
     }
 

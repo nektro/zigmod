@@ -25,6 +25,7 @@ pub const Module = struct {
     deps: []Module,
     clean_path: string,
     dep: ?zigmod.Dep,
+    for_build: bool = false,
 
     pub fn from(alloc: *std.mem.Allocator, dep: zigmod.Dep, modpath: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(alloc);
@@ -50,6 +51,7 @@ pub const Module = struct {
             .except_os = dep.except_os,
             .yaml = dep.yaml,
             .dep = dep,
+            .for_build = dep.for_build,
         };
     }
 

@@ -42,9 +42,13 @@ This accepts a list of local directories to embed static assets. These files wil
 - Type: `[]Dep`
 This is a list of `Dep` objects. `Dep` objects are how you include the other people's code in your project. See the `Dep` documentation below to learn more about the attributes available here.
 
-### `dev_dependencies`
+### `root_dependencies`
 - Type: `[]Dep`
 Similar to `dependencies` but will only get added to the project if the current `zig.mod` is the root module.
+
+### `build_dependencies`
+- Type: `[]Dep`
+Similar to `dependencies` but will only get added to the project if the current `zig.mod` is the root module. Exposed in `deps.zig` through the `deps.imports` decl.
 
 ----
 

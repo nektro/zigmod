@@ -351,6 +351,9 @@ fn print_pkgs(w: std.fs.File.Writer, m: zigmod.Module) !void {
         if (d.main.len == 0) {
             continue;
         }
+        if (d.for_build) {
+            continue;
+        }
         const ident = try zig_name_from_pkg_name(d.name);
         try w.print("    pub const {s} = package_data._{s};\n", .{ ident, d.id[0..12] });
     }
@@ -360,6 +363,9 @@ fn print_pkgs(w: std.fs.File.Writer, m: zigmod.Module) !void {
 fn print_imports(w: std.fs.File.Writer, m: zigmod.Module, path: string) !void {
     for (m.deps) |d| {
         if (d.main.len == 0) {
+            continue;
+        }
+        if (!d.for_build) {
             continue;
         }
         const ident = try zig_name_from_pkg_name(d.name);
