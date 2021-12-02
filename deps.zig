@@ -9,9 +9,9 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
     for (packages) |pkg| {
         exe.addPackage(pkg.pkg.?);
     }
+    var llc = false;
     inline for (std.meta.declarations(package_data)) |decl| {
         const pkg = @as(Package, @field(package_data, decl.name));
-        var llc = false;
         inline for (pkg.system_libs) |item| {
             exe.linkSystemLibrary(item);
             llc = true;
@@ -24,10 +24,8 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
             exe.addCSourceFile(@field(dirs, decl.name) ++ "/" ++ item, pkg.c_source_flags);
             llc = true;
         }
-        if (llc) {
-            exe.linkLibC();
-        }
     }
+    if (llc) exe.linkLibC();
 }
 
 pub const Package = struct {
