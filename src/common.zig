@@ -236,7 +236,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
         else => {
             var dd = try collect_deps(cachepath, moddir, options) catch |e| switch (e) {
                 error.FileNotFound => {
-                    if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0) {
+                    if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0 or d.keep) {
                         var mod_from = try zigmod.Module.from(options.alloc, d.*, cachepath, options);
                         if (d.type != .local) mod_from.clean_path = u.trim_prefix(modpath, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
@@ -329,6 +329,7 @@ pub fn add_files_package(alloc: *std.mem.Allocator, pkg_name: string, mdir: std.
         .version = "absolute",
         .yaml = null,
         .deps = &.{},
+        .keep = false,
     };
     var options = CollectOptions{
         .log = false,
@@ -372,6 +373,7 @@ pub fn parse_lockfile(alloc: *std.mem.Allocator, dir: std.fs.Dir) ![]const [4]st
                     .main = "",
                     .yaml = null,
                     .deps = &.{},
+                    .keep = false,
                 };
                 try list.append([4]string{
                     try asdep.clean_path(),

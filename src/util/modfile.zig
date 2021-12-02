@@ -125,6 +125,7 @@ pub const ModFile = struct {
                         .except_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("except_os"), ","), ""),
                         .yaml = item.mapping,
                         .deps = try dep_list_by_name(alloc, item.mapping, &.{"dependencies"}),
+                        .keep = std.mem.eql(u8, "true", item.mapping.get_string("keep")),
                     });
                 }
             }
