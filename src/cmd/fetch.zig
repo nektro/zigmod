@@ -247,6 +247,9 @@ fn print_deps(w: std.fs.File.Writer, m: zigmod.Module) !void {
         if (d.main.len == 0) {
             continue;
         }
+        if (d.for_build) {
+            continue;
+        }
         try w.print("    package_data._{s},\n", .{d.id[0..12]});
     }
     try w.writeAll("}");
