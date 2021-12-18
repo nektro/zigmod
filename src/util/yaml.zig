@@ -110,7 +110,7 @@ pub const Mapping = struct {
         return if (self.get(k)) |v| v.string else "";
     }
 
-    pub fn get_string_array(self: Mapping, alloc: *std.mem.Allocator, k: string) ![]string {
+    pub fn get_string_array(self: Mapping, alloc: std.mem.Allocator, k: string) ![]string {
         var list = std.ArrayList(string).init(alloc);
         defer list.deinit();
         if (self.get(k)) |val| {
@@ -145,7 +145,7 @@ pub const TokenList = []const Token;
 //
 //
 
-pub fn parse(alloc: *std.mem.Allocator, input: string) !Document {
+pub fn parse(alloc: std.mem.Allocator, input: string) !Document {
     var parser: c.yaml_parser_t = undefined;
     _ = c.yaml_parser_initialize(&parser);
     defer c.yaml_parser_delete(&parser);
@@ -182,7 +182,7 @@ pub fn parse(alloc: *std.mem.Allocator, input: string) !Document {
 }
 
 pub const Parser = struct {
-    alloc: *std.mem.Allocator,
+    alloc: std.mem.Allocator,
     tokens: TokenList,
     lines: []const string,
     index: usize,

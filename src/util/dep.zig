@@ -12,7 +12,7 @@ const yaml = @import("./yaml.zig");
 pub const Dep = struct {
     const Self = @This();
 
-    alloc: *std.mem.Allocator,
+    alloc: std.mem.Allocator,
     type: zigmod.DepType,
     path: string,
     id: string,

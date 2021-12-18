@@ -11,7 +11,7 @@ const common = @import("./../common.zig");
 //
 
 pub const Module = struct {
-    alloc: *std.mem.Allocator,
+    alloc: std.mem.Allocator,
     is_sys_lib: bool,
     id: string,
     name: string,
@@ -27,7 +27,7 @@ pub const Module = struct {
     dep: ?zigmod.Dep,
     for_build: bool = false,
 
-    pub fn from(alloc: *std.mem.Allocator, dep: zigmod.Dep, modpath: string, options: *common.CollectOptions) !Module {
+    pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, modpath: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(alloc);
         defer moddeps.deinit();
 

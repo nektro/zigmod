@@ -32,7 +32,7 @@ pub const DepType = enum {
     // hypercore,  // https://hypercore-protocol.org/
 
     // zig fmt: on
-    pub fn pull(self: DepType, alloc: *std.mem.Allocator, rpath: string, dpath: string) !void {
+    pub fn pull(self: DepType, alloc: std.mem.Allocator, rpath: string, dpath: string) !void {
         switch (self) {
             .local => {},
             .system_lib => {},
@@ -57,7 +57,7 @@ pub const DepType = enum {
     }
 
     // zig fmt: on
-    pub fn update(self: DepType, alloc: *std.mem.Allocator, dpath: string, rpath: string) !void {
+    pub fn update(self: DepType, alloc: std.mem.Allocator, dpath: string, rpath: string) !void {
         _ = rpath;
 
         switch (self) {
@@ -77,7 +77,7 @@ pub const DepType = enum {
     }
 
     // zig fmt: on
-    pub fn exact_version(self: DepType, alloc: *std.mem.Allocator, mpath: string) !string {
+    pub fn exact_version(self: DepType, alloc: std.mem.Allocator, mpath: string) !string {
         var mdir = try std.fs.cwd().openDir(mpath, .{});
         defer mdir.close();
         return switch (self) {
