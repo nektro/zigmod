@@ -61,6 +61,8 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
 }
 
 pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) anyerror!zigmod.Module {
+    try std.fs.cwd().makePath(cachepath);
+
     const m = try zigmod.ModFile.from_dir(options.alloc, mdir);
     var moduledeps = std.ArrayList(zigmod.Module).init(options.alloc);
     defer moduledeps.deinit();
