@@ -29,6 +29,8 @@ pub const CollectOptions = struct {
 };
 
 pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) !zigmod.Module {
+    try std.fs.cwd().makePath(cachepath);
+
     const m = try zigmod.ModFile.from_dir(options.alloc, mdir);
     try options.init();
     var moduledeps = std.ArrayList(zigmod.Module).init(options.alloc);
