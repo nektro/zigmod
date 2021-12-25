@@ -18,17 +18,7 @@ A package manager for the Zig programming language.
 
 ## Built With
 - Zig master `0.9.0-dev.1524+d2f9646d9`
-- https://github.com/yaml/libyaml
-- https://github.com/nektro/zig-ansi
-- https://github.com/ziglibs/known-folders
-- https://github.com/nektro/zig-licenses
-- https://github.com/truemedian/zfetch
-- https://github.com/nektro/zig-json
-- https://github.com/nektro/zig-range
-- https://github.com/marlersoft/zigwin32
-- https://github.com/nektro/zig-detect-license
-- https://github.com/nektro/zig-inquirer
-- https://github.com/arqv/ini
+- See [`zig.mod`](./zig.mod)
 
 ### Build from Source
 Initially,
@@ -49,14 +39,6 @@ $ ./zig-out/bin/zigmod
 Check out our [docs](docs/) or the website: https://nektro.github.io/zigmod/.
 
 There is now also a tutorial-style getting started guide that goes over various use cases that Zigmod provides and caters to. It is [available here](docs/tutorial.md).
-
-## Prior Art
-- https://golang.org/ref/mod#go-mod-file
-- https://github.com/mattnite/zkg
-
-## Honorable mentions
-- https://github.com/truemedian
-- https://github.com/MasterQ32
 
 ## Contact
 - hello@nektro.net
