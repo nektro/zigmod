@@ -30,7 +30,7 @@ pub const Package = struct {
 
 pub fn execute(args: [][]u8) !void {
     if (args.len == 0) {
-        std.debug.warn("{s}\n", .{
+        std.debug.print("{s}\n", .{
             \\This is a subcommand for use with https://github.com/zigtools/zpm-server instances but has no default behavior on its own aside from showing you this nice help text.
             \\
             \\The default remote is https://zpm.random-projects.net/.

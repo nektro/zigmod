@@ -19,7 +19,7 @@ pub const CollectOptions = struct {
     log: bool,
     update: bool,
     lock: ?[]const [4]string = null,
-    alloc: *std.mem.Allocator,
+    alloc: std.mem.Allocator,
     already_fetched: *std.ArrayList(string) = undefined,
 
     pub fn init(self: *CollectOptions) !void {
@@ -286,7 +286,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
     }
 }
 
-pub fn add_files_package(alloc: *std.mem.Allocator, cachepath: string, pkg_name: string, mdir: std.fs.Dir, dirs: []const string) !zigmod.Module {
+pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: string, mdir: std.fs.Dir, dirs: []const string) !zigmod.Module {
     const fname = try std.mem.join(alloc, "", &.{ pkg_name, ".zig" });
 
     const map = &std.StringHashMap(string).init(alloc);
@@ -300,7 +300,7 @@ pub fn add_files_package(alloc: *std.mem.Allocator, cachepath: string, pkg_name:
             if (p.kind == .Directory) {
                 continue;
             }
-            const path = try std.mem.dupe(alloc, u8, p.path);
+            const path = try alloc.dupe(u8, p.path);
             try map.put(path, try std.fmt.allocPrint(alloc, "{s}/{s}", .{ dir_path, path }));
         }
     }
@@ -350,7 +350,7 @@ pub fn add_files_package(alloc: *std.mem.Allocator, cachepath: string, pkg_name:
     return (try get_module_from_dep(&d, filesdestpath, &options)).?;
 }
 
-pub fn parse_lockfile(alloc: *std.mem.Allocator, dir: std.fs.Dir) ![]const [4]string {
+pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]string {
     var list = std.ArrayList([4]string).init(alloc);
     const max = std.math.maxInt(usize);
     const f = try dir.openFile("zigmod.lock", .{});

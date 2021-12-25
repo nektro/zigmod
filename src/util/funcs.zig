@@ -37,7 +37,7 @@ pub fn try_index(comptime T: type, array: []T, n: usize, def: T) T {
     return array[n];
 }
 
-pub fn split(alloc: *std.mem.Allocator, in: string, delim: string) ![]string {
+pub fn split(alloc: std.mem.Allocator, in: string, delim: string) ![]string {
     var list = std.ArrayList(string).init(alloc);
     defer list.deinit();
 
@@ -113,7 +113,7 @@ pub fn list_contains_gen(comptime T: type, haystack: []const T, needle: T) bool 
     return false;
 }
 
-pub fn file_list(alloc: *std.mem.Allocator, dpath: string) ![]const string {
+pub fn file_list(alloc: std.mem.Allocator, dpath: string) ![]const string {
     var list = std.ArrayList(string).init(alloc);
     defer list.deinit();
 
@@ -133,7 +133,7 @@ pub fn file_list(alloc: *std.mem.Allocator, dpath: string) ![]const string {
     return list.toOwnedSlice();
 }
 
-pub fn run_cmd_raw(alloc: *std.mem.Allocator, dir: ?string, args: []const string) !std.ChildProcess.ExecResult {
+pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.ChildProcess.ExecResult {
     return std.ChildProcess.exec(.{ .allocator = alloc, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
         error.FileNotFound => {
             u.fail("\"{s}\" command not found", .{args[0]});
@@ -142,14 +142,14 @@ pub fn run_cmd_raw(alloc: *std.mem.Allocator, dir: ?string, args: []const string
     };
 }
 
-pub fn run_cmd(alloc: *std.mem.Allocator, dir: ?string, args: []const string) !u32 {
+pub fn run_cmd(alloc: std.mem.Allocator, dir: ?string, args: []const string) !u32 {
     const result = try run_cmd_raw(alloc, dir, args);
     alloc.free(result.stdout);
     alloc.free(result.stderr);
     return result.term.Exited;
 }
 
-pub fn list_remove(alloc: *std.mem.Allocator, input: []string, search: string) ![]string {
+pub fn list_remove(alloc: std.mem.Allocator, input: []string, search: string) ![]string {
     var list = std.ArrayList(string).init(alloc);
     defer list.deinit();
     for (input) |item| {
@@ -169,7 +169,7 @@ pub fn last(in: []string) !string {
 
 const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-pub fn random_string(alloc: *std.mem.Allocator, len: usize) !string {
+pub fn random_string(alloc: std.mem.Allocator, len: usize) !string {
     const now = @intCast(u64, std.time.nanoTimestamp());
     var rand = std.rand.DefaultPrng.init(now);
     const r = &rand.random();
@@ -206,7 +206,7 @@ pub const HashFn = enum {
     sha512,
 };
 
-pub fn validate_hash(alloc: *std.mem.Allocator, input: string, file_path: string) !bool {
+pub fn validate_hash(alloc: std.mem.Allocator, input: string, file_path: string) !bool {
     const hash = parse_split(HashFn, "-").do(input) catch return false;
     const file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
@@ -224,7 +224,7 @@ pub fn validate_hash(alloc: *std.mem.Allocator, input: string, file_path: string
     return result;
 }
 
-pub fn do_hash(alloc: *std.mem.Allocator, comptime algo: type, data: string) !string {
+pub fn do_hash(alloc: std.mem.Allocator, comptime algo: type, data: string) !string {
     const h = &algo.init(.{});
     var out: [algo.digest_length]u8 = undefined;
     h.update(data);
@@ -234,7 +234,7 @@ pub fn do_hash(alloc: *std.mem.Allocator, comptime algo: type, data: string) !st
 }
 
 /// Returns the result of running `git rev-parse HEAD`
-pub fn git_rev_HEAD(alloc: *std.mem.Allocator, dir: std.fs.Dir) !string {
+pub fn git_rev_HEAD(alloc: std.mem.Allocator, dir: std.fs.Dir) !string {
     const max = std.math.maxInt(usize);
     const dirg = try dir.openDir(".git", .{});
     const h = std.mem.trim(u8, try dirg.readFileAlloc(alloc, "HEAD", max), "\n");
@@ -248,7 +248,7 @@ pub fn slice(comptime T: type, input: []const T, from: usize, to: usize) []const
     return input[f..t];
 }
 
-pub fn detect_pkgname(alloc: *std.mem.Allocator, override: string, dir: string) !string {
+pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: string) !string {
     if (override.len > 0) {
         return override;
     }
@@ -264,7 +264,7 @@ pub fn detect_pkgname(alloc: *std.mem.Allocator, override: string, dir: string) 
     return name;
 }
 
-pub fn detct_mainfile(alloc: *std.mem.Allocator, override: string, dir: ?std.fs.Dir, name: string) !string {
+pub fn detct_mainfile(alloc: std.mem.Allocator, override: string, dir: ?std.fs.Dir, name: string) !string {
     if (override.len > 0) {
         if (try does_file_exist(dir, override)) {
             if (std.mem.endsWith(u8, override, ".zig")) {
