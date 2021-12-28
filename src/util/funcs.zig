@@ -256,7 +256,7 @@ pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: string) !
     if (!(try does_file_exist(dirO, "build.zig"))) {
         return error.NoBuildZig;
     }
-    const dpath = try std.fs.realpathAlloc(alloc, try std.mem.concat(alloc, u8, &.{ dir, "build.zig" }));
+    const dpath = try std.fs.realpathAlloc(alloc, try std.fs.path.join(alloc, &.{ dir, "build.zig" }));
     const splitP = try split(alloc, dpath, std.fs.path.sep_str);
     var name = splitP[splitP.len - 2];
     name = trim_prefix(name, "zig-");
