@@ -74,25 +74,6 @@ pub fn execute(args: [][]u8) !void {
         },
     }
 
-    // ask about .gitignore
-    if (try u.does_folder_exist(".git")) {
-        const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitignore?", gpa);
-        if (do) {
-            const exists = try u.does_file_exist(null, ".gitignore");
-            const file: std.fs.File = try (if (exists) cwd.openFile(".gitignore", .{ .read = true, .write = true }) else cwd.createFile(".gitignore", .{}));
-            defer file.close();
-            const len = try file.getEndPos();
-            if (len > 0) try file.seekTo(len - 1);
-            const w = file.writer();
-            if (len > 0 and (try file.reader().readByte()) != '\n') {
-                try w.writeAll("\n");
-            }
-            if (!exists) try w.writeAll("zig-*\n");
-            try w.writeAll(".zigmod\n");
-            try w.writeAll("deps.zig\n");
-        }
-    }
-
     // ask about LICENSE
     if (!(try u.does_file_exist(null, "LICENSE"))) {
         if (detectlicense.licenses.find(license)) |text| {
@@ -118,6 +99,25 @@ pub fn execute(args: [][]u8) !void {
                 const w = file.writer();
                 try w.writeAll(realtext);
             }
+        }
+    }
+
+    // ask about .gitignore
+    if (try u.does_folder_exist(".git")) {
+        const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitignore?", gpa);
+        if (do) {
+            const exists = try u.does_file_exist(null, ".gitignore");
+            const file: std.fs.File = try (if (exists) cwd.openFile(".gitignore", .{ .read = true, .write = true }) else cwd.createFile(".gitignore", .{}));
+            defer file.close();
+            const len = try file.getEndPos();
+            if (len > 0) try file.seekTo(len - 1);
+            const w = file.writer();
+            if (len > 0 and (try file.reader().readByte()) != '\n') {
+                try w.writeAll("\n");
+            }
+            if (!exists) try w.writeAll("zig-*\n");
+            try w.writeAll(".zigmod\n");
+            try w.writeAll("deps.zig\n");
         }
     }
 }
