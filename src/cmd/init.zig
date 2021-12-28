@@ -120,6 +120,28 @@ pub fn execute(args: [][]u8) !void {
             try w.writeAll("deps.zig\n");
         }
     }
+
+    // ask about .gitattributes
+    if (try u.does_folder_exist(".git")) {
+        const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitattributes?", gpa);
+        if (do) {
+            const exists = try u.does_file_exist(null, ".gitattributes");
+            const file: std.fs.File = try (if (exists) cwd.openFile(".gitattributes", .{ .read = true, .write = true }) else cwd.createFile(".gitattributes", .{}));
+            defer file.close();
+            const len = try file.getEndPos();
+            if (len > 0) try file.seekTo(len - 1);
+            const w = file.writer();
+            if (len > 0 and (try file.reader().readByte()) != '\n') {
+                try w.writeAll("\n");
+            }
+            if (!exists) try w.writeAll("* text=auto\n");
+            if (!exists) try w.writeAll("*.zig text eol=lf # See https://github.com/ziglang/zig-spec/issues/38\n");
+            try w.writeAll("zig.mod text eol=lf\n");
+            try w.writeAll("zigmod.* text eol=lf\n");
+            try w.writeAll("zig.mod linguist-language=YAML\n");
+            try w.writeAll("zig.mod gitlab-language=yaml\n");
+        }
+    }
 }
 
 pub fn writeExeManifest(w: std.fs.File.Writer, id: string, name: string, license: ?string, description: ?string) !void {
