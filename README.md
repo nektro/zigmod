@@ -18,7 +18,7 @@ A package manager for the Zig programming language.
 
 ## Built With
 - Zig master (at least `0.9.0`)
-- See [`zig.mod`](./zig.mod)
+- See [`zig.mod`](./zig.mod) and [`zigmod.lock`](./zigmod.lock)
 
 ### Build from Source
 Initially,
