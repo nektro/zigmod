@@ -12,7 +12,7 @@ pub fn execute(args: [][]u8) !void {
 
     const root = @import("root");
     const build_options = if (@hasDecl(root, "build_options")) root.build_options else struct {};
-    const version = if (@hasDecl(build_options, "version")) build_options.version else "unknown";
+    const version = build_options.version;
 
     var gitversion = u.git_rev_HEAD(gpa, std.fs.cwd()) catch "";
     gitversion = if (gitversion.len > 0) gitversion[0..9] else gitversion;
@@ -28,9 +28,7 @@ pub fn execute(args: [][]u8) !void {
     }
 
     try w.print(" {s}", .{@tagName(builtin.os.tag)});
-
     try w.print(" {s}", .{@tagName(builtin.cpu.arch)});
-
     try w.print(" {s}", .{@tagName(builtin.abi)});
 
     try w.writeAll("\n");
