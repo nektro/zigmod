@@ -9,14 +9,26 @@ pub fn build(b: *std.build.Builder) void {
     b.setPreferredReleaseMode(.ReleaseSafe);
     const mode = b.standardReleaseOptions();
 
+    const bootstrap = b.option(bool, "bootstrap", "bootstrapping with just the zig compiler");
     const use_full_name = b.option(bool, "use-full-name", "") orelse false;
     const with_arch_os = b.fmt("-{s}-{s}", .{ @tagName(target.cpu_arch orelse builtin.cpu.arch), @tagName(target.os_tag orelse builtin.os.tag) });
     const exe_name = b.fmt("{s}{s}", .{ "zigmod", if (use_full_name) with_arch_os else "" });
+    const exe = makeExe(b, exe_name, target, mode, bootstrap);
 
+    const run_cmd = exe.run();
+    run_cmd.step.dependOn(b.getInstallStep());
+    if (b.args) |args| {
+        run_cmd.addArgs(args);
+    }
+
+    const run_step = b.step("run", "Run the app");
+    run_step.dependOn(&run_cmd.step);
+}
+
+fn makeExe(b: *std.build.Builder, exe_name: string, target: std.zig.CrossTarget, mode: std.builtin.Mode, bootstrap: ?bool) *std.build.LibExeObjStep {
     const exe = b.addExecutable(exe_name, "src/main.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
-    const bootstrap = b.option(bool, "bootstrap", "bootstrapping with just the zig compiler");
 
     const exe_options = b.addOptions();
     exe.addOptions("build_options", exe_options);
@@ -55,13 +67,5 @@ pub fn build(b: *std.build.Builder) void {
     }
 
     exe.install();
-
-    const run_cmd = exe.run();
-    run_cmd.step.dependOn(b.getInstallStep());
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
-
-    const run_step = b.step("run", "Run the app");
-    run_step.dependOn(&run_cmd.step);
+    return exe;
 }
