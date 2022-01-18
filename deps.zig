@@ -41,7 +41,7 @@ pub const Package = struct {
     vcpkg: bool = false,
 };
 
-const dirs = struct {
+pub const dirs = struct {
     pub const _root = "";
     pub const _89ujp8gq842x = cache ++ "/../..";
     pub const _8mdbh0zuneb0 = cache ++ "/v/git/github.com/yaml/libyaml/tag-0.2.5";
