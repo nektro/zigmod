@@ -26,6 +26,7 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
             exe.addCSourceFile(@field(dirs, decl.name) ++ "/" ++ item, pkg.c_source_flags);
             llc = true;
         }
+        vcpkg = vcpkg or pkg.vcpkg;
     }
     if (llc) exe.linkLibC();
     if (builtin.os.tag == .windows and vcpkg) exe.addVcpkgPaths(.static) catch |err| @panic(@errorName(err));

@@ -74,6 +74,7 @@ pub fn create_depszig(cachepath: string, dir: std.fs.Dir, top_module: zigmod.Mod
         \\            exe.addCSourceFile(@field(dirs, decl.name) ++ "/" ++ item, pkg.c_source_flags);
         \\            llc = true;
         \\        }
+        \\        vcpkg = vcpkg or pkg.vcpkg;
         \\    }
         \\    if (llc) exe.linkLibC();
         \\    if (builtin.os.tag == .windows and vcpkg) exe.addVcpkgPaths(.static) catch |err| @panic(@errorName(err));
