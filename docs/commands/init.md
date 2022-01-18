@@ -10,4 +10,4 @@ Check out the [`zig.mod` reference](./../zig.mod.md) for more info.
 Also check out `zigmod`'s own `zig.mod` for a useful example: https://github.com/nektro/zigmod/blob/master/zig.mod.
 
 ## Screenshot
-![image](https://user-images.githubusercontent.com/5464072/130743642-4fa28707-1ff7-4791-8f1f-1a12d73454f4.png)
+![image](https://user-images.githubusercontent.com/5464072/148404704-1082fd05-00fc-40ee-8cb7-17b538db3827.png)
