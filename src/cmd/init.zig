@@ -135,7 +135,7 @@ pub fn execute(args: [][]u8) !void {
                 try w.writeAll("\n");
             }
             if (!exists) try w.writeAll("* text=auto\n");
-            if (!exists) try w.writeAll("*.zig text eol=lf # See https://github.com/ziglang/zig-spec/issues/38\n");
+            if (!exists) try w.writeAll("*.zig text eol=lf\n");
             try w.writeAll("zig.mod text eol=lf\n");
             try w.writeAll("zigmod.* text eol=lf\n");
             try w.writeAll("zig.mod linguist-language=YAML\n");
