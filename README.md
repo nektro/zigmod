@@ -17,7 +17,7 @@ A package manager for the Zig programming language.
 - https://github.com/nektro/zigmod/releases
 
 ## Built With
-- Zig master `0.9.0`
+- Zig master (at least `0.9.0`)
 - See [`zig.mod`](./zig.mod)
 
 ### Build from Source
