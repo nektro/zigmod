@@ -6,6 +6,7 @@ const string = []const u8;
 pub const cache = ".zigmod/deps";
 
 pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
+    checkMinZig(builtin.zig_version, exe);
     @setEvalBranchQuota(1_000_000);
     for (packages) |pkg| {
         exe.addPackage(pkg.pkg.?);
@@ -41,6 +42,11 @@ pub const Package = struct {
     system_libs: []const string = &.{},
     vcpkg: bool = false,
 };
+
+fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {
+    const min = std.SemanticVersion.parse("0.9.0") catch return;
+    if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{current, min}));
+}
 
 pub const dirs = struct {
     pub const _root = "";

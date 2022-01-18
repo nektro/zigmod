@@ -26,6 +26,7 @@ pub const Module = struct {
     clean_path: string,
     dep: ?zigmod.Dep,
     for_build: bool = false,
+    min_zig_version: ?std.SemanticVersion,
 
     pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, modpath: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(alloc);
@@ -52,6 +53,7 @@ pub const Module = struct {
             .yaml = dep.yaml,
             .dep = dep,
             .for_build = dep.for_build,
+            .min_zig_version = null,
         };
     }
 
@@ -133,5 +135,18 @@ pub const Module = struct {
 
     pub fn short_id(self: Module) string {
         return u.slice(u8, self.id, 0, 12);
+    }
+
+    pub fn minZigVersion(self: Module) ?std.SemanticVersion {
+        var res = self.min_zig_version;
+
+        for (self.deps) |dm| {
+            if (dm.minZigVersion()) |sv| {
+                if (res == null or sv.order(res.?).compare(.gt)) {
+                    res = sv;
+                }
+            }
+        }
+        return res;
     }
 };

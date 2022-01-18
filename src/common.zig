@@ -59,6 +59,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
         .clean_path = "",
         .yaml = m.yaml,
         .dep = null,
+        .min_zig_version = m.min_zig_version,
     };
 }
 
@@ -89,6 +90,7 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOption
         .clean_path = "../..",
         .yaml = m.yaml,
         .dep = null,
+        .min_zig_version = m.min_zig_version,
     };
 }
 
@@ -239,6 +241,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                 .yaml = null,
                 .dep = d.*,
                 .for_build = d.for_build,
+                .min_zig_version = null,
             };
         },
         else => {

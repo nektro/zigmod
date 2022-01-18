@@ -53,6 +53,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     try w.writeAll("\n");
     try w.writeAll(
         \\pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
+        \\    checkMinZig(builtin.zig_version, exe);
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
         \\        exe.addPackage(pkg.pkg.?);
@@ -91,6 +92,15 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\
         \\
     );
+
+    try w.print(
+        \\fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {{
+        \\    const min = std.SemanticVersion.parse("{}") catch return;
+        \\    if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{{}} does not meet the minimum build requirement of v{{}}", .{{current, min}}));
+        \\}}
+        \\
+        \\
+    , .{top_module.minZigVersion()});
 
     try w.writeAll("pub const dirs = struct {\n");
     try print_dirs(w, list.items);

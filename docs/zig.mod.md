@@ -50,6 +50,10 @@ Similar to `dependencies` but will only get added to the project if the current 
 - Type: `[]Dep`
 Similar to `dependencies` but will only get added to the project if the current `zig.mod` is the root module. Exposed in `deps.zig` through the `deps.imports` decl.
 
+### `min_zig_version`
+- Type: `string`
+Parsed as a `std.SemanticVersion`, this attribute refers to the minimum compatible Zig version for this package/application and will cause `zig build` to panic if violated.
+
 ----
 
 ### Dep Object
