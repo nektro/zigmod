@@ -97,7 +97,40 @@ pub fn execute(args: [][]u8) !void {
                 const file = try cwd.createFile("LICENSE", .{});
                 defer file.close();
                 const w = file.writer();
-                try w.writeAll(realtext);
+
+                // properly format license text to fit within 80 columns
+                var start: usize = 0;
+                var end: usize = 0;
+                var run: u32 = 0;
+                var i: usize = 0;
+                while (i < realtext.len) {
+                    const c = realtext[i];
+                    end += 1;
+                    i += 1;
+
+                    if (c == '\n') {
+                        try w.writeAll(realtext[start..end]);
+                        std.log.info("{s}", .{realtext[start .. end - 1]});
+                        start = end;
+                        run = 0;
+                        i = start;
+                        continue;
+                    }
+                    run += 1;
+
+                    if (run >= 79) {
+                        const s_ind = (std.mem.lastIndexOfScalar(u8, realtext[start..end], ' ') orelse end) + start;
+                        const n_ind = (std.mem.lastIndexOfScalar(u8, realtext[start .. end - 1], '\n') orelse end) + start;
+                        const ind = std.math.min(s_ind, n_ind);
+                        try w.print("{s}\n", .{realtext[start..ind]});
+                        std.log.debug("{s}", .{realtext[start..ind]});
+                        end = ind + 1;
+                        start = end;
+                        run = 0;
+                        i = start;
+                    }
+                }
+                try w.writeAll(realtext[start..realtext.len]);
             }
         }
     }
