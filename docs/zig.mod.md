@@ -54,6 +54,11 @@ Similar to `dependencies` but will only get added to the project if the current 
 - Type: `string`
 Parsed as a `std.SemanticVersion`, this attribute refers to the minimum compatible Zig version for this package/application and will cause `zig build` to panic if violated.
 
+#### `vcpkg`
+- Type: `bool`
+- Example: `true`|any
+This attribute is a flag to call `try exe.addVcpkgPaths(.static);` when on Windows. Likely used in conjunction with adding system libraries/C code. `true` is the only value that will enable this flag.
+
 ----
 
 ### Dep Object

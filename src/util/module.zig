@@ -27,6 +27,7 @@ pub const Module = struct {
     dep: ?zigmod.Dep,
     for_build: bool = false,
     min_zig_version: ?std.SemanticVersion,
+    vcpkg: bool,
 
     pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, modpath: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(alloc);
@@ -54,6 +55,7 @@ pub const Module = struct {
             .dep = dep,
             .for_build = dep.for_build,
             .min_zig_version = null,
+            .vcpkg = dep.vcpkg,
         };
     }
 
@@ -117,16 +119,6 @@ pub const Module = struct {
     pub fn has_syslib_deps(self: Module) bool {
         for (self.deps) |d| {
             if (d.is_sys_lib) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    pub fn has_vcpkg_deps(self: Module) bool {
-        for (self.deps) |d| {
-            const dd = d.dep orelse continue;
-            if (dd.vcpkg) {
                 return true;
             }
         }

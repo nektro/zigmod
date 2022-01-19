@@ -331,7 +331,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                     }
                     try w.writeAll(" },\n");
                 }
-                if (mod.has_vcpkg_deps()) {
+                if (mod.vcpkg) {
                     try w.writeAll("        .vcpkg = true,\n");
                 }
                 try w.writeAll("    };\n");

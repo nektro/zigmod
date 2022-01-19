@@ -28,6 +28,7 @@ pub const ModFile = struct {
     rootdeps: []zigmod.Dep,
     builddeps: []zigmod.Dep,
     min_zig_version: ?std.SemanticVersion,
+    vcpkg: bool,
 
     pub fn init(alloc: std.mem.Allocator, mpath: string) !Self {
         const file = try std.fs.cwd().openFile(mpath, .{});
@@ -68,6 +69,7 @@ pub const ModFile = struct {
             .rootdeps = try dep_list_by_name(alloc, mapping, &.{ "dev_dependencies", "root_dependencies" }, false),
             .builddeps = try dep_list_by_name(alloc, mapping, &.{ "dev_dependencies", "build_dependencies" }, true),
             .min_zig_version = std.SemanticVersion.parse(mapping.get_string("min_zig_version")) catch null,
+            .vcpkg = std.mem.eql(u8, "true", mapping.get_string("vcpkg")),
         };
     }
 
