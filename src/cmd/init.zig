@@ -6,12 +6,12 @@ const inquirer = @import("inquirer");
 const detectlicense = @import("detect-license");
 const knownfolders = @import("known-folders");
 const ini = @import("ini");
+const time = @import("time");
+
 const u = @import("./../util/index.zig");
 
 //
 //
-
-const s_in_y = std.time.s_per_week * 52;
 
 pub fn execute(args: [][]u8) !void {
     _ = args;
@@ -84,7 +84,7 @@ pub fn execute(args: [][]u8) !void {
                     "year:",
                     string,
                     "{s}",
-                    try std.fmt.allocPrint(gpa, "{d}", .{1970 + @divFloor(std.time.timestamp(), s_in_y)}),
+                    try std.fmt.allocPrint(gpa, "{d}", .{time.DateTime.now().years}),
                 ));
                 realtext = try std.mem.replaceOwned(u8, gpa, realtext, "<copyright holders>", try inquirer.forString(
                     stdout,
