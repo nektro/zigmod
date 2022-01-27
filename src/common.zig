@@ -1,5 +1,6 @@
 const std = @import("std");
 const string = []const u8;
+const builtin = @import("builtin");
 const ansi = @import("ansi");
 const root = @import("root");
 
