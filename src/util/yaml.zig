@@ -1,6 +1,5 @@
 const std = @import("std");
 const string = []const u8;
-const yaml = @import("yaml");
 
 const c = @cImport({
     @cInclude("yaml.h");

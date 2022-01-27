@@ -2,7 +2,6 @@ const std = @import("std");
 const gpa = std.heap.c_allocator;
 
 const zigmod = @import("../lib.zig");
-const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
 
 //
