@@ -1,6 +1,5 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
-
 const style = @import("ansi").style;
 const licenses = @import("licenses");
 

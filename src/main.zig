@@ -1,7 +1,6 @@
 const std = @import("std");
 const string = []const u8;
 const builtin = @import("builtin");
-
 pub const build_options = @import("build_options");
 const zigmod = @import("zigmod");
 const win32 = @import("win32");

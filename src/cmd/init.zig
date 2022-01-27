@@ -1,7 +1,6 @@
 const std = @import("std");
 const string = []const u8;
 const gpa = std.heap.c_allocator;
-
 const inquirer = @import("inquirer");
 const detectlicense = @import("detect-license");
 const knownfolders = @import("known-folders");

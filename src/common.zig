@@ -1,14 +1,13 @@
 const std = @import("std");
 const string = []const u8;
 const builtin = @import("builtin");
-
 const ansi = @import("ansi");
+const root = @import("root");
 
 const zigmod = @import("./lib.zig");
 const u = @import("./util/index.zig");
 const yaml = @import("./util/yaml.zig");
 
-const root = @import("root");
 const build_options = if (@hasDecl(root, "build_options")) root.build_options else struct {};
 const bootstrap = if (@hasDecl(build_options, "bootstrap")) build_options.bootstrap else false;
 

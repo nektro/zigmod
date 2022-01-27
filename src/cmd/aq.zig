@@ -1,7 +1,6 @@
 const std = @import("std");
 const string = []const u8;
 const gpa = std.heap.c_allocator;
-
 const zfetch = @import("zfetch");
 const json = @import("json");
 
