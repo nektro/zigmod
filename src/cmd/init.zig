@@ -180,7 +180,7 @@ pub fn writeExeManifest(w: std.fs.File.Writer, id: string, name: string, license
     try w.print("name: {s}\n", .{name});
     if (license) |_| try w.print("license: {s}\n", .{license.?});
     if (description) |_| try w.print("description: {s}\n", .{description.?});
-    try w.print("dev_dependencies:\n", .{});
+    try w.print("root_dependencies:\n", .{});
 }
 
 pub fn writeLibManifest(w: std.fs.File.Writer, id: string, name: string, entry: string, license: string, description: string) !void {
