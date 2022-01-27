@@ -110,7 +110,6 @@ pub fn execute(args: [][]u8) !void {
 
                     if (c == '\n') {
                         try w.writeAll(realtext[start..end]);
-                        std.log.info("{s}", .{realtext[start .. end - 1]});
                         start = end;
                         run = 0;
                         i = start;
@@ -123,7 +122,6 @@ pub fn execute(args: [][]u8) !void {
                         const n_ind = (std.mem.lastIndexOfScalar(u8, realtext[start .. end - 1], '\n') orelse end) + start;
                         const ind = std.math.min(s_ind, n_ind);
                         try w.print("{s}\n", .{realtext[start..ind]});
-                        std.log.debug("{s}", .{realtext[start..ind]});
                         end = ind + 1;
                         start = end;
                         run = 0;
