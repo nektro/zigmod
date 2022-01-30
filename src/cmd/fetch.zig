@@ -371,12 +371,14 @@ fn print_pkgs(alloc: std.mem.Allocator, w: std.fs.File.Writer, m: zigmod.Module)
         try w.print("    pub const {s} = package_data._{s};\n", .{ ident, d.id[0..12] });
     }
 
+    try w.writeByte('\n');
+    try w.writeAll("    // this function is for gyro compatibility, in only adds zig packages to keep the semantics consistent\n");
     try w.writeAll("    pub fn addAllTo(artifact: *std.build.LibExeObjStep) void {\n");
     if (m.deps.len == 0)
         try w.writeAll("        _ = artifact;\n");
 
     for (m.deps) |d|
-        try w.print("        artifact.addPackage(package_data._{s});\n", .{d.id[0..12]});
+        try w.print("        artifact.addPackage(package_data._{s}.pkg.?);\n", .{d.id[0..12]});
 
     try w.writeAll("    }\n}");
 }

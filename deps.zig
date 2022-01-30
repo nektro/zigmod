@@ -173,9 +173,11 @@ pub const packages = &[_]Package{
 pub const pkgs = struct {
     pub const zigmod = package_data._89ujp8gq842x;
     pub const win32 = package_data._o6ogpor87xc2;
+
+    // this function is for gyro compatibility, in only adds zig packages to keep the semantics consistent
     pub fn addAllTo(artifact: *std.build.LibExeObjStep) void {
-        artifact.addPackage(package_data._89ujp8gq842x);
-        artifact.addPackage(package_data._o6ogpor87xc2);
+        artifact.addPackage(package_data._89ujp8gq842x.pkg.?);
+        artifact.addPackage(package_data._o6ogpor87xc2.pkg.?);
     }
 };
 
