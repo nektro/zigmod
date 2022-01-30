@@ -45,7 +45,7 @@ pub const Package = struct {
 
 fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {
     const min = std.SemanticVersion.parse("0.10.0-dev.397+f1b79c9a4") catch return;
-    if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{current, min}));
+    if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{ current, min }));
 }
 
 pub const dirs = struct {
@@ -76,7 +76,7 @@ pub const dirs = struct {
 pub const package_data = struct {
     pub const _8mdbh0zuneb0 = Package{
         .directory = dirs._8mdbh0zuneb0,
-        .c_include_dirs = &.{ "include" },
+        .c_include_dirs = &.{"include"},
         .c_source_files = &.{ "src/api.c", "src/dumper.c", "src/emitter.c", "src/loader.c", "src/parser.c", "src/reader.c", "src/scanner.c", "src/writer.c" },
         .c_source_flags = &.{ "-DYAML_VERSION_MAJOR=0", "-DYAML_VERSION_MINOR=2", "-DYAML_VERSION_PATCH=5", "-DYAML_VERSION_STRING=\"0.2.5\"", "-DYAML_DECLARE_STATIC=1" },
     };
@@ -118,11 +118,11 @@ pub const package_data = struct {
     };
     pub const _f7dubzb7cyqe = Package{
         .directory = dirs._f7dubzb7cyqe,
-        .pkg = Pkg{ .name = "extras", .path = .{ .path = dirs._f7dubzb7cyqe ++ "/src/lib.zig" }, .dependencies = &.{ _tnj3qf44tpeq.pkg.? } },
+        .pkg = Pkg{ .name = "extras", .path = .{ .path = dirs._f7dubzb7cyqe ++ "/src/lib.zig" }, .dependencies = &.{_tnj3qf44tpeq.pkg.?} },
     };
     pub const _ocmr9rtohgcc = Package{
         .directory = dirs._ocmr9rtohgcc,
-        .pkg = Pkg{ .name = "json", .path = .{ .path = dirs._ocmr9rtohgcc ++ "/src/lib.zig" }, .dependencies = &.{ _f7dubzb7cyqe.pkg.? } },
+        .pkg = Pkg{ .name = "json", .path = .{ .path = dirs._ocmr9rtohgcc ++ "/src/lib.zig" }, .dependencies = &.{_f7dubzb7cyqe.pkg.?} },
     };
     pub const _pt88y5d80m25 = Package{
         .directory = dirs._pt88y5d80m25,
@@ -130,7 +130,7 @@ pub const package_data = struct {
     };
     pub const _96h80ezrvj7i = Package{
         .directory = dirs._96h80ezrvj7i,
-        .pkg = Pkg{ .name = "leven", .path = .{ .path = dirs._96h80ezrvj7i ++ "/src/lib.zig" }, .dependencies = &.{ _tnj3qf44tpeq.pkg.? } },
+        .pkg = Pkg{ .name = "leven", .path = .{ .path = dirs._96h80ezrvj7i ++ "/src/lib.zig" }, .dependencies = &.{_tnj3qf44tpeq.pkg.?} },
     };
     pub const _qyrnfg0iwpzl = Package{
         .directory = dirs._qyrnfg0iwpzl,
@@ -150,7 +150,7 @@ pub const package_data = struct {
     };
     pub const _iecwp4b3bsfm = Package{
         .directory = dirs._iecwp4b3bsfm,
-        .pkg = Pkg{ .name = "time", .path = .{ .path = dirs._iecwp4b3bsfm ++ "/time.zig" }, .dependencies = &.{ _tnj3qf44tpeq.pkg.? } },
+        .pkg = Pkg{ .name = "time", .path = .{ .path = dirs._iecwp4b3bsfm ++ "/time.zig" }, .dependencies = &.{_tnj3qf44tpeq.pkg.?} },
     };
     pub const _89ujp8gq842x = Package{
         .directory = dirs._89ujp8gq842x,
@@ -173,7 +173,10 @@ pub const packages = &[_]Package{
 pub const pkgs = struct {
     pub const zigmod = package_data._89ujp8gq842x;
     pub const win32 = package_data._o6ogpor87xc2;
+    pub fn addAllTo(artifact: *std.build.LibExeObjStep) void {
+        artifact.addPackage(package_data._89ujp8gq842x);
+        artifact.addPackage(package_data._o6ogpor87xc2);
+    }
 };
 
-pub const imports = struct {
-};
+pub const imports = struct {};

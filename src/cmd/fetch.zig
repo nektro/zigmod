@@ -370,7 +370,15 @@ fn print_pkgs(alloc: std.mem.Allocator, w: std.fs.File.Writer, m: zigmod.Module)
         const ident = try zig_name_from_pkg_name(alloc, d.name);
         try w.print("    pub const {s} = package_data._{s};\n", .{ ident, d.id[0..12] });
     }
-    try w.writeAll("}");
+
+    try w.writeAll("    pub fn addAllTo(artifact: *std.build.LibExeObjStep) void {\n");
+    if (m.deps.len == 0)
+        try w.writeAll("        _ = artifact;\n");
+
+    for (m.deps) |d|
+        try w.print("        artifact.addPackage(package_data._{s});\n", .{d.id[0..12]});
+
+    try w.writeAll("    }\n}");
 }
 
 fn print_imports(alloc: std.mem.Allocator, w: std.fs.File.Writer, m: zigmod.Module, path: string) !void {
