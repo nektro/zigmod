@@ -137,7 +137,7 @@ pub fn execute(args: [][]u8) !void {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitignore?", gpa);
         if (do) {
             const exists = try u.does_file_exist(null, ".gitignore");
-            const file: std.fs.File = try (if (exists) cwd.openFile(".gitignore", .{ .read = true, .write = true }) else cwd.createFile(".gitignore", .{}));
+            const file: std.fs.File = try (if (exists) cwd.openFile(".gitignore", .{ .mode = .read_write }) else cwd.createFile(".gitignore", .{}));
             defer file.close();
             const len = try file.getEndPos();
             if (len > 0) try file.seekTo(len - 1);
@@ -156,7 +156,7 @@ pub fn execute(args: [][]u8) !void {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitattributes?", gpa);
         if (do) {
             const exists = try u.does_file_exist(null, ".gitattributes");
-            const file: std.fs.File = try (if (exists) cwd.openFile(".gitattributes", .{ .read = true, .write = true }) else cwd.createFile(".gitattributes", .{}));
+            const file: std.fs.File = try (if (exists) cwd.openFile(".gitattributes", .{ .mode = .read_write }) else cwd.createFile(".gitattributes", .{}));
             defer file.close();
             const len = try file.getEndPos();
             if (len > 0) try file.seekTo(len - 1);
