@@ -43,7 +43,7 @@ pub fn execute(args: [][]u8) !void {
         return;
     }
 
-    inline for (std.meta.declarations(commands)) |decl| {
+    inline for (comptime std.meta.declarations(commands)) |decl| {
         if (std.mem.eql(u8, args[0], decl.name)) {
             const cmd = @field(commands, decl.name);
             try cmd.execute(args[1..]);

@@ -60,7 +60,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    }
         \\    var llc = false;
         \\    var vcpkg = false;
-        \\    inline for (std.meta.declarations(package_data)) |decl| {
+        \\    inline for (comptime std.meta.declarations(package_data)) |decl| {
         \\        const pkg = @as(Package, @field(package_data, decl.name));
         \\        inline for (pkg.system_libs) |item| {
         \\            exe.linkSystemLibrary(item);
