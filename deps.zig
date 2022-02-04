@@ -13,7 +13,7 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
     }
     var llc = false;
     var vcpkg = false;
-    inline for (std.meta.declarations(package_data)) |decl| {
+    inline for (comptime std.meta.declarations(package_data)) |decl| {
         const pkg = @as(Package, @field(package_data, decl.name));
         inline for (pkg.system_libs) |item| {
             exe.linkSystemLibrary(item);
@@ -44,8 +44,9 @@ pub const Package = struct {
 };
 
 fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {
-    const min = std.SemanticVersion.parse("0.10.0-dev.397+f1b79c9a4") catch return;
-    if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{ current, min }));
+
+    const min = std.SemanticVersion.parse("0.10.0-dev.513+029844210") catch return;
+    if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{current, min}));
 }
 
 pub const dirs = struct {

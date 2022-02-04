@@ -58,7 +58,7 @@ pub fn execute(args: [][]u8) !void {
         break :blk _req.status.code == 200;
     };
 
-    const file = try std.fs.cwd().openFile("zig.mod", .{ .read = true, .write = true });
+    const file = try std.fs.cwd().openFile("zig.mod", .{ .mode = .read_write });
     try file.seekTo(try file.getEndPos());
 
     const file_w = file.writer();

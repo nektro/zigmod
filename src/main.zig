@@ -28,7 +28,7 @@ pub fn main() !void {
         });
         u.print("", .{});
         u.print("The commands available are:", .{});
-        inline for (std.meta.declarations(available)) |decl| {
+        inline for (comptime std.meta.declarations(available)) |decl| {
             u.print("  - {s}", .{decl.name});
         }
         return;
@@ -47,7 +47,7 @@ pub fn main() !void {
     try zigmod.init();
     defer zigmod.deinit();
 
-    inline for (std.meta.declarations(available)) |decl| {
+    inline for (comptime std.meta.declarations(available)) |decl| {
         if (std.mem.eql(u8, args[0], decl.name)) {
             const cmd = @field(available, decl.name);
             try cmd.execute(args[1..]);
