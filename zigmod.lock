@@ -1,6 +1,6 @@
 2
 git https://github.com/yaml/libyaml tag-0.2.5
-git https://github.com/nektro/iguanaTLS commit-6125dde57e38b39a6a2b6d574af206f43ceba52a
+git https://github.com/nektro/iguanaTLS commit-9a05f03681d5f273d0ce7447f0c7e729828ab8a2
 git https://github.com/nektro/zig-ansi commit-d4a53bcac5b87abecc65491109ec22aaf5f3dc2f
 git https://github.com/ziglibs/known-folders commit-9db1b99219c767d5e24994b1525273fe4031e464
 git https://github.com/nektro/zig-licenses commit-c9b8cbf3565675a056ad4e9b57cb4f84020e7680
