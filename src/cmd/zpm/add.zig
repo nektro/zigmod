@@ -33,7 +33,7 @@ pub fn execute(args: [][]u8) !void {
 
     u.assert(found.root_file != null, "package must have an entry point to be able to be added to your dependencies", .{});
 
-    const self_module = try zigmod.ModFile.init(gpa, "zig.mod");
+    const self_module = try zigmod.ModFile.init(gpa);
     for (self_module.deps) |dep| {
         if (std.mem.eql(u8, dep.name, found.name)) {
             std.log.warn("dependency with name '{s}' already exists in your dependencies", .{found.name});
