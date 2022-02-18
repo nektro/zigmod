@@ -66,7 +66,6 @@ pub const dirs = struct {
     pub const _2ovav391ivak = cache ++ "/git/github.com/nektro/zig-detect-license";
     pub const _pt88y5d80m25 = cache ++ "/git/github.com/nektro/zig-licenses-text";
     pub const _96h80ezrvj7i = cache ++ "/git/github.com/nektro/zig-leven";
-    pub const _qyrnfg0iwpzl = cache ++ "/git/github.com/nektro/zig-fs-check";
     pub const _c1xirp1ota5p = cache ++ "/git/github.com/nektro/zig-inquirer";
     pub const _u7sysdckdymi = cache ++ "/git/github.com/arqv/ini";
     pub const _iecwp4b3bsfm = cache ++ "/git/github.com/nektro/zig-time";
@@ -132,13 +131,9 @@ pub const package_data = struct {
         .directory = dirs._96h80ezrvj7i,
         .pkg = Pkg{ .name = "leven", .path = .{ .path = dirs._96h80ezrvj7i ++ "/src/lib.zig" }, .dependencies = &.{ _tnj3qf44tpeq.pkg.? } },
     };
-    pub const _qyrnfg0iwpzl = Package{
-        .directory = dirs._qyrnfg0iwpzl,
-        .pkg = Pkg{ .name = "fs-check", .path = .{ .path = dirs._qyrnfg0iwpzl ++ "/src/lib.zig" }, .dependencies = null },
-    };
     pub const _2ovav391ivak = Package{
         .directory = dirs._2ovav391ivak,
-        .pkg = Pkg{ .name = "detect-license", .path = .{ .path = dirs._2ovav391ivak ++ "/src/lib.zig" }, .dependencies = &.{ _pt88y5d80m25.pkg.?, _96h80ezrvj7i.pkg.?, _qyrnfg0iwpzl.pkg.? } },
+        .pkg = Pkg{ .name = "detect-license", .path = .{ .path = dirs._2ovav391ivak ++ "/src/lib.zig" }, .dependencies = &.{ _pt88y5d80m25.pkg.?, _96h80ezrvj7i.pkg.? } },
     };
     pub const _c1xirp1ota5p = Package{
         .directory = dirs._c1xirp1ota5p,
