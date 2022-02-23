@@ -41,8 +41,8 @@ pub const DepType = enum {
             },
             .fossil => {
                 try std.fs.cwd().makePath(dpath);
-                u.assert((try u.run_cmd(dpath, &.{ "fossil", "open", rpath})) == 0, "fossil open {s} failed", .{rpath});
-            }
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "fossil", "open", rpath })) == 0, "fossil open {s} failed", .{rpath});
+            },
         }
     }
 
@@ -64,8 +64,8 @@ pub const DepType = enum {
                 //
             },
             .fossil => {
-                u.assert((try u.run_cmd(dpath, &.{ "fossil", "pull" })) == 0, "fossil pull failed", .{});
-                u.assert((try u.run_cmd(dpath, &.{ "fossil", "update" })) == 0, "fossil update failed", .{});
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "fossil", "pull" })) == 0, "fossil pull failed", .{});
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "fossil", "update" })) == 0, "fossil update failed", .{});
             },
         }
     }
@@ -80,7 +80,7 @@ pub const DepType = enum {
             .git => try std.fmt.allocPrint(alloc, "commit-{s}", .{(try u.git_rev_HEAD(alloc, mdir))}),
             .hg => "",
             .http => "",
-            .fossil => getFossilCheckout(mpath),
+            .fossil => getFossilCheckout(alloc, mpath),
         };
     }
 
@@ -92,6 +92,7 @@ pub const DepType = enum {
             .git => false,
             .hg => false,
             .http => false,
+            .fossil => false,
         };
     }
 
@@ -102,6 +103,7 @@ pub const DepType = enum {
         git: Git,
         hg: void,
         http: void,
+        fossil: void,
 
         pub const Git = enum {
             branch,
@@ -119,20 +121,18 @@ pub const DepType = enum {
     };
 };
 
-
-fn getFossilCheckout(mpath: []const u8) ![]const u8 {
-    const result = try u.run_cmd_raw(mpath, &.{"fossil", "status"});
-    gpa.free(result.stderr);
-    defer gpa.free(result.stdout);
+fn getFossilCheckout(alloc: std.mem.Allocator, mpath: []const u8) ![]const u8 {
+    const result = try u.run_cmd_raw(alloc, mpath, &.{ "fossil", "status" });
+    alloc.free(result.stderr);
+    defer alloc.free(result.stdout);
 
     var iter = std.mem.tokenize(u8, result.stdout, " \n");
     while (iter.next()) |tk| {
         if (std.mem.eql(u8, tk, "checkout:")) {
             const co = iter.next() orelse return "";
-            return try gpa.dupe(u8, co);
+            return try alloc.dupe(u8, co);
         }
     }
 
     return "";
 }
-
