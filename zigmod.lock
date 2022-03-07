@@ -17,4 +17,4 @@ git https://github.com/nektro/zig-leven commit-ab852cf74fa0b4edc530d925f0654b62c
 git https://github.com/nektro/zig-inquirer commit-14c3492c46f9765c3e77436741794d1a3118cbee
 git https://github.com/arqv/ini commit-b93f5b5ff9449f9af68ae3081f6a5e858b6698d9
 git https://github.com/nektro/zig-time commit-a22054de725ef19b3f91b9ad960d4093f852b7e0
-git https://github.com/marlersoft/zigwin32 commit-a74c9dae6a1ccd361eb9a1d146a09c08d22f02b0
+git https://github.com/marlersoft/zigwin32 commit-032a1b51b83b8fe64e0a97d7fe5da802065244c6
