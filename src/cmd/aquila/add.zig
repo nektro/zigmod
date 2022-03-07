@@ -36,7 +36,7 @@ pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
         }
     }
 
-    const file = try zigmod.ModFile.openFile(std.fs.cwd(), .{ .mode = .read_write });
+    var file = try zigmod.ModFile.openFile(dir, .{ .mode = .read_write });
     defer file.close();
     try file.seekTo(try file.getEndPos());
 
