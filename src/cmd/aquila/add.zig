@@ -3,7 +3,6 @@ const string = []const u8;
 const gpa = std.heap.c_allocator;
 
 const zigmod = @import("../../lib.zig");
-const u = @import("./../../util/index.zig");
 const aq = @import("./../aq.zig");
 
 //
