@@ -9,6 +9,4 @@ zigmod zpm add <name>
 For example running `zigmod zpm add apple_pie` will append the following to your `zigmod.yml`:
 ```yml
   - src: git https://github.com/Luukdegram/apple_pie
-    name: apple_pie
-    main: src/apple_pie.zig
 ```
