@@ -3,7 +3,6 @@ const string = []const u8;
 const gpa = std.heap.c_allocator;
 
 const zigmod = @import("../../lib.zig");
-const u = @import("./../../util/index.zig");
 const aq = @import("./../aq.zig");
 
 //
@@ -21,7 +20,7 @@ pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
 
     const pkg_url = try std.fmt.allocPrint(gpa, "https://{s}/{s}", .{
         val.getT(.{ "repo", "domain" }, .String).?,
-        val.getT(.{ "pkg", "RemoteName" }, .String).?,
+        val.getT(.{ "package", "remote_name" }, .String).?,
     });
 
     const m = try zigmod.ModFile.from_dir(gpa, dir);
@@ -36,10 +35,7 @@ pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
         }
     }
 
-    const file = dir.openFile("zig.mod", .{ .mode = .read_write }) catch |err| switch (err) {
-        error.FileNotFound => u.fail("error: zig.mod manifest not found! must run from project root.", .{}),
-        else => return err,
-    };
+    var file = try zigmod.ModFile.openFile(dir, .{ .mode = .read_write });
     defer file.close();
     try file.seekTo(try file.getEndPos());
 

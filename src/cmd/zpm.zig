@@ -16,15 +16,17 @@ pub const commands = struct {
     pub const search = @import("./zpm/search.zig");
 };
 
-pub const server_root = "https://zpm.random-projects.net/api";
+pub const server_root = "https://zig.pm/api";
 
 pub const Package = struct {
     author: string,
     name: string,
-    tags: []string,
+    tags: []const string,
     git: string,
-    root_file: ?string,
+    root_file: string,
     description: string,
+    source: u32,
+    links: []const ?string,
 };
 
 pub fn execute(args: [][]u8) !void {
@@ -32,7 +34,7 @@ pub fn execute(args: [][]u8) !void {
         std.debug.print("{s}\n", .{
             \\This is a subcommand for use with https://github.com/zigtools/zpm-server instances but has no default behavior on its own aside from showing you this nice help text.
             \\
-            \\The default remote is https://zpm.random-projects.net/.
+            \\The default remote is https://zig.pm/.
             \\
             \\The subcommands available are:
             \\  - add       Append this package to your dependencies
@@ -61,4 +63,46 @@ pub fn server_fetch(url: string) !json.Value {
     const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
     const val = try json.parse(gpa, body_content);
     return val;
+}
+
+pub fn server_fetchArray(url: string) ![]const Package {
+    const val = try server_fetch(url);
+    var list = std.ArrayList(Package).init(gpa);
+    errdefer list.deinit();
+
+    for (val.Array) |item| {
+        if (item.getT("root_file", .String) == null) continue;
+        try list.append(Package{
+            .name = item.getT("name", .String).?,
+            .author = item.getT("author", .String).?,
+            .description = item.getT("description", .String).?,
+            .tags = try valueStrArray(item.getT("tags", .Array).?),
+            .git = item.getT("git", .String).?,
+            .root_file = item.getT("root_file", .String).?,
+            .source = @intCast(u32, item.getT("source", .Int).?),
+            .links = try valueLinks(item.get("links").?),
+        });
+    }
+    return list.toOwnedSlice();
+}
+
+fn valueStrArray(vals: []json.Value) ![]string {
+    var list = std.ArrayList(string).init(gpa);
+    errdefer list.deinit();
+
+    for (vals) |item| {
+        if (item != .String) continue;
+        try list.append(item.String);
+    }
+    return list.toOwnedSlice();
+}
+
+fn valueLinks(vals: json.Value) ![]?string {
+    var list = std.ArrayList(?string).init(gpa);
+    errdefer list.deinit();
+
+    try list.append(vals.getT("github", .String));
+    try list.append(vals.getT("aquila", .String));
+    try list.append(vals.getT("astrolabe", .String));
+    return list.toOwnedSlice();
 }

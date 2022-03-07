@@ -15,7 +15,7 @@ const u = @import("./../util/index.zig");
 pub fn execute(args: [][]u8) !void {
     _ = args;
 
-    std.debug.print("This utility will walk you through creating a zig.mod file.\n", .{});
+    std.debug.print("This utility will walk you through creating a zigmod.yml file.\n", .{});
     std.debug.print("That will give a good launching off point to get your next project started.\n", .{});
     std.debug.print("Use `zigmod aq add <pkg>` to add a dependency from https://aquila.red/\n", .{});
     std.debug.print("Press ^C at any time to quit.\n", .{});
@@ -46,7 +46,7 @@ pub fn execute(args: [][]u8) !void {
     const description = try inquirer.forString(stdout, stdin, "description:", gpa, null);
 
     std.debug.print("\n", .{});
-    std.debug.print("About to write local zig.mod:\n", .{});
+    std.debug.print("About to write local zigmod.yml:\n", .{});
 
     std.debug.print("\n", .{});
     switch (ptype) {
@@ -61,7 +61,7 @@ pub fn execute(args: [][]u8) !void {
             return;
         },
         true => {
-            const file = try cwd.createFile("zig.mod", .{});
+            const file = try cwd.createFile("zigmod.yml", .{});
             defer file.close();
             const w = file.writer();
             switch (ptype) {
@@ -166,10 +166,7 @@ pub fn execute(args: [][]u8) !void {
             }
             if (!exists) try w.writeAll("* text=auto\n");
             if (!exists) try w.writeAll("*.zig text eol=lf\n");
-            try w.writeAll("zig.mod text eol=lf\n");
             try w.writeAll("zigmod.* text eol=lf\n");
-            try w.writeAll("zig.mod linguist-language=YAML\n");
-            try w.writeAll("zig.mod gitlab-language=yaml\n");
         }
     }
 }

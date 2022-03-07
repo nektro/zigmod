@@ -1,4 +1,8 @@
-## `zig.mod` Reference
+## `zigmod.yml` Reference
+
+`zigmod.yml` is the main manifest that Zigmod will read to learn all about your application or package.
+
+`zig.mod` is a valid legacy alternative.
 
 ### `id`
 - Type: `string`

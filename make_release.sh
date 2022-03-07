@@ -2,18 +2,20 @@
 
 set -e
 
-date=$(date +'%Y.%m.%d')
-version=${CIRCLE_BUILD_NUM-$date}
-tag=v$version
+tag=r$(./release_num.sh)
+
+GITHUB_TOKEN="$1"
+PROJECT_USERNAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
+PROJECT_REPONAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
 
 # ghr uses Zigmod to build itself, so we need to use the binary to build Zigmod
 curl -s https://api.github.com/repos/nektro/ghr-zig/releases | jq -r '.[0].assets[].browser_download_url' | grep $(uname -m) | grep linux | wget -i -
 chmod +x ./ghr-linux-x86_64
 ./ghr-linux-x86_64 \
     -t ${GITHUB_TOKEN} \
-    -u ${CIRCLE_PROJECT_USERNAME} \
-    -r ${CIRCLE_PROJECT_REPONAME} \
+    -u ${PROJECT_USERNAME} \
+    -r ${PROJECT_REPONAME} \
     -b "$(./changelog.sh)" \
     -n "$tag" \
     "$tag" \
-    "/artifacts/"
+    "./bin/"

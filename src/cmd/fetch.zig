@@ -234,6 +234,7 @@ fn diff_lockfile(alloc: std.mem.Allocator) !void {
 
 fn diff_printchange(comptime testt: string, comptime replacement: string, item: std.StringHashMap(DiffChange).Entry) bool {
     if (std.mem.startsWith(u8, item.key_ptr.*, testt)) {
+        if (std.mem.eql(u8, item.value_ptr.from, item.value_ptr.to)) return true;
         std.debug.print(replacement, .{ item.key_ptr.*[4..], item.value_ptr.from, item.value_ptr.to });
         return true;
     }

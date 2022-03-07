@@ -30,16 +30,22 @@ pub const ModFile = struct {
     min_zig_version: ?std.SemanticVersion,
     vcpkg: bool,
 
-    pub fn init(alloc: std.mem.Allocator, mpath: string) !Self {
-        const file = try std.fs.cwd().openFile(mpath, .{});
-        defer file.close();
-        const input = try file.reader().readAllAlloc(alloc, mb);
-        const doc = try yaml.parse(alloc, input);
-        return from_mapping(alloc, doc.mapping);
+    pub fn openFile(dir: std.fs.Dir, ops: std.fs.File.OpenFlags) !std.fs.File {
+        return dir.openFile("zig.mod", ops) catch |err| switch (err) {
+            error.FileNotFound => dir.openFile("zigmod.yml", ops) catch |err2| switch (err2) {
+                error.FileNotFound => return error.ManifestNotFound,
+                else => |e2| return e2,
+            },
+            else => |e| return e,
+        };
+    }
+
+    pub fn init(alloc: std.mem.Allocator) !Self {
+        return try from_dir(alloc, std.fs.cwd());
     }
 
     pub fn from_dir(alloc: std.mem.Allocator, dir: std.fs.Dir) !Self {
-        const file = try dir.openFile("zig.mod", .{});
+        const file = try openFile(dir, .{});
         defer file.close();
         const input = try file.reader().readAllAlloc(alloc, mb);
         const doc = try yaml.parse(alloc, input);

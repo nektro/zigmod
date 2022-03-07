@@ -200,7 +200,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             if (try u.does_folder_exist(p)) {
                 try std.fs.cwd().deleteTree(p);
             }
-            const file_path = try std.fs.path.join(options.alloc, &.{ p, file_name });
+            const file_path = try std.fs.path.resolve(options.alloc, &.{ p, file_name });
             try d.type.pull(options.alloc, d.path, p);
             try std.fs.deleteFileAbsolute(file_path);
             return p;
@@ -247,7 +247,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
         },
         else => {
             var dd = try collect_deps(cachepath, moddir, options) catch |e| switch (e) {
-                error.FileNotFound => {
+                error.ManifestNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0 or d.keep) {
                         var mod_from = try zigmod.Module.from(options.alloc, d.*, modpath, options);
                         if (d.type != .local) mod_from.clean_path = u.trim_prefix(modpath, cachepath)[1..];
@@ -268,7 +268,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
-                    u.fail("no zig.mod found and no override props defined. unable to use add this dependency!", .{});
+                    u.fail("no zig.mod or zigmod.yml found and no override props defined. unable to use add this dependency!", .{});
                 },
                 else => e,
             };
@@ -324,12 +324,6 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
     const rff = try destdir.createFile(fname, .{});
     defer rff.close();
     const w = rff.writer();
-    try w.writeAll(
-        \\const std = @import("std");
-        \\const string = []const u8;
-        \\
-        \\
-    );
     try w.print("const srcpath = \"../../../{}\";\n\n", .{std.zig.fmtEscapes(fpath[1..])});
     var iter = map.iterator();
     while (iter.next()) |item| {

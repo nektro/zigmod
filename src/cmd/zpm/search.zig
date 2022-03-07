@@ -13,25 +13,7 @@ pub fn execute(args: [][]u8) !void {
     const out = std.io.getStdOut().writer();
 
     const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, "packages" });
-    const val = try zpm.server_fetch(url);
-
-    var arr = std.ArrayList(zpm.Package).init(gpa);
-    defer arr.deinit();
-
-    for (val.Array) |item| {
-        if (item.get("root_file")) |_| {} else {
-            continue;
-        }
-        try arr.append(zpm.Package{
-            .name = item.getT("name", .String).?,
-            .author = item.getT("author", .String).?,
-            .description = item.getT("description", .String).?,
-            .tags = &.{},
-            .git = "",
-            .root_file = "",
-        });
-    }
-    const list = arr.items;
+    const list = try zpm.server_fetchArray(url);
 
     const name_col_width = blk: {
         var w: usize = 4;

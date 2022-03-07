@@ -13,6 +13,7 @@ pub const commands = struct {
     pub const add = @import("./aquila/add.zig");
     pub const showjson = @import("./aquila/showjson.zig");
     pub const install = @import("./aquila/install.zig");
+    pub const update = @import("./aquila/update.zig");
 };
 
 pub const server_root = "https://aquila.red";

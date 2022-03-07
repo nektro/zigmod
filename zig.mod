@@ -30,8 +30,6 @@ dependencies:
   # --------
   # Entries below this line are only fetched with zigmod itself 
 
-  - src: git https://github.com/nektro/iguanaTLS
-
   - src: git https://github.com/nektro/zig-ansi
   - src: git https://github.com/ziglibs/known-folders
   - src: git https://github.com/nektro/zig-licenses

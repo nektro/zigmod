@@ -36,7 +36,7 @@ $ ./zig-out/bin/zigmod
 
 Check here for the [full command reference](./commands/).
 
-Check here for the [`zig.mod` reference](./zig.mod.md).
+Check here for the [`zigmod.yml` reference](./zig.mod.md).
 
 Check here for the [`deps.zig` reference](./deps.zig.md).
 

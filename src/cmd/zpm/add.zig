@@ -10,17 +10,8 @@ const zpm = @import("./../zpm.zig");
 //
 
 pub fn execute(args: [][]u8) !void {
-    const url = "https://zpm.random-projects.net/api/packages";
-
-    const req = try zfetch.Request.init(gpa, url, null);
-    defer req.deinit();
-
-    try req.do(.GET, null, null);
-    const r = req.reader();
-
-    const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
-    var stream = std.json.TokenStream.init(body_content);
-    const val = try std.json.parse([]zpm.Package, &stream, .{ .allocator = gpa });
+    const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, "packages" });
+    const val = try zpm.server_fetchArray(url);
 
     const found = blk: {
         for (val) |pkg| {
@@ -31,9 +22,7 @@ pub fn execute(args: [][]u8) !void {
         u.fail("no package with name '{s}' found", .{args[0]});
     };
 
-    u.assert(found.root_file != null, "package must have an entry point to be able to be added to your dependencies", .{});
-
-    const self_module = try zigmod.ModFile.init(gpa, "zig.mod");
+    const self_module = try zigmod.ModFile.init(gpa);
     for (self_module.deps) |dep| {
         if (std.mem.eql(u8, dep.name, found.name)) {
             std.log.warn("dependency with name '{s}' already exists in your dependencies", .{found.name});
@@ -57,16 +46,24 @@ pub fn execute(args: [][]u8) !void {
         try _req.do(.GET, null, null);
         break :blk _req.status.code == 200;
     };
+    const has_zigmodyml = blk: {
+        const _url = try std.mem.join(gpa, "/", &.{ found.git, "blob", "HEAD", "zigmod.yml" });
+        const _req = try zfetch.Request.init(gpa, _url, null);
+        defer _req.deinit();
+        try _req.do(.GET, null, null);
+        break :blk _req.status.code == 200;
+    };
 
-    const file = try std.fs.cwd().openFile("zig.mod", .{ .mode = .read_write });
+    const file = try zigmod.ModFile.openFile(std.fs.cwd(), .{ .mode = .read_write });
+    defer file.close();
     try file.seekTo(try file.getEndPos());
 
     const file_w = file.writer();
     try file_w.print("\n", .{});
     try file_w.print("  - src: git {s}\n", .{u.trim_suffix(found.git, ".git")});
-    if (!has_zigdotmod) {
+    if (!(has_zigdotmod or has_zigmodyml)) {
         try file_w.print("    name: {s}\n", .{found.name});
-        try file_w.print("    main: {s}\n", .{found.root_file.?[1..]});
+        try file_w.print("    main: {s}\n", .{found.root_file[1..]});
     }
 
     std.log.info("Successfully added package {s} by {s}", .{ found.name, found.author });
