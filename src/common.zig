@@ -324,12 +324,6 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
     const rff = try destdir.createFile(fname, .{});
     defer rff.close();
     const w = rff.writer();
-    try w.writeAll(
-        \\const std = @import("std");
-        \\const string = []const u8;
-        \\
-        \\
-    );
     try w.print("const srcpath = \"../../../{}\";\n\n", .{std.zig.fmtEscapes(fpath[1..])});
     var iter = map.iterator();
     while (iter.next()) |item| {
