@@ -11,7 +11,7 @@ zig init-exe
 zigmod init
 ```
 
-Zigmod's init wizard will ask you if the current project is an application or a library and setup some initial properties in your `zig.mod`. However, if you do plan to have a project that is both a library to be used in other Zig projects and an application itself, don't fret. For Zigmod is able to support both of thses configurations simultaneously.
+Zigmod's init wizard will ask you if the current project is an application or a library and setup some initial properties in your `zigmod.yml`. However, if you do plan to have a project that is both a library to be used in other Zig projects and an application itself, don't fret. For Zigmod is able to support both of thses configurations simultaneously.
 
 The wizard will also ask if you'd like it setup any additional metadata files such as `.gitignore` or `LICENSE` for you.
 
@@ -19,7 +19,7 @@ The wizard will also ask if you'd like it setup any additional metadata files su
 
 ---
 ## Running `zigmod fetch`
-This command will inspect your `zig.mod` and download any new dependencies as well as pulling updates for any ones already download. It will recursively do this for your entire tree until it is full constructed which will culminate in the generation of two output files: `deps.zig` and `zigmod.lock`.
+This command will inspect your `zigmod.yml` and download any new dependencies as well as pulling updates for any ones already download. It will recursively do this for your entire tree until it is full constructed which will culminate in the generation of two output files: `deps.zig` and `zigmod.lock`.
 
 `deps.zig` we will use in the next step integrating with the [Zig Build System](https://ziglang.org/documentation/master/#Zig-Build-System). [Learn more](./deps.zig.md).
 
@@ -58,7 +58,7 @@ The core of expandability, it is possible to add dependencies to your project. H
      - https://zig.pm/ is another supported pacakge index. You may add packages from ZPM with `zigmod zpm add <pacakge>`.
 
 - Other/Git
-     - Zigmod supports adding any Git repository as a dependency. This is done by manually editing your `zig.mod` and adding a line under either the `dependencies` or `dev_dependencies` keys. For example, adding a line with this contents would add `apple_pie` to your project: `  - src: git https://github.com/Luukdegram/apple_pie`. The URL field may be any valid Git url that you would pass to `git clone`.
+     - Zigmod supports adding any Git repository as a dependency. This is done by manually editing your `zigmod.yml` and adding a line under either the `dependencies` or `dev_dependencies` keys. For example, adding a line with this contents would add `apple_pie` to your project: `  - src: git https://github.com/Luukdegram/apple_pie`. The URL field may be any valid Git url that you would pass to `git clone`.
 
 - Other/System Library
      - System libraries are similar to Git dependencies, but instead of `git <url>` it is `system_lib <name>`.

@@ -268,7 +268,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
-                    u.fail("no zig.mod found and no override props defined. unable to use add this dependency!", .{});
+                    u.fail("no zig.mod or zigmod.yml found and no override props defined. unable to use add this dependency!", .{});
                 },
                 else => e,
             };

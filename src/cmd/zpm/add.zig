@@ -57,14 +57,22 @@ pub fn execute(args: [][]u8) !void {
         try _req.do(.GET, null, null);
         break :blk _req.status.code == 200;
     };
+    const has_zigmodyml = blk: {
+        const _url = try std.mem.join(gpa, "/", &.{ found.git, "blob", "HEAD", "zigmod.yml" });
+        const _req = try zfetch.Request.init(gpa, _url, null);
+        defer _req.deinit();
+        try _req.do(.GET, null, null);
+        break :blk _req.status.code == 200;
+    };
 
-    const file = try std.fs.cwd().openFile("zig.mod", .{ .mode = .read_write });
+    const file = try zigmod.ModFile.openFile(std.fs.cwd(), .{ .mode = .read_write });
+    defer file.close();
     try file.seekTo(try file.getEndPos());
 
     const file_w = file.writer();
     try file_w.print("\n", .{});
     try file_w.print("  - src: git {s}\n", .{u.trim_suffix(found.git, ".git")});
-    if (!has_zigdotmod) {
+    if (!(has_zigdotmod or has_zigmodyml)) {
         try file_w.print("    name: {s}\n", .{found.name});
         try file_w.print("    main: {s}\n", .{found.root_file.?[1..]});
     }

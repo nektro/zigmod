@@ -12,15 +12,15 @@ pub fn execute(args: [][]u8) !void {
     const homepath = home.?;
     const homedir = try std.fs.cwd().openDir(homepath, .{});
 
-    if (!(try u.does_file_exist(homedir, "zig.mod"))) {
-        const f = try homedir.createFile("zig.mod", .{});
+    if (!(try u.does_file_exist(homedir, "zigmod.yml"))) {
+        const f = try homedir.createFile("zigmod.yml", .{});
         defer f.close();
         const w = f.writer();
         const init = @import("../init.zig");
         try init.writeExeManifest(w, try u.random_string(gpa, 48), "zigmod_installation", null, null);
     }
 
-    // add to ~/zig.mod for later
+    // add to ~/zigmod.yml for later
     const aqadd = @import("./add.zig");
     const pkgurl = aqadd.do(homedir, args[0]) catch |err| switch (err) {
         error.AquilaBadResponse => return,

@@ -36,10 +36,7 @@ pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
         }
     }
 
-    const file = dir.openFile("zig.mod", .{ .mode = .read_write }) catch |err| switch (err) {
-        error.FileNotFound => u.fail("error: zig.mod manifest not found! must run from project root.", .{}),
-        else => return err,
-    };
+    const file = try zigmod.ModFile.openFile(std.fs.cwd(), .{ .mode = .read_write });
     defer file.close();
     try file.seekTo(try file.getEndPos());
 
