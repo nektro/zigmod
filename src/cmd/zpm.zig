@@ -16,7 +16,7 @@ pub const commands = struct {
     pub const search = @import("./zpm/search.zig");
 };
 
-pub const server_root = "https://zpm.random-projects.net/api";
+pub const server_root = "https://zig.pm/api";
 
 pub const Package = struct {
     author: string,
@@ -32,7 +32,7 @@ pub fn execute(args: [][]u8) !void {
         std.debug.print("{s}\n", .{
             \\This is a subcommand for use with https://github.com/zigtools/zpm-server instances but has no default behavior on its own aside from showing you this nice help text.
             \\
-            \\The default remote is https://zpm.random-projects.net/.
+            \\The default remote is https://zig.pm/.
             \\
             \\The subcommands available are:
             \\  - add       Append this package to your dependencies
