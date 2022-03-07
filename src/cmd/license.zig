@@ -59,8 +59,11 @@ pub fn execute(args: [][]u8) !void {
         try tracking_list.append(item);
     }
 
+    var first = true;
     var iter = map.iterator();
     while (iter.next()) |entry| {
+        if (!first) std.debug.print("\n", .{});
+        first = false;
         std.debug.print(style.Bold ++ "{s}:\n", .{entry.key_ptr.*});
         if (u.list_contains(licenses.spdx, entry.key_ptr.*)) {
             std.debug.print(style.Faint ++ "= {s}{s}\n", .{ "https://spdx.org/licenses/", entry.key_ptr.* });
@@ -73,7 +76,6 @@ pub fn execute(args: [][]u8) !void {
                 std.debug.print("- {s} {s}\n", .{ @tagName(item.dep.?.type), item.dep.?.path });
             }
         }
-        std.debug.print("\n", .{});
     }
     if (unspecified_list.items.len > 0) {
         std.debug.print(style.Bold ++ "Unspecified:\n", .{});
