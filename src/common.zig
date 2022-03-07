@@ -200,7 +200,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             if (try u.does_folder_exist(p)) {
                 try std.fs.cwd().deleteTree(p);
             }
-            const file_path = try std.fs.path.join(options.alloc, &.{ p, file_name });
+            const file_path = try std.fs.path.resolve(options.alloc, &.{ p, file_name });
             try d.type.pull(options.alloc, d.path, p);
             try std.fs.deleteFileAbsolute(file_path);
             return p;
