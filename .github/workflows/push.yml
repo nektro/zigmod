@@ -31,7 +31,6 @@ jobs:
       # Build All
       - run: ./build_release.sh aarch64-linux-musl
       - run: ./build_release.sh aarch64-macos-gnu
-      - run: ./build_release.sh i386-linux-musl
       - run: ./build_release.sh x86_64-linux-musl
       - run: ./build_release.sh x86_64-macos-gnu
       - run: ./build_release.sh x86_64-windows-gnu
