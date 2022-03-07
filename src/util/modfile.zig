@@ -32,7 +32,7 @@ pub const ModFile = struct {
 
     pub fn openFile(dir: std.fs.Dir, ops: std.fs.File.OpenFlags) !std.fs.File {
         return dir.openFile("zig.mod", ops) catch |err| switch (err) {
-            error.FileNotFound => dir.openFile("zigmod.yml", .{}) catch |err2| switch (err2) {
+            error.FileNotFound => dir.openFile("zigmod.yml", ops) catch |err2| switch (err2) {
                 error.FileNotFound => return error.ManifestNotFound,
                 else => |e2| return e2,
             },
