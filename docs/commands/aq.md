@@ -14,3 +14,4 @@ The subcommands available are:
 - [`update`](aq_update.md)
 - [`modfile`](aq_modfile.md)
 - [`showjson`](aq_showjson.md)
+- [`install`](aq_install.md)
