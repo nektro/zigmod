@@ -52,12 +52,12 @@ pub const dirs = struct {
     pub const _root = "";
     pub const _89ujp8gq842x = cache ++ "/../..";
     pub const _8mdbh0zuneb0 = cache ++ "/v/git/github.com/yaml/libyaml/tag-0.2.5";
-    pub const _csbnipaad8n7 = cache ++ "/git/github.com/nektro/iguanaTLS";
     pub const _s84v9o48ucb0 = cache ++ "/git/github.com/nektro/zig-ansi";
     pub const _2ta738wrqbaq = cache ++ "/git/github.com/ziglibs/known-folders";
     pub const _0npcrzfdlrvk = cache ++ "/git/github.com/nektro/zig-licenses";
     pub const _ejw82j2ipa0e = cache ++ "/git/github.com/truemedian/zfetch";
     pub const _9k24gimke1an = cache ++ "/git/github.com/truemedian/hzzp";
+    pub const _csbnipaad8n7 = cache ++ "/git/github.com/nektro/iguanaTLS";
     pub const _yyhw90zkzgmu = cache ++ "/git/github.com/MasterQ32/zig-network";
     pub const _u9w9dpp6p804 = cache ++ "/git/github.com/MasterQ32/zig-uri";
     pub const _ocmr9rtohgcc = cache ++ "/git/github.com/nektro/zig-json";
@@ -79,10 +79,6 @@ pub const package_data = struct {
         .c_source_files = &.{ "src/api.c", "src/dumper.c", "src/emitter.c", "src/loader.c", "src/parser.c", "src/reader.c", "src/scanner.c", "src/writer.c" },
         .c_source_flags = &.{ "-DYAML_VERSION_MAJOR=0", "-DYAML_VERSION_MINOR=2", "-DYAML_VERSION_PATCH=5", "-DYAML_VERSION_STRING=\"0.2.5\"", "-DYAML_DECLARE_STATIC=1" },
     };
-    pub const _csbnipaad8n7 = Package{
-        .directory = dirs._csbnipaad8n7,
-        .pkg = Pkg{ .name = "iguanaTLS", .path = .{ .path = dirs._csbnipaad8n7 ++ "/src/main.zig" }, .dependencies = null },
-    };
     pub const _s84v9o48ucb0 = Package{
         .directory = dirs._s84v9o48ucb0,
         .pkg = Pkg{ .name = "ansi", .path = .{ .path = dirs._s84v9o48ucb0 ++ "/src/lib.zig" }, .dependencies = null },
@@ -98,6 +94,10 @@ pub const package_data = struct {
     pub const _9k24gimke1an = Package{
         .directory = dirs._9k24gimke1an,
         .pkg = Pkg{ .name = "hzzp", .path = .{ .path = dirs._9k24gimke1an ++ "/src/main.zig" }, .dependencies = null },
+    };
+    pub const _csbnipaad8n7 = Package{
+        .directory = dirs._csbnipaad8n7,
+        .pkg = Pkg{ .name = "iguanaTLS", .path = .{ .path = dirs._csbnipaad8n7 ++ "/src/main.zig" }, .dependencies = null },
     };
     pub const _yyhw90zkzgmu = Package{
         .directory = dirs._yyhw90zkzgmu,
@@ -145,11 +145,11 @@ pub const package_data = struct {
     };
     pub const _iecwp4b3bsfm = Package{
         .directory = dirs._iecwp4b3bsfm,
-        .pkg = Pkg{ .name = "time", .path = .{ .path = dirs._iecwp4b3bsfm ++ "/time.zig" }, .dependencies = &.{ _tnj3qf44tpeq.pkg.? } },
+        .pkg = Pkg{ .name = "time", .path = .{ .path = dirs._iecwp4b3bsfm ++ "/time.zig" }, .dependencies = &.{ _tnj3qf44tpeq.pkg.?, _f7dubzb7cyqe.pkg.? } },
     };
     pub const _89ujp8gq842x = Package{
         .directory = dirs._89ujp8gq842x,
-        .pkg = Pkg{ .name = "zigmod", .path = .{ .path = dirs._89ujp8gq842x ++ "/src/lib.zig" }, .dependencies = &.{ _csbnipaad8n7.pkg.?, _s84v9o48ucb0.pkg.?, _2ta738wrqbaq.pkg.?, _0npcrzfdlrvk.pkg.?, _ejw82j2ipa0e.pkg.?, _ocmr9rtohgcc.pkg.?, _tnj3qf44tpeq.pkg.?, _2ovav391ivak.pkg.?, _c1xirp1ota5p.pkg.?, _u7sysdckdymi.pkg.?, _iecwp4b3bsfm.pkg.? } },
+        .pkg = Pkg{ .name = "zigmod", .path = .{ .path = dirs._89ujp8gq842x ++ "/src/lib.zig" }, .dependencies = &.{ _s84v9o48ucb0.pkg.?, _2ta738wrqbaq.pkg.?, _0npcrzfdlrvk.pkg.?, _ejw82j2ipa0e.pkg.?, _ocmr9rtohgcc.pkg.?, _tnj3qf44tpeq.pkg.?, _2ovav391ivak.pkg.?, _c1xirp1ota5p.pkg.?, _u7sysdckdymi.pkg.?, _iecwp4b3bsfm.pkg.? } },
     };
     pub const _o6ogpor87xc2 = Package{
         .directory = dirs._o6ogpor87xc2,
