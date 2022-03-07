@@ -10,17 +10,8 @@ const zpm = @import("./../zpm.zig");
 //
 
 pub fn execute(args: [][]u8) !void {
-    const url = "https://zpm.random-projects.net/api/packages";
-
-    const req = try zfetch.Request.init(gpa, url, null);
-    defer req.deinit();
-
-    try req.do(.GET, null, null);
-    const r = req.reader();
-
-    const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
-    var stream = std.json.TokenStream.init(body_content);
-    const val = try std.json.parse([]zpm.Package, &stream, .{ .allocator = gpa });
+    const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, "packages" });
+    const val = try zpm.server_fetchArray(url);
 
     const found = blk: {
         for (val) |pkg| {
@@ -30,8 +21,6 @@ pub fn execute(args: [][]u8) !void {
         }
         u.fail("no package with name '{s}' found", .{args[0]});
     };
-
-    u.assert(found.root_file != null, "package must have an entry point to be able to be added to your dependencies", .{});
 
     const self_module = try zigmod.ModFile.init(gpa);
     for (self_module.deps) |dep| {
@@ -74,7 +63,7 @@ pub fn execute(args: [][]u8) !void {
     try file_w.print("  - src: git {s}\n", .{u.trim_suffix(found.git, ".git")});
     if (!(has_zigdotmod or has_zigmodyml)) {
         try file_w.print("    name: {s}\n", .{found.name});
-        try file_w.print("    main: {s}\n", .{found.root_file.?[1..]});
+        try file_w.print("    main: {s}\n", .{found.root_file[1..]});
     }
 
     std.log.info("Successfully added package {s} by {s}", .{ found.name, found.author });
