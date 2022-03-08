@@ -35,7 +35,6 @@ jobs:
       - run: cat deps.zig
       - run: zig build
       - run: ./zig-out/bin/zigmod version
-      - run: ./zig-out/bin/zigmod license
       - run: ./zig-out/bin/zigmod sum
       - run: ./zig-out/bin/zigmod zpm add apple_pie
       - run: ./zig-out/bin/zigmod zpm tags
