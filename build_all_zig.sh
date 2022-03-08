@@ -2,8 +2,8 @@
 
 set -e
 
+zig build
 zigmod license > licenses.txt
-
 zigmod sum
 
 targets="
