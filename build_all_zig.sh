@@ -2,6 +2,10 @@
 
 set -e
 
+zigmod license > licenses.txt
+
+zigmod sum
+
 targets="
 aarch64-linux-musl
 aarch64-macos-gnu
