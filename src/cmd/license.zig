@@ -59,32 +59,42 @@ pub fn execute(args: [][]u8) !void {
         try tracking_list.append(item);
     }
 
+    const stdout = std.io.getStdOut();
+    const istty = stdout.isTty();
+    const writer = stdout.writer();
+    const Bold = if (!istty) "" else style.Bold;
+    const Faint = if (!istty) "" else style.Faint;
+    const ResetIntensity = if (!istty) "" else style.ResetIntensity;
+
     var first = true;
     var iter = map.iterator();
     while (iter.next()) |entry| {
         if (!first) std.debug.print("\n", .{});
         first = false;
-        std.debug.print(style.Bold ++ "{s}:\n", .{entry.key_ptr.*});
+        try writer.writeAll(Bold);
+        try writer.print("{s}:\n", .{entry.key_ptr.*});
         if (u.list_contains(licenses.spdx, entry.key_ptr.*)) {
-            std.debug.print(style.Faint ++ "= {s}{s}\n", .{ "https://spdx.org/licenses/", entry.key_ptr.* });
+            try writer.writeAll(Faint);
+            try writer.print("= {s}{s}\n", .{ "https://spdx.org/licenses/", entry.key_ptr.* });
         }
-        std.debug.print(style.ResetIntensity, .{});
+        try writer.writeAll(ResetIntensity);
         for (entry.value_ptr.*.items) |item| {
             if (std.mem.eql(u8, item.clean_path, "../..")) {
-                std.debug.print("- This\n", .{});
+                try writer.print("- This\n", .{});
             } else {
-                std.debug.print("- {s} {s}\n", .{ @tagName(item.dep.?.type), item.dep.?.path });
+                try writer.print("- {s} {s}\n", .{ @tagName(item.dep.?.type), item.dep.?.path });
             }
         }
     }
     if (unspecified_list.items.len > 0) {
-        std.debug.print(style.Bold ++ "Unspecified:\n", .{});
-        std.debug.print(style.ResetIntensity, .{});
+        try writer.writeAll(Bold);
+        try writer.print("Unspecified:\n", .{});
+        try writer.writeAll(ResetIntensity);
         for (unspecified_list.items) |item| {
             if (std.mem.eql(u8, item.clean_path, "../..")) {
-                std.debug.print("- This\n", .{});
+                try writer.print("- This\n", .{});
             } else {
-                std.debug.print("- {s} {s}\n", .{ @tagName(item.dep.?.type), item.dep.?.path });
+                try writer.print("- {s} {s}\n", .{ @tagName(item.dep.?.type), item.dep.?.path });
             }
         }
     }
