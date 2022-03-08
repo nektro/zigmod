@@ -42,6 +42,7 @@ pub fn main() !void {
             .ENABLE_LINE_INPUT = 1, //ENABLE_WRAP_AT_EOL_OUTPUT
             .ENABLE_ECHO_INPUT = 1, //ENABLE_VIRTUAL_TERMINAL_PROCESSING
         }));
+        _ = console.SetConsoleOutputCP(65001);
     }
 
     try zigmod.init();
