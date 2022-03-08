@@ -15,7 +15,7 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
     var vcpkg = false;
     inline for (comptime std.meta.declarations(package_data)) |decl| {
         const pkg = @as(Package, @field(package_data, decl.name));
-        inline for (pkg.system_libs) |item| {
+        for (pkg.system_libs) |item| {
             exe.linkSystemLibrary(item);
             llc = true;
         }
