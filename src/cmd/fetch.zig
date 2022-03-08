@@ -138,10 +138,7 @@ fn create_lockfile(alloc: std.mem.Allocator, list: *std.ArrayList(zigmod.Module)
     try wl.writeAll("2\n");
     for (list.items) |m| {
         if (m.dep) |md| {
-            if (md.type == .local) {
-                continue;
-            }
-            if (md.type == .system_lib) continue;
+            if (md.type.isLocal()) continue;
             const mpath = try std.fs.path.join(alloc, &.{ path, m.clean_path });
             const version = try md.exact_version(mpath);
             try wl.print("{s} {s} {s}\n", .{ @tagName(md.type), md.path, version });

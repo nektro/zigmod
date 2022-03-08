@@ -108,7 +108,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
     const p = try std.fs.path.join(options.alloc, &.{ cachepath, try d.clean_path() });
     const pv = try std.fs.path.join(options.alloc, &.{ cachepath, try d.clean_path_v() });
 
-    const nocache = d.type == .local or d.type == .system_lib;
+    const nocache = d.type.isLocal();
     if (!nocache and u.list_contains(options.already_fetched.items, p)) return p;
     if (!nocache and u.list_contains(options.already_fetched.items, pv)) return pv;
 
@@ -223,7 +223,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
     const modpath = try get_modpath(cachepath, d.*, options);
     const moddir = if (std.mem.eql(u8, modpath, "files") or modpath.len == 0) try std.fs.cwd().openDir(cachepath, .{}) else try std.fs.cwd().openDir(modpath, .{});
 
-    const nocache = d.type == .local or d.type == .system_lib;
+    const nocache = d.type.isLocal();
     if (!nocache) try options.already_fetched.append(modpath);
 
     switch (d.type) {

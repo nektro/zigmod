@@ -89,6 +89,16 @@ pub const DepType = enum {
         };
     }
 
+    pub fn isLocal(self: DepType) bool {
+        return switch (self) {
+            .local => true,
+            .system_lib => true,
+            .git => false,
+            .hg => false,
+            .http => false,
+        };
+    }
+
     pub const GitVersion = enum {
         branch,
         tag,
