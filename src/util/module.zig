@@ -13,6 +13,7 @@ const common = @import("./../common.zig");
 pub const Module = struct {
     alloc: std.mem.Allocator,
     is_sys_lib: bool,
+    is_framework: bool,
     id: string,
     name: string,
     main: string,
@@ -41,6 +42,7 @@ pub const Module = struct {
         return Module{
             .alloc = alloc,
             .is_sys_lib = false,
+            .is_framework = false,
             .id = if (dep.id.len > 0) dep.id else try u.random_string(alloc, 48),
             .name = dep.name,
             .main = dep.main,
@@ -119,6 +121,15 @@ pub const Module = struct {
     pub fn has_syslib_deps(self: Module) bool {
         for (self.deps) |d| {
             if (d.is_sys_lib) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    pub fn has_framework_deps(self: Module) bool {
+        for (self.deps) |d| {
+            if (d.is_framework) {
                 return true;
             }
         }

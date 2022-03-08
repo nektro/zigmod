@@ -66,6 +66,11 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            exe.linkSystemLibrary(item);
         \\            llc = true;
         \\        }
+        \\        for (pkg.frameworks) |item| {
+        \\            if (!std.Target.current.isDarwin()) @panic(exe.builder.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
+        \\            exe.linkFramework(item);
+        \\            llc = true;
+        \\        }
         \\        inline for (pkg.c_include_dirs) |item| {
         \\            exe.addIncludeDir(@field(dirs, decl.name) ++ "/" ++ item);
         \\            llc = true;
@@ -87,6 +92,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    c_source_files: []const string = &.{},
         \\    c_source_flags: []const string = &.{},
         \\    system_libs: []const string = &.{},
+        \\    frameworks: []const string = &.{},
         \\    vcpkg: bool = false,
         \\};
         \\
@@ -109,7 +115,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     try w.writeAll("pub const package_data = struct {\n");
     var duped = std.ArrayList(zigmod.Module).init(alloc);
     for (list.items) |mod| {
-        if (mod.is_sys_lib) {
+        if (mod.is_sys_lib or mod.is_framework) {
             continue;
         }
         try duped.append(mod);
@@ -240,7 +246,7 @@ fn diff_printchange(comptime testt: string, comptime replacement: string, item: 
 
 fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module) !void {
     for (list) |mod| {
-        if (mod.is_sys_lib) continue;
+        if (mod.is_sys_lib or mod.is_framework) continue;
         if (std.mem.eql(u8, mod.id, "root")) {
             try w.print("    pub const _root = \"\";\n", .{});
             continue;
@@ -322,6 +328,15 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                 }
                 if (mod.has_syslib_deps()) {
                     try w.writeAll("        .system_libs = &.{");
+                    for (mod.deps) |item, j| {
+                        if (!item.is_sys_lib) continue;
+                        try w.print(" \"{}\"", .{std.zig.fmtEscapes(item.name)});
+                        if (j != mod.deps.len - 1) try w.writeAll(",");
+                    }
+                    try w.writeAll(" },\n");
+                }
+                if (mod.has_framework_deps()) {
+                    try w.writeAll("        .frameworks = &.{");
                     for (mod.deps) |item, j| {
                         if (!item.is_sys_lib) continue;
                         try w.print(" \"{}\"", .{std.zig.fmtEscapes(item.name)});

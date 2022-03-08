@@ -18,6 +18,7 @@ pub const Package = struct {
     c_source_files: []const string = &.{},
     c_source_flags: []const string = &.{},
     system_libs: []const string = &.{},
+    frameworks: []const string = &.{},
     vcpkg: bool = false,
 };
 ```

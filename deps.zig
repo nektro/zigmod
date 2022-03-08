@@ -19,6 +19,11 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
             exe.linkSystemLibrary(item);
             llc = true;
         }
+        for (pkg.frameworks) |item| {
+            if (!std.Target.current.isDarwin()) @panic(exe.builder.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
+            exe.linkFramework(item);
+            llc = true;
+        }
         inline for (pkg.c_include_dirs) |item| {
             exe.addIncludeDir(@field(dirs, decl.name) ++ "/" ++ item);
             llc = true;
@@ -40,6 +45,7 @@ pub const Package = struct {
     c_source_files: []const string = &.{},
     c_source_flags: []const string = &.{},
     system_libs: []const string = &.{},
+    frameworks: []const string = &.{},
     vcpkg: bool = false,
 };
 

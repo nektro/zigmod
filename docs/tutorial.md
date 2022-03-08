@@ -63,6 +63,9 @@ The core of expandability, it is possible to add dependencies to your project. H
 - Other/System Library
      - System libraries are similar to Git dependencies, but instead of `git <url>` it is `system_lib <name>`.
 
+- Other/Framework
+     - Frameworks are similar to system libraries but are specific to Darwin (macOS, iOS, etc) and are defined with `framework <name>`.
+
 - Other/HTTP
      - Http tarballs are also allowed and follow a similar pattern as Git dependencies but use the `http` type. One thing to note is that it is recomended to add a hash verification after your tarball URL so that zigmod may assert whether or not it has been downloaded already to prevent unnecessary trips to the network. Hash verification versions are placed after the URL and in the form `type-string` such as `sha256-8ff0b79fd9118af7a760f1f6a98cac3e69daed325c8f9f0a581ecb62f797fd64`. They may also be placed in their own `version` key instead of `src`. The available hash algorithms are `blake3`, `sha256`, `sha512`.
 

@@ -36,7 +36,7 @@ pub fn execute(args: [][]u8) !void {
         if (std.mem.eql(u8, m.clean_path, "../..")) {
             continue;
         }
-        if (m.is_sys_lib) continue;
+        if (m.is_sys_lib or m.is_framework) continue;
         const hash = try m.get_hash(cachepath);
         try w.print("{s} {s}\n", .{ hash, m.clean_path });
     }

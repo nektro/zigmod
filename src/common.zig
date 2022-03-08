@@ -50,6 +50,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
     return zigmod.Module{
         .alloc = options.alloc,
         .is_sys_lib = false,
+        .is_framework = false,
         .id = "root",
         .name = "root",
         .main = m.main,
@@ -79,6 +80,7 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOption
     return zigmod.Module{
         .alloc = options.alloc,
         .is_sys_lib = false,
+        .is_framework = false,
         .id = m.id,
         .name = m.name,
         .main = m.main,
@@ -128,7 +130,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             }
             return d.path;
         },
-        .system_lib => {
+        .system_lib, .framework => {
             // no op
             return "";
         },
@@ -227,10 +229,11 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
     if (!nocache) try options.already_fetched.append(modpath);
 
     switch (d.type) {
-        .system_lib => {
+        .system_lib, .framework => {
             return zigmod.Module{
                 .alloc = options.alloc,
-                .is_sys_lib = true,
+                .is_sys_lib = d.type == .system_lib,
+                .is_framework = d.type == .framework,
                 .id = try u.do_hash(options.alloc, std.crypto.hash.sha3.Sha3_384, d.path),
                 .name = d.path,
                 .only_os = d.only_os,

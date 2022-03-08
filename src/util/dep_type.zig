@@ -10,6 +10,7 @@ const u = @import("./index.zig");
 pub const DepType = enum {
     local,      // A 'package' derived from files in the same repository.
     system_lib, // std.build.LibExeObjStep.linkSystemLibrary
+    framework,  // std.build.LibExeObjStep.linkFramework
     git,        // https://git-scm.com/
     hg,         // https://www.mercurial-scm.org/
     http,       // https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
@@ -36,6 +37,7 @@ pub const DepType = enum {
         switch (self) {
             .local => {},
             .system_lib => {},
+            .framework => {},
             .git => {
                 u.assert((try u.run_cmd(alloc, null, &.{ "git", "clone", "--recurse-submodules", rpath, dpath })) == 0, "git clone {s} failed", .{rpath});
             },
@@ -56,13 +58,13 @@ pub const DepType = enum {
         }
     }
 
-    // zig fmt: on
     pub fn update(self: DepType, alloc: std.mem.Allocator, dpath: string, rpath: string) !void {
         _ = rpath;
 
         switch (self) {
             .local => {},
             .system_lib => {},
+            .framework => {},
             .git => {
                 u.assert((try u.run_cmd(alloc, dpath, &.{ "git", "fetch" })) == 0, "git fetch failed", .{});
                 u.assert((try u.run_cmd(alloc, dpath, &.{ "git", "pull" })) == 0, "git pull failed", .{});
@@ -76,13 +78,13 @@ pub const DepType = enum {
         }
     }
 
-    // zig fmt: on
     pub fn exact_version(self: DepType, alloc: std.mem.Allocator, mpath: string) !string {
         var mdir = try std.fs.cwd().openDir(mpath, .{});
         defer mdir.close();
         return switch (self) {
             .local => "",
             .system_lib => "",
+            .framework => "",
             .git => try std.fmt.allocPrint(alloc, "commit-{s}", .{(try u.git_rev_HEAD(alloc, mdir))}),
             .hg => "",
             .http => "",
@@ -93,6 +95,7 @@ pub const DepType = enum {
         return switch (self) {
             .local => true,
             .system_lib => true,
+            .framework => true,
             .git => false,
             .hg => false,
             .http => false,
