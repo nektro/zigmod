@@ -48,11 +48,11 @@ This is a list of `Dep` objects. `Dep` objects are how you include the other peo
 
 ### `root_dependencies`
 - Type: `[]Dep`
-Similar to `dependencies` but will only get added to the project if the current `zig.mod` is the root module.
+Similar to `dependencies` but will only get added to the project if the current `zigmod.yml` is the root module.
 
 ### `build_dependencies`
 - Type: `[]Dep`
-Similar to `dependencies` but will only get added to the project if the current `zig.mod` is the root module. Exposed in `deps.zig` through the `deps.imports` decl.
+Similar to `dependencies` but will only get added to the project if the current `zigmod.yml` is the root module. Exposed in `deps.zig` through the `deps.imports` decl.
 
 ### `min_zig_version`
 - Type: `string`
@@ -127,4 +127,4 @@ This attribute is a manual override for having an external repo that contains no
 This attribute is a flag to call `try exe.addVcpkgPaths(.static);` when on Windows. Likely used in conjunction with adding system libraries/C code. `true` is the only value that will enable this flag.
 
 #### Dep Overrides
-There are a number of fields you can add to a `Dep` object that will override it's top-level value. This is most useful in the case where a project you want to use does not have a `zig.mod` manifest. You can then use overrides to define the values for them. The only top-level value you can not override is `dependencies`.
+There are a number of fields you can add to a `Dep` object that will override it's top-level value. This is most useful in the case where a project you want to use does not have a `zigmod.yml` manifest. You can then use overrides to define the values for them. The only top-level value you can not override is `dependencies`.
