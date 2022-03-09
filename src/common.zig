@@ -107,8 +107,8 @@ pub fn collect_pkgs(mod: zigmod.Module, list: *std.ArrayList(zigmod.Module)) any
 }
 
 pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !string {
-    const p = try std.fs.path.join(options.alloc, &.{ cachepath, try d.clean_path() });
-    const pv = try std.fs.path.join(options.alloc, &.{ cachepath, try d.clean_path_v() });
+    const p = try std.fs.path.join(options.alloc, &.{ cachepath, try d.clean_path(options.alloc) });
+    const pv = try std.fs.path.join(options.alloc, &.{ cachepath, try d.clean_path_v(options.alloc) });
 
     const nocache = d.type.isLocal();
     if (!nocache and u.list_contains(options.already_fetched.items, p)) return p;
@@ -213,7 +213,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
 pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectOptions) anyerror!?zigmod.Module {
     if (options.lock) |lock| {
         for (lock) |item| {
-            if (std.mem.eql(u8, item[0], try d.clean_path())) {
+            if (std.mem.eql(u8, item[0], try d.clean_path(options.alloc))) {
                 d.type = std.meta.stringToEnum(zigmod.DepType, item[1]).?;
                 d.path = item[2];
                 d.version = item[3];
@@ -334,7 +334,6 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
     }
 
     var d: zigmod.Dep = .{
-        .alloc = alloc,
         .type = .local,
         .path = "files",
         .id = "",
@@ -379,7 +378,6 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
             2 => {
                 var iter = std.mem.split(u8, line, " ");
                 const asdep = zigmod.Dep{
-                    .alloc = alloc,
                     .type = std.meta.stringToEnum(zigmod.DepType, iter.next().?).?,
                     .path = iter.next().?,
                     .version = iter.next().?,
@@ -390,7 +388,7 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
                     .deps = &.{},
                 };
                 try list.append([4]string{
-                    try asdep.clean_path(),
+                    try asdep.clean_path(alloc),
                     @tagName(asdep.type),
                     asdep.path,
                     asdep.version,

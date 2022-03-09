@@ -12,7 +12,6 @@ const yaml = @import("./yaml.zig");
 pub const Dep = struct {
     const Self = @This();
 
-    alloc: std.mem.Allocator,
     type: zigmod.DepType,
     path: string,
     id: string,
@@ -30,7 +29,7 @@ pub const Dep = struct {
     vcpkg: bool = false,
     for_build: bool = false,
 
-    pub fn clean_path(self: Dep) !string {
+    pub fn clean_path(self: Dep, alloc: std.mem.Allocator) !string {
         if (self.type == .local) {
             return if (self.path.len == 0) "../.." else self.path;
         }
@@ -39,16 +38,16 @@ pub const Dep = struct {
         p = u.trim_prefix(p, "https://");
         p = u.trim_prefix(p, "git://");
         p = u.trim_suffix(p, ".git");
-        p = try std.mem.join(self.alloc, "/", &.{ @tagName(self.type), p });
+        p = try std.mem.join(alloc, "/", &.{ @tagName(self.type), p });
         return p;
     }
 
-    pub fn clean_path_v(self: Dep) !string {
+    pub fn clean_path_v(self: Dep, alloc: std.mem.Allocator) !string {
         if (self.type == .http and self.version.len > 0) {
             const i = std.mem.indexOf(u8, self.version, "-").?;
-            return std.mem.join(self.alloc, "/", &.{ "v", try self.clean_path(), self.version[i + 1 .. 15] });
+            return std.mem.join(alloc, "/", &.{ "v", try self.clean_path(alloc), self.version[i + 1 .. 15] });
         }
-        return std.mem.join(self.alloc, "/", &.{ "v", try self.clean_path(), self.version });
+        return std.mem.join(alloc, "/", &.{ "v", try self.clean_path(alloc), self.version });
     }
 
     pub fn is_for_this(self: Dep) bool {
@@ -62,15 +61,15 @@ pub const Dep = struct {
         return true;
     }
 
-    pub fn exact_version(self: Dep, dpath: string) !string {
+    pub fn exact_version(self: Dep, alloc: std.mem.Allocator, dpath: string) !string {
         if (self.version.len == 0) {
-            return try self.type.exact_version(self.alloc, dpath);
+            return try self.type.exact_version(alloc, dpath);
         }
         return switch (self.type) {
             .git => blk: {
                 const vers = try u.parse_split(zigmod.DepType.GitVersion, "-").do(self.version);
                 if (vers.id.frozen()) break :blk self.version;
-                break :blk try self.type.exact_version(self.alloc, dpath);
+                break :blk try self.type.exact_version(alloc, dpath);
             },
             else => self.version,
         };
