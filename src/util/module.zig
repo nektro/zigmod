@@ -11,7 +11,6 @@ const common = @import("./../common.zig");
 //
 
 pub const Module = struct {
-    alloc: std.mem.Allocator,
     is_sys_lib: bool,
     is_framework: bool,
     id: string,
@@ -40,7 +39,6 @@ pub const Module = struct {
             }
         }
         return Module{
-            .alloc = alloc,
             .is_sys_lib = false,
             .is_framework = false,
             .id = if (dep.id.len > 0) dep.id else try u.random_string(alloc, 48),
@@ -65,10 +63,10 @@ pub const Module = struct {
         return std.mem.eql(u8, self.id, another.id);
     }
 
-    pub fn get_hash(self: Module, cdpath: string) !string {
-        const file_list_1 = try u.file_list(self.alloc, try std.mem.concat(self.alloc, u8, &.{ cdpath, "/", self.clean_path }));
+    pub fn get_hash(self: Module, alloc: std.mem.Allocator, cdpath: string) !string {
+        const file_list_1 = try u.file_list(alloc, try std.mem.concat(alloc, u8, &.{ cdpath, "/", self.clean_path }));
 
-        var file_list_2 = std.ArrayList(string).init(self.alloc);
+        var file_list_2 = std.ArrayList(string).init(alloc);
         defer file_list_2.deinit();
         for (file_list_1) |item| {
             const _a = u.trim_prefix(item, cdpath);
@@ -86,15 +84,15 @@ pub const Module = struct {
 
         const h = &std.crypto.hash.Blake3.init(.{});
         for (file_list_2.items) |item| {
-            const abs_path = try std.fs.path.join(self.alloc, &.{ cdpath, self.clean_path, item });
+            const abs_path = try std.fs.path.join(alloc, &.{ cdpath, self.clean_path, item });
             const file = try std.fs.cwd().openFile(abs_path, .{});
             defer file.close();
-            const input = try file.reader().readAllAlloc(self.alloc, u.mb * 100);
+            const input = try file.reader().readAllAlloc(alloc, u.mb * 100);
             h.update(input);
         }
         var out: [32]u8 = undefined;
         h.final(&out);
-        const hex = try std.fmt.allocPrint(self.alloc, "blake3-{x}", .{std.fmt.fmtSliceHexLower(out[0..])});
+        const hex = try std.fmt.allocPrint(alloc, "blake3-{x}", .{std.fmt.fmtSliceHexLower(out[0..])});
         return hex;
     }
 

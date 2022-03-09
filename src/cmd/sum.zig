@@ -37,7 +37,7 @@ pub fn execute(args: [][]u8) !void {
             continue;
         }
         if (m.is_sys_lib or m.is_framework) continue;
-        const hash = try m.get_hash(cachepath);
+        const hash = try m.get_hash(gpa, cachepath);
         try w.print("{s} {s}\n", .{ hash, m.clean_path });
     }
 }
