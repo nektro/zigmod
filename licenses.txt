@@ -8,7 +8,6 @@ MIT:
 - git https://github.com/truemedian/zfetch
 - git https://github.com/truemedian/hzzp
 - git https://github.com/nektro/iguanaTLS
-- git https://github.com/MasterQ32/zig-network
 - git https://github.com/MasterQ32/zig-uri
 - git https://github.com/nektro/zig-json
 - git https://github.com/nektro/zig-extras

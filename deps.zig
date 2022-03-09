@@ -64,7 +64,6 @@ pub const dirs = struct {
     pub const _ejw82j2ipa0e = cache ++ "/git/github.com/truemedian/zfetch";
     pub const _9k24gimke1an = cache ++ "/git/github.com/truemedian/hzzp";
     pub const _csbnipaad8n7 = cache ++ "/git/github.com/nektro/iguanaTLS";
-    pub const _yyhw90zkzgmu = cache ++ "/git/github.com/MasterQ32/zig-network";
     pub const _u9w9dpp6p804 = cache ++ "/git/github.com/MasterQ32/zig-uri";
     pub const _ocmr9rtohgcc = cache ++ "/git/github.com/nektro/zig-json";
     pub const _f7dubzb7cyqe = cache ++ "/git/github.com/nektro/zig-extras";
@@ -105,17 +104,13 @@ pub const package_data = struct {
         .directory = dirs._csbnipaad8n7,
         .pkg = Pkg{ .name = "iguanaTLS", .path = .{ .path = dirs._csbnipaad8n7 ++ "/src/main.zig" }, .dependencies = null },
     };
-    pub const _yyhw90zkzgmu = Package{
-        .directory = dirs._yyhw90zkzgmu,
-        .pkg = Pkg{ .name = "network", .path = .{ .path = dirs._yyhw90zkzgmu ++ "/network.zig" }, .dependencies = null },
-    };
     pub const _u9w9dpp6p804 = Package{
         .directory = dirs._u9w9dpp6p804,
         .pkg = Pkg{ .name = "uri", .path = .{ .path = dirs._u9w9dpp6p804 ++ "/uri.zig" }, .dependencies = null },
     };
     pub const _ejw82j2ipa0e = Package{
         .directory = dirs._ejw82j2ipa0e,
-        .pkg = Pkg{ .name = "zfetch", .path = .{ .path = dirs._ejw82j2ipa0e ++ "/src/main.zig" }, .dependencies = &.{ _9k24gimke1an.pkg.?, _csbnipaad8n7.pkg.?, _yyhw90zkzgmu.pkg.?, _u9w9dpp6p804.pkg.? } },
+        .pkg = Pkg{ .name = "zfetch", .path = .{ .path = dirs._ejw82j2ipa0e ++ "/src/main.zig" }, .dependencies = &.{ _9k24gimke1an.pkg.?, _csbnipaad8n7.pkg.?, _u9w9dpp6p804.pkg.? } },
     };
     pub const _tnj3qf44tpeq = Package{
         .directory = dirs._tnj3qf44tpeq,
