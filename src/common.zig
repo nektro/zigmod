@@ -205,6 +205,16 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             try std.fs.deleteFileAbsolute(file_path);
             return p;
         },
+        .pijul => {
+            if (!try u.does_folder_exist(p)) {
+                try d.type.pull(options.alloc, d.path, p);
+            } else {
+                if (options.update) {
+                    try d.type.update(options.alloc, p, d.path);
+                }
+            }
+            return p;
+        },
     }
 }
 
