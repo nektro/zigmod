@@ -134,7 +134,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
         },
         .git => {
             if (d.version.len > 0) {
-                const vers = u.parse_split(zigmod.DepType.GitVersion, "-").do(d.version) catch |e| switch (e) {
+                const vers = u.parse_split(zigmod.DepType.Version.Git, "-").do(d.version) catch |e| switch (e) {
                     error.IterEmpty => unreachable,
                     error.NoMemberFound => {
                         const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];

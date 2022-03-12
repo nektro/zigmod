@@ -85,17 +85,26 @@ pub const DepType = enum {
         };
     }
 
-    pub const GitVersion = enum {
-        branch,
-        tag,
-        commit,
+    pub const Version = union(DepType) {
+        local: void,
+        system_lib: void,
+        framework: void,
+        git: Git,
+        hg: void,
+        http: void,
 
-        pub fn frozen(self: GitVersion) bool {
-            return switch (self) {
-                .branch => false,
-                .tag => true,
-                .commit => true,
-            };
-        }
+        pub const Git = enum {
+            branch,
+            tag,
+            commit,
+
+            pub fn frozen(self: Git) bool {
+                return switch (self) {
+                    .branch => false,
+                    .tag => true,
+                    .commit => true,
+                };
+            }
+        };
     };
 };
