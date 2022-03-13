@@ -206,6 +206,35 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             return p;
         },
         .pijul => {
+            if (d.version.len > 0) {
+                const vers = u.parse_split(zigmod.DepType.Version.Pijul, "-").do(d.version) catch |e| switch (e) {
+                    error.IterEmpty => unreachable,
+                    error.NoMemberFound => {
+                        const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];
+                        u.fail("pijul: version type '{s}' is invalid.", .{vtype});
+                    },
+                };
+                // this version is already pulled
+                if (try u.does_folder_exist(pv)) {
+                    if (vers.id == .channel) {
+                        if (options.update) {
+                            // This does not work with pijul, have to use explicit channel name
+                            // try d.type.update(options.alloc, pv, d.path);
+                            if ((try u.run_cmd(options.alloc, pv, &.{ "pijul", "pull", "--all", "--from-channel", vers.string })) > 0) {
+                                u.fail("pijul pull --from-channel {s}: did not succeed", .{vers.string});
+                            }
+                        }
+                    }
+                    return pv;
+                }
+                // version has not pulled yet
+                if ((try u.run_cmd(options.alloc, null, &.{ "pijul", "clone", "--channel", vers.string, d.path, pv })) > 0) {
+                    u.fail("pijul clone --channel: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
+                }
+                return pv;
+            }
+
+            // no version string
             if (!try u.does_folder_exist(p)) {
                 try d.type.pull(options.alloc, d.path, p);
             } else {

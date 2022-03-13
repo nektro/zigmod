@@ -117,6 +117,7 @@ pub const DepType = enum {
         git: Git,
         hg: void,
         http: void,
+        pijul: Pijul,
 
         pub const Git = enum {
             branch,
@@ -130,6 +131,9 @@ pub const DepType = enum {
                     .commit => true,
                 };
             }
+        };
+        pub const Pijul = enum {
+            channel,
         };
     };
 };
