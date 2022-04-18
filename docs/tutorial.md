@@ -18,6 +18,88 @@ The wizard will also ask if you'd like it setup any additional metadata files su
 > Ref: See [`zigmod init`](./commands/init.md) for more info.
 
 ---
+## Understanding `zigmod.yml`
+
+Running [`zigmod init`](./commands/init.md) will ask if You want to create an application or a
+library. Based on You answer the resulting `zigmod.yml` file have two types.
+
+### `zigmod.yml` for an application (`id` is omitted)
+
+```yaml
+name: my-package
+license: None
+description: None
+root_dependencies:
+  - src: git https://github.com/jecolon/ziglyph
+```
+
+In this case You can use `@import("ziglyph")` to import the package and use it.
+
+### `zigmod.yml` for a library (`id` is omitted)
+
+```yaml
+name: my-package
+main: src/lib.zig
+license: None
+description: None
+dependencies:
+  - src: git https://github.com/jecolon/ziglyph
+```
+
+Here I assume that You initialized Your project with `zig init-exe` or
+`zig init-lib`, so Your `build.zig` the `addExecutable()` or
+`addStaticLibrary()` call points to `src/main.zig`.
+
+In this case You can `@import("ziglyph")` in `src/lib.zig`, but not in
+`src/main.zig`. However You can `@import("my-package")` in `src/main.zig`.
+
+Please note, that using `zig init-exe` or `zig init-lib` for creating a project
+does not mean that You have to use `zigmod init` in application or library mode.
+Creating a `zigmod.yml` file with proper `name` and `main` only makes Your package
+importable by other projects. This is usually not needed with applications, but
+quite useful in case of libraries; hence the name.
+
+### Zig and Zigmod package handling explained
+
+Zig packages can only `@import` **direct** children. The include tree is
+something like this:
+
+```
+root
+  A
+    C
+  B
+  D
+    E
+```
+
+`root` can `@import` `A`, `B` and `D`, but `E` can be imported only from `D`.
+`B` can not import anything.
+(Everybody can import relative files, this limitation is only for packages.)
+
+In library `zigmod.yml` example the tree looks like this:
+
+```
+root (src/main.zig)
+  my-package (src/lib.zig)
+    ziglyph (separate package)
+```
+
+`root` is always set in `build.zig` using `addExecutable()` or
+`addStaticLibrary()` calls.
+
+It is very important to understand, that `my-package` is _below_ `root`, as
+`name/main` in `zigmod.yml` will create a separate package (it will not be chained to
+`root`).
+
+If You want to use the dependencies from `root`, then make sure that Your
+`zigmod.yml` does _not_ contain a `main` line **and** use `root_dependencies`
+instead of `dependencies`. This is what `zigmod init` does in application mode.
+
+On the other hand using `root_dependencies` and `dependencies` is not mutually
+exclusive, You can take advantage of using both, like zigmod does. Using
+`dependencies` requires a proper `main` field in Your `zigmod.yml`.
+
 ## Running `zigmod fetch`
 This command will inspect your `zigmod.yml` and download any new dependencies as well as pulling updates for any ones already download. It will recursively do this for your entire tree until it is full constructed which will culminate in the generation of two output files: `deps.zig` and `zigmod.lock`.
 
@@ -46,6 +128,9 @@ Add `--no-update` if you do want it to fetch remote updates and only regenerate 
 +    deps.addAllTo(exe);
      exe.install();
 ```
+
+> Note: If You would like to use the external dependencies in tests, do not
+forget to add `deps.addAllTo(main_tests)` after the `addTest()` call.
 
 ---
 ## Adding a dependency
