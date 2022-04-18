@@ -39,6 +39,10 @@ pub fn execute(args: [][]u8) !void {
         const moddir = try std.fs.cwd().openDir(modpath, .{});
         std.log.info("{s}", .{dep.path});
 
+        // git update
+        u.assert((try u.run_cmd(gpa, modpath, &.{ "git", "fetch" })) == 0, "git fetch failed", .{});
+        u.assert((try u.run_cmd(gpa, modpath, &.{ "git", "pull" })) == 0, "git pull failed", .{});
+
         // zigmod ci
         const ci = @import("../ci.zig");
         try ci.do(gpa, modpath, moddir);
