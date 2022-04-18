@@ -27,11 +27,14 @@ pub fn execute(args: [][]u8) !void {
     const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
     var master_list = List.init(gpa);
+    errdefer master_list.deinit();
     try common.collect_pkgs(top_module, &master_list);
 
     var map = Map.init(gpa);
+    errdefer map.deinit();
 
     var unspecified_list = List.init(gpa);
+    errdefer unspecified_list.deinit();
 
     for (master_list.items) |item| {
         if (item.clean_path.len == 0) {
