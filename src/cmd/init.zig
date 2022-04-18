@@ -69,7 +69,7 @@ pub fn execute(args: [][]u8) !void {
                 .lib => try writeLibManifest(w, id, name, entry.?, license, description),
             }
             std.debug.print("\n", .{});
-            u.print("Successfully initialized new package {s}!\n", .{name});
+            std.debug.print("Successfully initialized new package {s}!\n", .{name});
         },
     }
 

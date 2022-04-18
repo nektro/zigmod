@@ -113,7 +113,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
     if (!nocache and u.list_contains(options.already_fetched.items, pv)) return pv;
 
     if (options.log and d.type != .local) {
-        u.print("fetch: {s}: {s}", .{ @tagName(d.type), d.path });
+        std.debug.print("fetch: {s}: {s}\n", .{ @tagName(d.type), d.path });
     }
     defer {
         if (!bootstrap and options.log and d.type != .local) {

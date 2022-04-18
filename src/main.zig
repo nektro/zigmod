@@ -20,16 +20,16 @@ pub fn main() !void {
     const available = if (build_options.bootstrap) zigmod.commands_to_bootstrap else zigmod.commands;
 
     if (args.len == 0) {
-        u.print("zigmod {s} {s} {s} {s}", .{
+        std.debug.print("zigmod {s} {s} {s} {s}\n", .{
             build_options.version,
             @tagName(builtin.os.tag),
             @tagName(builtin.cpu.arch),
             @tagName(builtin.abi),
         });
-        u.print("", .{});
-        u.print("The commands available are:", .{});
+        std.debug.print("\n", .{});
+        std.debug.print("The commands available are:\n", .{});
         inline for (comptime std.meta.declarations(available)) |decl| {
-            u.print("  - {s}", .{decl.name});
+            std.debug.print("  - {s}\n", .{decl.name});
         }
         return;
     }
