@@ -295,7 +295,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
 pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: string, mdir: std.fs.Dir, dirs: []const string) !zigmod.Module {
     const fname = try std.mem.join(alloc, "", &.{ pkg_name, ".zig" });
 
-    const map = &std.StringHashMap(string).init(alloc);
+    var map = std.StringHashMap(string).init(alloc);
     defer map.deinit();
 
     for (dirs) |dir_path| {

@@ -26,12 +26,12 @@ pub fn execute(args: [][]u8) !void {
     };
     const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
-    const master_list = &List.init(gpa);
-    try common.collect_pkgs(top_module, master_list);
+    var master_list = List.init(gpa);
+    try common.collect_pkgs(top_module, &master_list);
 
-    const map = &Map.init(gpa);
+    var map = Map.init(gpa);
 
-    const unspecified_list = &List.init(gpa);
+    var unspecified_list = List.init(gpa);
 
     for (master_list.items) |item| {
         if (item.clean_path.len == 0) {

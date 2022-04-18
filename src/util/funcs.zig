@@ -172,7 +172,7 @@ const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
 pub fn random_string(alloc: std.mem.Allocator, len: usize) !string {
     const now = @intCast(u64, std.time.nanoTimestamp());
     var rand = std.rand.DefaultPrng.init(now);
-    const r = &rand.random();
+    var r = rand.random();
     var buf = try alloc.alloc(u8, len);
     var i: usize = 0;
     while (i < len) : (i += 1) {
@@ -225,7 +225,7 @@ pub fn validate_hash(alloc: std.mem.Allocator, input: string, file_path: string)
 }
 
 pub fn do_hash(alloc: std.mem.Allocator, comptime algo: type, data: string) !string {
-    const h = &algo.init(.{});
+    var h = algo.init(.{});
     var out: [algo.digest_length]u8 = undefined;
     h.update(data);
     h.final(&out);

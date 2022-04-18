@@ -82,7 +82,7 @@ pub const Module = struct {
             }
         }.lt);
 
-        const h = &std.crypto.hash.Blake3.init(.{});
+        var h = std.crypto.hash.Blake3.init(.{});
         for (file_list_2.items) |item| {
             const abs_path = try std.fs.path.join(alloc, &.{ cdpath, self.clean_path, item });
             const file = try std.fs.cwd().openFile(abs_path, .{});

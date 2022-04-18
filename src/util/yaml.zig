@@ -170,7 +170,7 @@ pub fn parse(alloc: std.mem.Allocator, input: string) !Document {
         }
     }
 
-    const p = &Parser{
+    var p = Parser{
         .alloc = alloc,
         .tokens = all_events.items,
         .lines = lines,
