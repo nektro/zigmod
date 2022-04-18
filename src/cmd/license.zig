@@ -72,7 +72,7 @@ pub fn execute(args: [][]u8) !void {
     var first = true;
     var iter = map.iterator();
     while (iter.next()) |entry| {
-        if (!first) std.debug.print("\n", .{});
+        if (!first) try writer.writeAll("\n");
         first = false;
         try writer.writeAll(Bold);
         try writer.print("{s}:\n", .{entry.key_ptr.*});
