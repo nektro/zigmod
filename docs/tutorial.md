@@ -45,11 +45,11 @@ dependencies:
   - src: git https://github.com/jecolon/ziglyph
 ```
 
-Here I assume that you initialized your project with `zig init-exe` or `zig init-lib`, so your `build.zig` the `addExecutable()` or `addStaticLibrary()` call points to `src/main.zig`.
+Here I assume that you initialized your project with `zig init-exe` or `zig init-lib`, so in your `build.zig` the respective `addExecutable()` or `addStaticLibrary()` call points to `src/main.zig`.
 
 In this case you can `@import("ziglyph")` in `src/lib.zig`, but not in `src/main.zig`. However you can `@import("my-package")` in `src/main.zig`.
 
-Please note, that using `zig init-exe` or `zig init-lib` for creating a project does not mean that you have to use `zigmod init` in application or library mode. Creating a `zigmod.yml` file with proper `name` and `main` only makes your package importable by other projects. This is usually not needed with applications, but quite useful in case of libraries; hence the name.
+> Note: using `zig init-exe` or `zig init-lib` for creating a project does not mean that you have to use `zigmod init` in application or library mode. Creating a `zigmod.yml` file with proper `name` and `main` only makes your package importable by other projects. This is usually not needed with applications, but quite useful in case of libraries; hence the name.
 
 ### Zig and Zigmod package handling explained
 
@@ -66,7 +66,7 @@ root
 
 `root` can `@import` `A`, `B` and `D`, but `E` can be imported only from `D`. `B` can not import anything. (Everybody can import relative files, this limitation is only for packages.)
 
-In library `zigmod.yml` example the tree looks like this:
+In the library `zigmod.yml` example from above, the tree looks like this:
 
 ```
 root (src/main.zig)
@@ -78,9 +78,9 @@ root (src/main.zig)
 
 It is very important to understand, that `my-package` is _below_ `root`, as `name/main` in `zigmod.yml` will create a separate package (it will not be chained to `root`).
 
-If you want to use the dependencies from `root`, then make sure that your `zigmod.yml` does _not_ contain a `main` line **and** use `root_dependencies` instead of `dependencies`. This is what `zigmod init` does in application mode.
+If you want to use the dependencies from `root`, then make sure that your `zigmod.yml` lists them under `root_dependencies` instead of `dependencies`.
 
-On the other hand using `root_dependencies` and `dependencies` is not mutually exclusive, you can take advantage of using both, like zigmod does. Using `dependencies` requires a proper `main` field in your `zigmod.yml`.
+Note: Using `root_dependencies` and `dependencies` is not mutually exclusive, you can take advantage of using both like Zigmod itself does. Using `dependencies` requires a proper `main` field in your `zigmod.yml`.
 
 ## Running `zigmod fetch`
 This command will inspect your `zigmod.yml` and download any new dependencies as well as pulling updates for any ones already download. It will recursively do this for your entire tree until it is full constructed which will culminate in the generation of two output files: `deps.zig` and `zigmod.lock`.
@@ -90,6 +90,8 @@ This command will inspect your `zigmod.yml` and download any new dependencies as
 `zigmod.lock` is a way to enable [Reproducible builds](https://reproducible-builds.org/) and often used in CI environments. [Learn more](./commands/ci.md).
 
 Add `--no-update` if you do want it to fetch remote updates and only regenerate `deps.zig`.
+
+Alternatively, if you want to download updates exactly as defined by the lockfile, use [`zigmod ci`](./commands/ci.md) instead of `zigmod fetch`.
 
 > Ref: See [`zigmod fetch`](commands/fetch.md) reference for more info.
 
