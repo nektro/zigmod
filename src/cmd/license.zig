@@ -83,7 +83,7 @@ pub fn execute(args: [][]u8) !void {
         try writer.writeAll(ResetIntensity);
         for (entry.value_ptr.*.items) |item| {
             if (std.mem.eql(u8, item.clean_path, "../..")) {
-                try writer.print("- This\n", .{});
+                try writer.writeAll("- This\n");
             } else {
                 try writer.print("- {s} {s}\n", .{ @tagName(item.dep.?.type), item.dep.?.path });
             }
@@ -91,11 +91,11 @@ pub fn execute(args: [][]u8) !void {
     }
     if (unspecified_list.items.len > 0) {
         try writer.writeAll(Bold);
-        try writer.print("Unspecified:\n", .{});
+        try writer.writeAll("Unspecified:\n");
         try writer.writeAll(ResetIntensity);
         for (unspecified_list.items) |item| {
             if (std.mem.eql(u8, item.clean_path, "../..")) {
-                try writer.print("- This\n", .{});
+                try writer.writeAll("- This\n");
             } else {
                 try writer.print("- {s} {s}\n", .{ @tagName(item.dep.?.type), item.dep.?.path });
             }

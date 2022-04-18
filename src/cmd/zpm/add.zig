@@ -59,7 +59,7 @@ pub fn execute(args: [][]u8) !void {
     try file.seekTo(try file.getEndPos());
 
     const file_w = file.writer();
-    try file_w.print("\n", .{});
+    try file_w.writeAll("\n");
     try file_w.print("  - src: git {s}\n", .{u.trim_suffix(found.git, ".git")});
     if (!(has_zigdotmod or has_zigmodyml)) {
         try file_w.print("    name: {s}\n", .{found.name});

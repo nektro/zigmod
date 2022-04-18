@@ -248,7 +248,7 @@ fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module) !void {
     for (list) |mod| {
         if (mod.is_sys_lib or mod.is_framework) continue;
         if (std.mem.eql(u8, mod.id, "root")) {
-            try w.print("    pub const _root = \"\";\n", .{});
+            try w.writeAll("    pub const _root = \"\";\n");
             continue;
         }
         try w.print("    pub const _{s} = cache ++ \"/{}\";\n", .{ mod.short_id(), std.zig.fmtEscapes(mod.clean_path) });
