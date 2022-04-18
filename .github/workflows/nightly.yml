@@ -26,7 +26,7 @@ jobs:
       - name: Setup Zig
         uses: goto-bus-stop/setup-zig@v1
         with:
-          version: "0.10.0-dev.1107+7deadf430"
+          version: "0.10.0-dev.1860+7b090df66"
 
       - run: zig version
       - run: zig env
