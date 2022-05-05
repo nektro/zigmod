@@ -53,7 +53,7 @@ pub fn execute(args: [][]u8) !void {
             "--prefix",    try std.fs.path.join(gpa, &.{ homepath, ".zigmod" }),
             "--cache-dir", try std.fs.path.join(gpa, &.{ cache.?, "zigmod", "zig" }),
         };
-        const proc = try std.ChildProcess.init(argv, gpa);
+        var proc = std.ChildProcess.init(argv, gpa);
         proc.cwd = modpath;
         const term = try proc.spawnAndWait();
         switch (term) {
