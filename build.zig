@@ -57,9 +57,9 @@ fn makeExe(b: *std.build.Builder, exe_name: string, target: std.zig.CrossTarget,
 
         exe.addPackage(.{
             .name = "zigmod",
-            .path = .{ .path = "./src/lib.zig" },
+            .source = .{ .path = "./src/lib.zig" },
             .dependencies = &[_]std.build.Pkg{
-                .{ .name = "zfetch", .path = .{ .path = "src/zfetch_stub.zig" } },
+                .{ .name = "zfetch", .source = .{ .path = "src/zfetch_stub.zig" } },
             },
         });
     } else {
