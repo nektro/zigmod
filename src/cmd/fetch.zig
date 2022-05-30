@@ -284,7 +284,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                 });
                 if (mod.main.len > 0 and !std.mem.eql(u8, mod.id, "root")) {
                     try w.print(
-                        \\        .pkg = Pkg{{ .name = "{s}", .path = .{{ .path = dirs._{s} ++ "/{s}" }}, .dependencies =
+                        \\        .pkg = Pkg{{ .name = "{s}", .source = .{{ .path = dirs._{s} ++ "/{s}" }}, .dependencies =
                     , .{
                         mod.name,
                         mod.short_id(),
