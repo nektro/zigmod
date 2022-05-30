@@ -1,3 +1,4 @@
+// zig fmt: off
 const std = @import("std");
 const builtin = @import("builtin");
 const Pkg = std.build.Pkg;

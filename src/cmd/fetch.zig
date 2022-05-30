@@ -44,6 +44,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     defer f.close();
 
     const w = f.writer();
+    try w.writeAll("// zig fmt: off\n");
     try w.writeAll("const std = @import(\"std\");\n");
     try w.writeAll("const builtin = @import(\"builtin\");\n");
     try w.writeAll("const Pkg = std.build.Pkg;\n");
