@@ -123,7 +123,7 @@ The core of expandability, it is possible to add dependencies to your project. H
      - One place packages can be sourced from is https://aquila.red/. In order to add them to your project, you will obtain its ID in the form `1/truemedian/hzzp` and then run `zigmod aq add <package>`.
 
 - ZPM
-     - https://zig.pm/ is another supported pacakge index. You may add packages from ZPM with `zigmod zpm add <pacakge>`.
+     - https://zig.pm/ is another supported package index. You may add packages from ZPM with `zigmod zpm add <package>`.
 
 - Other/Git
      - Zigmod supports adding any Git repository as a dependency. This is done by manually editing your `zigmod.yml` and adding a line under either the `dependencies` or `dev_dependencies` keys. For example, adding a line with this contents would add `apple_pie` to your project: `  - src: git https://github.com/Luukdegram/apple_pie`. The URL field may be any valid Git url that you would pass to `git clone`.
@@ -184,9 +184,9 @@ https://github.com/nektro/aquila is a package index software and CI system desig
 
 > Note: I, @nektro, host a public instance at https://aquila.red/ available for anyone to use. However Aquila can be self hosted and the only difference in the following instructions will be the domain name.
 
-Navigating to https://aquila.red/ will show you the homepage with recent pacakges and most starred ones.
+Navigating to https://aquila.red/ will show you the homepage with recent packages and most starred ones.
 
-Clicking the "Login" button will bring you to https://aquila.red/dashboard which will show you a list of your currently imported pacakges. The login screen will prompt you to authorize with an identity provider and ask you for webhook permissions. This is so that aquila can listen for new updates and automatically test them for the CI.
+Clicking the "Login" button will bring you to https://aquila.red/dashboard which will show you a list of your currently imported packages. The login screen will prompt you to authorize with an identity provider and ask you for webhook permissions. This is so that aquila can listen for new updates and automatically test them for the CI.
 
 The main nav will contain a link to https://aquila.red/import. Listed will be all of your not-imported Zig projects. Clicking "Select" will not immediately navigate the page in most browsers as the server will attempt to clone and verify your repository. Please be patient while it loads.
 
