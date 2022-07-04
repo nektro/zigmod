@@ -5,7 +5,7 @@ git https://github.com/ziglibs/known-folders commit-9db1b99219c767d5e24994b15252
 git https://github.com/nektro/zig-licenses commit-c9b8cbf3565675a056ad4e9b57cb4f84020e7680
 git https://github.com/truemedian/zfetch commit-5a7ce5811ee19fb959b41c718018f461f45611d4
 git https://github.com/truemedian/hzzp commit-bf5aaf224e94561e035a631c3c40fbf02faa27d2
-git https://github.com/nektro/iguanaTLS commit-9a05f03681d5f273d0ce7447f0c7e729828ab8a2
+git https://github.com/nektro/iguanaTLS commit-09d9fe92f329484536dfb2b07cfa8b406151cde4
 git https://github.com/MasterQ32/zig-uri commit-e879df3a236869f92298fbe2db3c25e6e84cfd4c
 git https://github.com/nektro/zig-json commit-a091eaa9f9ae91c3875630ba1983b33ea04971a3
 git https://github.com/nektro/zig-extras commit-b16f583d5af5c86c92237bf56fa8063a5e9961c3
