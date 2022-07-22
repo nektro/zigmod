@@ -113,7 +113,7 @@ pub fn file_list(alloc: std.mem.Allocator, dpath: string) ![]const string {
     var list = std.ArrayList(string).init(alloc);
     defer list.deinit();
 
-    const dir = try std.fs.cwd().openDir(dpath, .{ .iterate = true });
+    const dir = try std.fs.cwd().openIterableDir(dpath, .{});
     var walk = try dir.walk(alloc);
     defer walk.deinit();
     while (true) {
