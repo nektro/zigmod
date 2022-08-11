@@ -4,6 +4,7 @@ const builtin = @import("builtin");
 const deps = @import("./deps.zig");
 
 pub fn build(b: *std.build.Builder) void {
+    b.prominent_compile_errors = true;
     const target = b.standardTargetOptions(.{});
 
     b.setPreferredReleaseMode(.ReleaseSafe);
