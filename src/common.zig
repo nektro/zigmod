@@ -299,7 +299,7 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
     defer map.deinit();
 
     for (dirs) |dir_path| {
-        const dir = try mdir.openDir(dir_path, .{ .iterate = true });
+        const dir = try mdir.openIterableDir(dir_path, .{});
         var walker = try dir.walk(alloc);
         defer walker.deinit();
         while (try walker.next()) |p| {
