@@ -102,7 +102,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
 
     try w.print(
         \\fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {{
-        \\    const min = std.SemanticVersion.parse("{}") catch return;
+        \\    const min = std.SemanticVersion.parse("{?}") catch return;
         \\    if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{{}} does not meet the minimum build requirement of v{{}}", .{{current, min}}));
         \\}}
         \\
