@@ -1,1 +1,1 @@
-usingnamespace @import("./funcs.zig");
+pub usingnamespace @import("./funcs.zig");
