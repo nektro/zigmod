@@ -5,6 +5,7 @@ const deps = @import("./deps.zig");
 
 pub fn build(b: *std.build.Builder) void {
     b.prominent_compile_errors = true;
+    b.use_stage1 = true; // currently blocked on https://github.com/ziglang/zig/issues/12403
     const target = b.standardTargetOptions(.{});
 
     b.setPreferredReleaseMode(.ReleaseSafe);
