@@ -16,6 +16,6 @@ MIT:
 - git https://github.com/nektro/zig-licenses-text
 - git https://github.com/nektro/zig-leven
 - git https://github.com/nektro/zig-inquirer
-- git https://github.com/arqv/ini
+- git https://github.com/nektro/arqv-ini
 - git https://github.com/nektro/zig-time
 - git https://github.com/marlersoft/zigwin32
