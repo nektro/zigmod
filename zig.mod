@@ -38,7 +38,7 @@ dependencies:
   - src: git https://github.com/nektro/zig-range
   - src: git https://github.com/nektro/zig-detect-license
   - src: git https://github.com/nektro/zig-inquirer
-  - src: git https://github.com/arqv/ini
+  - src: git https://github.com/nektro/arqv-ini
   - src: git https://github.com/nektro/zig-time
 
 root_dependencies:

@@ -73,7 +73,7 @@ pub const dirs = struct {
     pub const _pt88y5d80m25 = cache ++ "/git/github.com/nektro/zig-licenses-text";
     pub const _96h80ezrvj7i = cache ++ "/git/github.com/nektro/zig-leven";
     pub const _c1xirp1ota5p = cache ++ "/git/github.com/nektro/zig-inquirer";
-    pub const _u7sysdckdymi = cache ++ "/git/github.com/arqv/ini";
+    pub const _u7sysdckdymi = cache ++ "/git/github.com/nektro/arqv-ini";
     pub const _iecwp4b3bsfm = cache ++ "/git/github.com/nektro/zig-time";
     pub const _o6ogpor87xc2 = cache ++ "/git/github.com/marlersoft/zigwin32";
 };
