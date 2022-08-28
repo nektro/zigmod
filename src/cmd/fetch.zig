@@ -68,7 +68,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            llc = true;
         \\        }
         \\        for (pkg.frameworks) |item| {
-        \\            if (!std.Target.current.isDarwin()) @panic(exe.builder.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
+        \\            if (!builtin.target.isDarwin()) @panic(exe.builder.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
         \\            exe.linkFramework(item);
         \\            llc = true;
         \\        }
@@ -339,7 +339,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                 if (mod.has_framework_deps()) {
                     try w.writeAll("        .frameworks = &.{");
                     for (mod.deps) |item, j| {
-                        if (!item.is_sys_lib) continue;
+                        if (!item.is_framework) continue;
                         try w.print(" \"{}\"", .{std.zig.fmtEscapes(item.name)});
                         if (j != mod.deps.len - 1) try w.writeAll(",");
                     }
