@@ -141,6 +141,8 @@ fn create_lockfile(alloc: std.mem.Allocator, list: *std.ArrayList(zigmod.Module)
     const fl = try dir.createFile("zigmod.lock", .{});
     defer fl.close();
 
+    std.sort.sort(zigmod.Module, list.items, {}, zigmod.Module.lessThan);
+
     const wl = fl.writer();
     try wl.writeAll("2\n");
     for (list.items) |m| {
