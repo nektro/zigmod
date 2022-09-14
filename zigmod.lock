@@ -1,8 +1,8 @@
 2
 git https://github.com/MasterQ32/zig-uri commit-e879df3a236869f92298fbe2db3c25e6e84cfd4c
-git https://github.com/marlersoft/zigwin32 commit-2b40704fbc2c9fbdb6f31acbc48684b6b98c15e3
+git https://github.com/marlersoft/zigwin32 commit-209f07cc5861c7bd9c3010a37f32bf6244f9a158
 git https://github.com/nektro/arqv-ini commit-1a9b2e90379895e197893b6e19c93bd213ad36e6
-git https://github.com/nektro/iguanaTLS commit-09d9fe92f329484536dfb2b07cfa8b406151cde4
+git https://github.com/nektro/iguanaTLS commit-c9403b8414d7f80b5e2c04c8f1f8780ca1d2827f
 git https://github.com/nektro/zig-ansi commit-d4a53bcac5b87abecc65491109ec22aaf5f3dc2f
 git https://github.com/nektro/zig-detect-license commit-de5c285d999eea68b9189b48bb000243fef0a689
 git https://github.com/nektro/zig-extras commit-01fae956e2f17aa992e717e041a3dd457d440b31
@@ -12,7 +12,7 @@ git https://github.com/nektro/zig-leven commit-ab852cf74fa0b4edc530d925f0654b62c
 git https://github.com/nektro/zig-licenses commit-c9b8cbf3565675a056ad4e9b57cb4f84020e7680
 git https://github.com/nektro/zig-licenses-text commit-3c07c6e4eb0965dafd0b029c632f823631b3169c
 git https://github.com/nektro/zig-range commit-4b2f12808aa09be4b27a163efc424dd4e0415992
-git https://github.com/nektro/zig-time commit-a22054de725ef19b3f91b9ad960d4093f852b7e0
+git https://github.com/nektro/zig-time commit-52a6050939b83e9f8b52b2236a36332dcb4c17a3
 git https://github.com/truemedian/hzzp commit-d4fbade2d806fc93bc5f79ec8efdcc25ea625fa3
 git https://github.com/truemedian/zfetch commit-12b1374aae32e8ebf719a096a22cdf4c49433458
 git https://github.com/ziglibs/known-folders commit-24845b0103e611c108d6bc334231c464e699742c
