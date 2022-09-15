@@ -110,7 +110,7 @@ pub const ModFile = struct {
                     if (version == null) {
                         version = "";
                     }
-                    const dep_type = std.meta.stringToEnum(zigmod.DepType, dtype).?;
+                    const dep_type = std.meta.stringToEnum(zigmod.Dep.Type, dtype).?;
                     if (dep_type == .local) {
                         if (path.len > 0) {
                             name = path;

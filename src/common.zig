@@ -134,7 +134,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
         },
         .git => {
             if (d.version.len > 0) {
-                const vers = u.parse_split(zigmod.DepType.Version.Git, "-").do(d.version) catch |e| switch (e) {
+                const vers = u.parse_split(zigmod.Dep.Type.Version.Git, "-").do(d.version) catch |e| switch (e) {
                     error.IterEmpty => unreachable,
                     error.NoMemberFound => {
                         const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];
@@ -212,7 +212,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
     if (options.lock) |lock| {
         for (lock) |item| {
             if (std.mem.eql(u8, item[0], try d.clean_path(options.alloc))) {
-                d.type = std.meta.stringToEnum(zigmod.DepType, item[1]).?;
+                d.type = std.meta.stringToEnum(zigmod.Dep.Type, item[1]).?;
                 d.path = item[2];
                 d.version = item[3];
                 break;
@@ -375,7 +375,7 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
             2 => {
                 var iter = std.mem.split(u8, line, " ");
                 const asdep = zigmod.Dep{
-                    .type = std.meta.stringToEnum(zigmod.DepType, iter.next().?).?,
+                    .type = std.meta.stringToEnum(zigmod.Dep.Type, iter.next().?).?,
                     .path = iter.next().?,
                     .version = iter.next().?,
                     .id = "",

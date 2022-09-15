@@ -12,7 +12,7 @@ const yaml = @import("./yaml.zig");
 pub const Dep = struct {
     const Self = @This();
 
-    type: zigmod.DepType,
+    type: Type,
     path: string,
     id: string,
     name: string,
@@ -28,6 +28,8 @@ pub const Dep = struct {
     keep: bool = false,
     vcpkg: bool = false,
     for_build: bool = false,
+
+    pub const Type = @import("./dep_type.zig").DepType;
 
     pub fn clean_path(self: Dep, alloc: std.mem.Allocator) !string {
         if (self.type == .local) {
@@ -67,7 +69,7 @@ pub const Dep = struct {
         }
         return switch (self.type) {
             .git => blk: {
-                const vers = try u.parse_split(zigmod.DepType.Version.Git, "-").do(self.version);
+                const vers = try u.parse_split(zigmod.Dep.Type.Version.Git, "-").do(self.version);
                 if (vers.id.frozen()) break :blk self.version;
                 break :blk try self.type.exact_version(alloc, dpath);
             },
