@@ -11,8 +11,6 @@ const common = @import("./../common.zig");
 //
 
 pub const Module = struct {
-    is_sys_lib: bool,
-    is_framework: bool,
     type: zigmod.Dep.Type,
     id: string,
     name: string,
@@ -40,8 +38,6 @@ pub const Module = struct {
             }
         }
         return Module{
-            .is_sys_lib = false,
-            .is_framework = false,
             .type = dep.type,
             .id = if (dep.id.len > 0) dep.id else try u.random_string(alloc, 48),
             .name = dep.name,
@@ -120,7 +116,7 @@ pub const Module = struct {
 
     pub fn has_syslib_deps(self: Module) bool {
         for (self.deps) |d| {
-            if (d.is_sys_lib) {
+            if (d.type == .system_lib) {
                 return true;
             }
         }
@@ -129,7 +125,7 @@ pub const Module = struct {
 
     pub fn has_framework_deps(self: Module) bool {
         for (self.deps) |d| {
-            if (d.is_framework) {
+            if (d.type == .framework) {
                 return true;
             }
         }
