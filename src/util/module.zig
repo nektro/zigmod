@@ -13,6 +13,7 @@ const common = @import("./../common.zig");
 pub const Module = struct {
     is_sys_lib: bool,
     is_framework: bool,
+    type: zigmod.Dep.Type,
     id: string,
     name: string,
     main: string,
@@ -41,6 +42,7 @@ pub const Module = struct {
         return Module{
             .is_sys_lib = false,
             .is_framework = false,
+            .type = dep.type,
             .id = if (dep.id.len > 0) dep.id else try u.random_string(alloc, 48),
             .name = dep.name,
             .main = dep.main,
