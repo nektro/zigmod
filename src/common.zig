@@ -2,13 +2,9 @@ const std = @import("std");
 const string = []const u8;
 const builtin = @import("builtin");
 const ansi = @import("ansi");
-const root = @import("root");
 
 const zigmod = @import("./lib.zig");
 const u = @import("./util/index.zig");
-
-const build_options = if (@hasDecl(root, "build_options")) root.build_options else struct {};
-const bootstrap = if (@hasDecl(build_options, "bootstrap")) build_options.bootstrap else false;
 
 //
 //
@@ -114,7 +110,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
         std.debug.print("fetch: {s}: {s}\n", .{ @tagName(d.type), d.path });
     }
     defer {
-        if (!bootstrap and options.log and d.type != .local) {
+        if (options.log and d.type != .local) {
             std.debug.print("{s}", .{ansi.csi.CursorUp(1)});
             std.debug.print("{s}", .{ansi.csi.EraseInLine(0)});
         }

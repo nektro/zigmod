@@ -1,14 +1,10 @@
 const std = @import("std");
 const string = []const u8;
 const ansi = @import("ansi");
-const root = @import("root");
 
 const zigmod = @import("../lib.zig");
 const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
-
-const build_options = if (@hasDecl(root, "build_options")) root.build_options else struct {};
-const bootstrap = if (@hasDecl(build_options, "bootstrap")) build_options.bootstrap else false;
 
 //
 //
@@ -31,8 +27,6 @@ pub fn execute(args: [][]u8) !void {
     try common.collect_pkgs(top_module, &list);
 
     try create_depszig(gpa, cachepath, dir, top_module, &list);
-
-    if (bootstrap) return;
 
     try create_lockfile(gpa, &list, cachepath, dir);
 

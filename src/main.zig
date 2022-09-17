@@ -17,8 +17,6 @@ pub fn main() !void {
     const proc_args = try std.process.argsAlloc(gpa);
     const args = proc_args[1..];
 
-    const available = if (build_options.bootstrap) zigmod.commands_to_bootstrap else zigmod.commands;
-
     if (args.len == 0) {
         std.debug.print("zigmod {s} {s} {s} {s}\n", .{
             build_options.version,
@@ -28,13 +26,13 @@ pub fn main() !void {
         });
         std.debug.print("\n", .{});
         std.debug.print("The commands available are:\n", .{});
-        inline for (comptime std.meta.declarations(available)) |decl| {
+        inline for (comptime std.meta.declarations(zigmod.commands)) |decl| {
             std.debug.print("  - {s}\n", .{decl.name});
         }
         return;
     }
 
-    if (!build_options.bootstrap and builtin.os.tag == .windows) {
+    if (builtin.os.tag == .windows) {
         const console = win32.system.console;
         const h_out = console.GetStdHandle(console.STD_OUTPUT_HANDLE);
         _ = console.SetConsoleMode(h_out, console.CONSOLE_MODE.initFlags(.{
@@ -47,9 +45,9 @@ pub fn main() !void {
     try zigmod.init();
     defer zigmod.deinit();
 
-    inline for (comptime std.meta.declarations(available)) |decl| {
+    inline for (comptime std.meta.declarations(zigmod.commands)) |decl| {
         if (std.mem.eql(u8, args[0], decl.name)) {
-            const cmd = @field(available, decl.name);
+            const cmd = @field(zigmod.commands, decl.name);
             try cmd.execute(args[1..]);
             return;
         }
