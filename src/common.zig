@@ -151,7 +151,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 if ((try u.run_cmd(options.alloc, pv, &.{ "git", "checkout", vers.string })) > 0) {
                     u.fail("fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
                 }
-                if (builtin.os.tag != .windows and vers.id != .branch) {
+                if (builtin.os.tag != .windows and vers.id == .commit) {
                     const pvd = try std.fs.cwd().openDir(pv, .{});
                     try pvd.deleteTree(".git");
                 }
