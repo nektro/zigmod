@@ -233,6 +233,7 @@ pub fn do_hash(alloc: std.mem.Allocator, comptime algo: type, data: string) !str
 pub fn git_rev_HEAD(alloc: std.mem.Allocator, dir: std.fs.Dir) !string {
     const dirg = try dir.openDir(".git", .{});
     const h = std.mem.trim(u8, try dirg.readFileAlloc(alloc, "HEAD", 50), "\n");
+    if (!std.mem.startsWith(u8, h, "ref:")) return h;
     const r = std.mem.trim(u8, try dirg.readFileAlloc(alloc, h[5..], 50), "\n");
     return r;
 }
