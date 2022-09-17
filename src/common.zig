@@ -36,7 +36,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
     if (m.root_files.len > 0) {
         try moduledeps.append(try add_files_package(options.alloc, cachepath, "root", mdir, m.root_files));
     }
-    try moduledeps.append(try collect_deps(cachepath, mdir, options));
+    try moduledeps.append(try collect_deps(cachepath, mdir, .local, options));
     for (m.rootdeps) |*d| {
         if (try get_module_from_dep(d, cachepath, options)) |founddep| {
             try moduledeps.append(founddep);
@@ -61,7 +61,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
     };
 }
 
-pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) anyerror!zigmod.Module {
+pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, dtype: zigmod.Dep.Type, options: *CollectOptions) anyerror!zigmod.Module {
     try std.fs.cwd().makePath(cachepath);
 
     const m = try zigmod.ModFile.from_dir(options.alloc, mdir);
@@ -76,7 +76,7 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, options: *CollectOption
         }
     }
     return zigmod.Module{
-        .type = .local,
+        .type = dtype,
         .id = m.id,
         .name = m.name,
         .main = m.main,
@@ -243,7 +243,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
             };
         },
         else => {
-            var dd = try collect_deps(cachepath, moddir, options) catch |e| switch (e) {
+            var dd = try collect_deps(cachepath, moddir, d.type, options) catch |e| switch (e) {
                 error.ManifestNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0 or d.keep) {
                         var mod_from = try zigmod.Module.from(options.alloc, d.*, modpath, options);
