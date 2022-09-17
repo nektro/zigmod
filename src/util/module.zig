@@ -157,4 +157,24 @@ pub const Module = struct {
         }
         return false;
     }
+
+    pub fn pin(self: Module, alloc: std.mem.Allocator, cachepath: string) !string {
+        return switch (self.type) {
+            .local => "",
+            .system_lib => "",
+            .framework => "",
+            else => |sub| {
+                var cdir = try std.fs.cwd().openDir(cachepath, .{});
+                defer cdir.close();
+                var mdir = try cdir.openDir(self.clean_path, .{});
+                defer mdir.close();
+                return switch (sub) {
+                    .local, .system_lib, .framework => unreachable,
+                    .git => try u.git_rev_HEAD(alloc, mdir),
+                    .hg => @panic("TODO"),
+                    .http => @panic("TODO"),
+                };
+            },
+        };
+    }
 };

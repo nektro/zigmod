@@ -13,6 +13,7 @@ pub const commands = struct {
     pub const zpm = @import("./cmd/zpm.zig");
     pub const license = @import("./cmd/license.zig");
     pub const aq = @import("./cmd/aq.zig");
+    pub const generate = @import("./cmd/generate.zig");
 };
 
 pub fn init() !void {
