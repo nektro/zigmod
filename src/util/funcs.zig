@@ -49,7 +49,7 @@ pub fn does_folder_exist(fpath: string) !bool {
     const file = std.fs.cwd().openFile(fpath, .{}) catch |e| switch (e) {
         error.FileNotFound => return false,
         error.IsDir => return true,
-        else => return e,
+        else => |ee| return ee,
     };
     defer file.close();
     const s = try file.stat();
@@ -109,7 +109,7 @@ pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string)
         error.FileNotFound => {
             u.fail("\"{s}\" command not found", .{args[0]});
         },
-        else => return e,
+        else => |ee| return ee,
     };
 }
 

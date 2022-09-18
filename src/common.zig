@@ -252,7 +252,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                     const tryname = try u.detect_pkgname(options.alloc, d.name, modpath);
                     const trymain = u.detct_mainfile(options.alloc, d.main, moddirO, tryname) catch |err| switch (err) {
                         error.CantFindMain => null,
-                        else => return err,
+                        else => |ee| return ee,
                     };
                     if (trymain) |_| {
                         d.*.name = tryname;

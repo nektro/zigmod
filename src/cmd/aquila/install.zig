@@ -25,7 +25,7 @@ pub fn execute(args: [][]u8) !void {
     const aqadd = @import("./add.zig");
     const pkgurl = aqadd.do(homedir, args[0]) catch |err| switch (err) {
         error.AquilaBadResponse => return,
-        else => return err,
+        else => |ee| return ee,
     };
 
     // get modfile and dep

@@ -32,12 +32,12 @@ pub fn execute(args: [][]u8) !void {
         error.NoBuildZig => {
             u.fail("init requires a build.zig file", .{});
         },
-        else => return err,
+        else => |ee| return ee,
     });
 
     const entry = if (ptype == .lib) try inquirer.forString(stdout, stdin, "package entry point:", gpa, u.detct_mainfile(gpa, u.try_index(string, args, 1, ""), null, name) catch |err| switch (err) {
         error.CantFindMain => null,
-        else => return err,
+        else => |ee| return ee,
     }) else null;
 
     const license = try inquirer.forString(stdout, stdin, "license:", gpa, try detectlicense.detectInDir(gpa, cwd));
