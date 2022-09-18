@@ -240,7 +240,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
             };
         },
         else => {
-            var dd = try collect_deps(cachepath, moddir, d.type, options) catch |e| switch (e) {
+            var dd = collect_deps(cachepath, moddir, d.type, options) catch |e| switch (e) {
                 error.ManifestNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0 or d.keep) {
                         var mod_from = try zigmod.Module.from(options.alloc, d.*, modpath, options);
@@ -264,7 +264,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                     }
                     u.fail("no zig.mod or zigmod.yml found and no override props defined. unable to use add this dependency!", .{});
                 },
-                else => e,
+                else => |ee| return ee,
             };
             dd.dep = d.*;
             dd.for_build = d.for_build;
