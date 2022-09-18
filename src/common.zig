@@ -346,7 +346,7 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
 pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]string {
     var list = std.ArrayList([4]string).init(alloc);
     const max = std.math.maxInt(usize);
-    if (!try u.does_file_exist(dir, "zigmod.lock")) return &[_][4]string{};
+    if (!try extras.doesFileExist(dir, "zigmod.lock")) return &[_][4]string{};
     const f = try dir.openFile("zigmod.lock", .{});
     const r = f.reader();
     var i: usize = 0;

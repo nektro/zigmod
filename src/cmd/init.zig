@@ -6,6 +6,7 @@ const detectlicense = @import("detect-license");
 const knownfolders = @import("known-folders");
 const ini = @import("ini");
 const time = @import("time");
+const extras = @import("extras");
 
 const u = @import("./../util/index.zig");
 
@@ -72,7 +73,7 @@ pub fn execute(args: [][]u8) !void {
     }
 
     // ask about LICENSE
-    if (!(try u.does_file_exist(null, "LICENSE"))) {
+    if (!(try extras.doesFileExist(null, "LICENSE"))) {
         if (detectlicense.licenses.find(license)) |text| {
             if (try inquirer.forConfirm(stdout, stdin, "It appears you don't have a LICENSE file defined, would you like init to add it for you?", gpa)) {
                 var realtext = text;
@@ -134,7 +135,7 @@ pub fn execute(args: [][]u8) !void {
     if (try u.does_folder_exist(".git")) {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitignore?", gpa);
         if (do) {
-            const exists = try u.does_file_exist(null, ".gitignore");
+            const exists = try extras.doesFileExist(null, ".gitignore");
             const file: std.fs.File = try (if (exists) cwd.openFile(".gitignore", .{ .mode = .read_write }) else cwd.createFile(".gitignore", .{}));
             defer file.close();
             const len = try file.getEndPos();
@@ -153,7 +154,7 @@ pub fn execute(args: [][]u8) !void {
     if (try u.does_folder_exist(".git")) {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitattributes?", gpa);
         if (do) {
-            const exists = try u.does_file_exist(null, ".gitattributes");
+            const exists = try extras.doesFileExist(null, ".gitattributes");
             const file: std.fs.File = try (if (exists) cwd.openFile(".gitattributes", .{ .mode = .read_write }) else cwd.createFile(".gitattributes", .{}));
             defer file.close();
             const len = try file.getEndPos();
@@ -188,7 +189,7 @@ pub fn writeLibManifest(w: std.fs.File.Writer, id: string, name: string, entry: 
 
 fn guessCopyrightName() !?string {
     const home = (try knownfolders.open(gpa, .home, .{})).?;
-    if (!(try u.does_file_exist(home, ".gitconfig"))) return null;
+    if (!(try extras.doesFileExist(home, ".gitconfig"))) return null;
     const file = try home.openFile(".gitconfig", .{});
     const content = try file.reader().readAllAlloc(gpa, 1024 * 1024);
     var iniO = try ini.parseIntoMap(content, gpa);

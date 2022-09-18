@@ -2,6 +2,7 @@ const std = @import("std");
 const string = []const u8;
 const gpa = std.heap.c_allocator;
 const knownfolders = @import("known-folders");
+const extras = @import("extras");
 
 const zigmod = @import("../../lib.zig");
 const u = @import("./../../util/index.zig");
@@ -12,7 +13,7 @@ pub fn execute(args: [][]u8) !void {
     const homepath = home.?;
     const homedir = try std.fs.cwd().openDir(homepath, .{});
 
-    if (!(try u.does_file_exist(homedir, "zigmod.yml"))) {
+    if (!(try extras.doesFileExist(homedir, "zigmod.yml"))) {
         const f = try homedir.createFile("zigmod.yml", .{});
         defer f.close();
         const w = f.writer();

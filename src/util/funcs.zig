@@ -45,16 +45,6 @@ pub fn split(alloc: std.mem.Allocator, in: string, delim: string) ![]string {
     return list.toOwnedSlice();
 }
 
-pub fn does_file_exist(dir: ?std.fs.Dir, fpath: string) !bool {
-    const file = (dir orelse std.fs.cwd()).openFile(fpath, .{}) catch |e| switch (e) {
-        error.FileNotFound => return false,
-        error.IsDir => return true,
-        else => return e,
-    };
-    defer file.close();
-    return true;
-}
-
 pub fn does_folder_exist(fpath: string) !bool {
     const file = std.fs.cwd().openFile(fpath, .{}) catch |e| switch (e) {
         error.FileNotFound => return false,
@@ -243,7 +233,7 @@ pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: string) !
         return override;
     }
     const dirO = if (dir.len == 0) std.fs.cwd() else try std.fs.cwd().openDir(dir, .{});
-    if (!(try does_file_exist(dirO, "build.zig"))) {
+    if (!(try extras.doesFileExist(dirO, "build.zig"))) {
         return error.NoBuildZig;
     }
     const dpath = try std.fs.realpathAlloc(alloc, try std.fs.path.join(alloc, &.{ dir, "build.zig" }));
@@ -256,20 +246,20 @@ pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: string) !
 
 pub fn detct_mainfile(alloc: std.mem.Allocator, override: string, dir: ?std.fs.Dir, name: string) !string {
     if (override.len > 0) {
-        if (try does_file_exist(dir, override)) {
+        if (try extras.doesFileExist(dir, override)) {
             if (std.mem.endsWith(u8, override, ".zig")) {
                 return override;
             }
         }
     }
     const namedotzig = try std.mem.concat(alloc, u8, &.{ name, ".zig" });
-    if (try does_file_exist(dir, namedotzig)) {
+    if (try extras.doesFileExist(dir, namedotzig)) {
         return namedotzig;
     }
-    if (try does_file_exist(dir, try std.fs.path.join(alloc, &.{ "src", "lib.zig" }))) {
+    if (try extras.doesFileExist(dir, try std.fs.path.join(alloc, &.{ "src", "lib.zig" }))) {
         return "src/lib.zig";
     }
-    if (try does_file_exist(dir, try std.fs.path.join(alloc, &.{ "src", "main.zig" }))) {
+    if (try extras.doesFileExist(dir, try std.fs.path.join(alloc, &.{ "src", "main.zig" }))) {
         return "src/main.zig";
     }
     return error.CantFindMain;
