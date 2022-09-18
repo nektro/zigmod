@@ -1,5 +1,6 @@
 const std = @import("std");
 const string = []const u8;
+const extras = @import("extras");
 
 const u = @import("index.zig");
 
@@ -42,13 +43,6 @@ pub fn split(alloc: std.mem.Allocator, in: string, delim: string) ![]string {
         try list.append(str);
     }
     return list.toOwnedSlice();
-}
-
-pub fn trim_prefix(in: string, prefix: string) string {
-    if (std.mem.startsWith(u8, in, prefix)) {
-        return in[prefix.len..];
-    }
-    return in;
 }
 
 pub fn does_file_exist(dir: ?std.fs.Dir, fpath: string) !bool {
@@ -255,7 +249,7 @@ pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: string) !
     const dpath = try std.fs.realpathAlloc(alloc, try std.fs.path.join(alloc, &.{ dir, "build.zig" }));
     const splitP = try split(alloc, dpath, std.fs.path.sep_str);
     var name = splitP[splitP.len - 2];
-    name = trim_prefix(name, "zig-");
+    name = extras.trimPrefix(name, "zig-");
     assert(name.len > 0, "package name must not be an empty string", .{});
     return name;
 }

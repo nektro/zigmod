@@ -249,7 +249,7 @@ pub const package_data = struct {
     pub var _89ujp8gq842x = Package{
         .name = "zigmod",
         .entry = "/../..//src/lib.zig",
-        .deps = &[_]*Package{ &_g982zq6e8wsv, &_s84v9o48ucb0, &_2ta738wrqbaq, &_0npcrzfdlrvk, &_ejw82j2ipa0e, &_ocmr9rtohgcc, &_tnj3qf44tpeq, &_2ovav391ivak, &_c1xirp1ota5p, &_u7sysdckdymi, &_iecwp4b3bsfm },
+        .deps = &[_]*Package{ &_g982zq6e8wsv, &_s84v9o48ucb0, &_2ta738wrqbaq, &_0npcrzfdlrvk, &_ejw82j2ipa0e, &_ocmr9rtohgcc, &_tnj3qf44tpeq, &_2ovav391ivak, &_c1xirp1ota5p, &_u7sysdckdymi, &_iecwp4b3bsfm, &_f7dubzb7cyqe },
     };
     pub var _root = Package{
     };

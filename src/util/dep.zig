@@ -2,6 +2,7 @@ const std = @import("std");
 const string = []const u8;
 const builtin = @import("builtin");
 const yaml = @import("yaml");
+const extras = @import("extras");
 
 const zigmod = @import("../lib.zig");
 const u = @import("index.zig");
@@ -36,9 +37,9 @@ pub const Dep = struct {
             return if (self.path.len == 0) "../.." else self.path;
         }
         var p = self.path;
-        p = u.trim_prefix(p, "http://");
-        p = u.trim_prefix(p, "https://");
-        p = u.trim_prefix(p, "git://");
+        p = extras.trimPrefix(p, "http://");
+        p = extras.trimPrefix(p, "https://");
+        p = extras.trimPrefix(p, "git://");
         p = u.trim_suffix(p, ".git");
         p = try std.mem.join(alloc, "/", &.{ @tagName(self.type), p });
         return p;

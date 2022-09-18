@@ -2,6 +2,7 @@ const std = @import("std");
 const string = []const u8;
 const builtin = @import("builtin");
 const yaml = @import("yaml");
+const extras = @import("extras");
 
 const zigmod = @import("../lib.zig");
 const u = @import("index.zig");
@@ -67,8 +68,8 @@ pub const Module = struct {
         var file_list_2 = std.ArrayList(string).init(alloc);
         defer file_list_2.deinit();
         for (file_list_1) |item| {
-            const _a = u.trim_prefix(item, cdpath);
-            const _b = u.trim_prefix(_a, self.clean_path);
+            const _a = extras.trimPrefix(item, cdpath);
+            const _b = extras.trimPrefix(_a, self.clean_path);
             if (_b[0] == '.') continue;
             try file_list_2.append(_b);
         }

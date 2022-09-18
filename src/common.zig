@@ -2,6 +2,7 @@ const std = @import("std");
 const string = []const u8;
 const builtin = @import("builtin");
 const ansi = @import("ansi");
+const extras = @import("extras");
 
 const zigmod = @import("./lib.zig");
 const u = @import("./util/index.zig");
@@ -243,7 +244,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                 error.ManifestNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0 or d.keep) {
                         var mod_from = try zigmod.Module.from(options.alloc, d.*, modpath, options);
-                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(modpath, cachepath)[1..];
+                        if (d.type != .local) mod_from.clean_path = extras.trimPrefix(modpath, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
@@ -257,7 +258,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                         d.*.name = tryname;
                         d.*.main = trymain.?;
                         var mod_from = try zigmod.Module.from(options.alloc, d.*, cachepath, options);
-                        if (d.type != .local) mod_from.clean_path = u.trim_prefix(modpath, cachepath)[1..];
+                        if (d.type != .local) mod_from.clean_path = extras.trimPrefix(modpath, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
@@ -268,7 +269,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
             dd.dep = d.*;
             dd.for_build = d.for_build;
             const save = dd;
-            if (d.type != .local) dd.clean_path = u.trim_prefix(modpath, cachepath)[1..];
+            if (d.type != .local) dd.clean_path = extras.trimPrefix(modpath, cachepath)[1..];
             if (dd.id.len == 0) dd.id = try u.random_string(options.alloc, 48);
             if (d.name.len > 0) dd.name = d.name;
             if (d.main.len > 0) dd.main = d.main;
@@ -306,7 +307,7 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
 
     const cwdpath = try std.fs.cwd().realpathAlloc(alloc, ".");
     const mpath = try mdir.realpathAlloc(alloc, ".");
-    var fpath = u.trim_prefix(mpath, cwdpath);
+    var fpath = extras.trimPrefix(mpath, cwdpath);
     if (fpath.len == 0) fpath = std.fs.path.sep_str;
 
     var cachedir = try std.fs.cwd().openDir(cachepath, .{});
