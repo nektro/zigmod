@@ -23,16 +23,9 @@ A package manager for the Zig programming language.
 ### Build from Source
 Initially,
 ```
-$ git clone https://github.com/nektro/zigmod --recursive
+$ git clone https://github.com/nektro/zigmod
 $ cd zigmod
-$ zig build -Dbootstrap
-$ ./zig-out/bin/zigmod fetch
-```
-
-To build,
-```
 $ zig build
-$ ./zig-out/bin/zigmod
 ```
 
 ## Usage

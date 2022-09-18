@@ -16,20 +16,10 @@ The earliest Zig release this Zigmod was verified to work with is `0.10.0-dev.39
 You may download a precompiled binary from https://github.com/nektro/zigmod/releases or build the project from source.
 
 ### Build Zigmod from source
-Zigmod partially uses itself to manage dependencies but can be bootstrapped with the 2 (two) included Git submodules. The first step will generate a build of Zigmod that only has the `fetch` command. This binary can then be used to grab the rest of the dependencies and generate a full build.
-
 ```
-$ git clone https://github.com/nektro/zigmod --recursive
+$ git clone https://github.com/nektro/zigmod
 $ cd zigmod
-$ zig build -Dbootstrap
-$ ./zig-out/bin/zigmod fetch
-```
-
-Now that we made our bootstrap build and have the rest of our dependencies, we can build as normal.
-
-```
 $ zig build
-$ ./zig-out/bin/zigmod
 ```
 
 ## Getting Started
