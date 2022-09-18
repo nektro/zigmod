@@ -36,7 +36,7 @@ pub fn try_index(comptime T: type, array: []T, n: usize, def: T) T {
 
 pub fn split(alloc: std.mem.Allocator, in: string, delim: string) ![]string {
     var list = std.ArrayList(string).init(alloc);
-    defer list.deinit();
+    errdefer list.deinit();
 
     var iter = std.mem.split(u8, in, delim);
     while (iter.next()) |str| {
@@ -122,7 +122,7 @@ pub fn run_cmd(alloc: std.mem.Allocator, dir: ?string, args: []const string) !u3
 
 pub fn list_remove(alloc: std.mem.Allocator, input: []string, search: string) ![]string {
     var list = std.ArrayList(string).init(alloc);
-    defer list.deinit();
+    errdefer list.deinit();
     for (input) |item| {
         if (!std.mem.eql(u8, item, search)) {
             try list.append(item);

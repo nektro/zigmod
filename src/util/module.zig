@@ -31,7 +31,7 @@ pub const Module = struct {
 
     pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, modpath: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(alloc);
-        defer moddeps.deinit();
+        errdefer moddeps.deinit();
 
         for (dep.deps) |*d| {
             if (try common.get_module_from_dep(d, modpath, options)) |founddep| {
@@ -66,7 +66,7 @@ pub const Module = struct {
         const file_list_1 = try u.file_list(alloc, try std.mem.concat(alloc, u8, &.{ cdpath, "/", self.clean_path }));
 
         var file_list_2 = std.ArrayList(string).init(alloc);
-        defer file_list_2.deinit();
+        errdefer file_list_2.deinit();
         for (file_list_1) |item| {
             const _a = extras.trimPrefix(item, cdpath);
             const _b = extras.trimPrefix(_a, self.clean_path);

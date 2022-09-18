@@ -29,7 +29,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
     const m = try zigmod.ModFile.from_dir(options.alloc, mdir);
     try options.init();
     var moduledeps = std.ArrayList(zigmod.Module).init(options.alloc);
-    defer moduledeps.deinit();
+    errdefer moduledeps.deinit();
     if (m.root_files.len > 0) {
         try moduledeps.append(try add_files_package(options.alloc, cachepath, "root", mdir, m.root_files));
     }
@@ -63,7 +63,7 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, dtype: zigmod.Dep.Type,
 
     const m = try zigmod.ModFile.from_dir(options.alloc, mdir);
     var moduledeps = std.ArrayList(zigmod.Module).init(options.alloc);
-    defer moduledeps.deinit();
+    errdefer moduledeps.deinit();
     if (m.files.len > 0) {
         try moduledeps.append(try add_files_package(options.alloc, cachepath, m.id, mdir, m.files));
     }

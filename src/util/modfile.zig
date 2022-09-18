@@ -81,7 +81,7 @@ pub const ModFile = struct {
 
     fn dep_list_by_name(alloc: std.mem.Allocator, mapping: yaml.Mapping, props: []const string, for_build: bool) std.mem.Allocator.Error![]zigmod.Dep {
         var dep_list = std.ArrayList(zigmod.Dep).init(alloc);
-        defer dep_list.deinit();
+        errdefer dep_list.deinit();
 
         for (props) |prop| {
             if (mapping.get(prop)) |dep_seq| {
