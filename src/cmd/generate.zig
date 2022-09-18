@@ -189,13 +189,14 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
 
     try w.writeAll("pub const package_data = struct {\n");
     var duped = std.ArrayList(zigmod.Module).init(alloc);
+    var done = std.ArrayList(zigmod.Module).init(alloc);
     for (list) |mod| {
         if (mod.type == .system_lib or mod.type == .framework) {
             continue;
         }
         try duped.append(mod);
     }
-    try print_pkg_data_to(w, alloc, cachepath, &duped, &std.ArrayList(zigmod.Module).init(alloc));
+    try print_pkg_data_to(w, alloc, cachepath, &duped, &done);
     try w.writeAll("};\n\n");
 
     try w.writeAll("pub const packages = ");

@@ -109,13 +109,14 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
 
     try w.writeAll("pub const package_data = struct {\n");
     var duped = std.ArrayList(zigmod.Module).init(alloc);
+    var done = std.ArrayList(zigmod.Module).init(alloc);
     for (list.items) |mod| {
         if (mod.type == .system_lib or mod.type == .framework) {
             continue;
         }
         try duped.append(mod);
     }
-    try print_pkg_data_to(w, &duped, &std.ArrayList(zigmod.Module).init(alloc));
+    try print_pkg_data_to(w, &duped, &done);
     try w.writeAll("};\n\n");
 
     try w.writeAll("pub const packages = ");
@@ -159,7 +160,8 @@ fn diff_lockfile(alloc: std.mem.Allocator) !void {
 
     if (try u.does_folder_exist(".git")) {
         const result = try u.run_cmd_raw(alloc, null, &.{ "git", "diff", "zigmod.lock" });
-        const r = std.io.fixedBufferStream(result.stdout).reader();
+        var stdout = std.io.fixedBufferStream(result.stdout);
+        const r = stdout.reader();
         while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line| {
             if (std.mem.startsWith(u8, line, "@@")) break;
         }
