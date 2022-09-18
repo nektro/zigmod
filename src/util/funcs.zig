@@ -76,23 +76,9 @@ pub fn list_contains_gen(comptime T: type, haystack: []const T, needle: T) bool 
 }
 
 pub fn file_list(alloc: std.mem.Allocator, dpath: string) ![]const string {
-    var list = std.ArrayList(string).init(alloc);
-    defer list.deinit();
-
-    const dir = try std.fs.cwd().openIterableDir(dpath, .{});
-    var walk = try dir.walk(alloc);
-    defer walk.deinit();
-    while (true) {
-        if (try walk.next()) |entry| {
-            if (entry.kind != .File) {
-                continue;
-            }
-            try list.append(try alloc.dupe(u8, entry.path));
-        } else {
-            break;
-        }
-    }
-    return list.toOwnedSlice();
+    var dir = try std.fs.cwd().openIterableDir(dpath, .{});
+    defer dir.close();
+    return try extras.fileList(alloc, dir);
 }
 
 pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.ChildProcess.ExecResult {
