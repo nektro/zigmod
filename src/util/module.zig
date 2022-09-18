@@ -1,10 +1,10 @@
 const std = @import("std");
 const string = []const u8;
 const builtin = @import("builtin");
+const yaml = @import("yaml");
 
 const zigmod = @import("../lib.zig");
 const u = @import("index.zig");
-const yaml = @import("./yaml.zig");
 const common = @import("./../common.zig");
 
 //

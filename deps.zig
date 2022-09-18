@@ -48,6 +48,7 @@ pub fn fetch(exe: *std.build.LibExeObjStep) void {
         const root = if (@field(package_data, decl.name).store) |_| b.cache_root else ".";
         if (path.* != null) path.* = b.fmt("{s}/zigmod/deps{s}", .{ root, path.*.? });
     }
+    exe.step.dependOn(&GitExactStep.create(b, "https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc", "0911d65210fe14467fa73afd5b09d781a3995adc").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/MasterQ32/zig-uri", "e879df3a236869f92298fbe2db3c25e6e84cfd4c").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "209f07cc5861c7bd9c3010a37f32bf6244f9a158").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "1a9b2e90379895e197893b6e19c93bd213ad36e6").step);
@@ -193,6 +194,12 @@ pub const package_data = struct {
         .entry = "/git/github.com/nektro/zig-extras/01fae956e2f17aa992e717e041a3dd457d440b31/src/lib.zig",
         .deps = &[_]*Package{ &_tnj3qf44tpeq },
     };
+    pub var _g982zq6e8wsv = Package{
+        .store = "/git/gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc/0911d65210fe14467fa73afd5b09d781a3995adc",
+        .name = "yaml",
+        .entry = "/git/gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc/0911d65210fe14467fa73afd5b09d781a3995adc/yaml.zig",
+        .deps = &[_]*Package{ &_f7dubzb7cyqe },
+    };
     pub var _c1xirp1ota5p = Package{
         .store = "/git/github.com/nektro/zig-inquirer/14c3492c46f9765c3e77436741794d1a3118cbee",
         .name = "inquirer",
@@ -242,7 +249,7 @@ pub const package_data = struct {
     pub var _89ujp8gq842x = Package{
         .name = "zigmod",
         .entry = "/../..//src/lib.zig",
-        .deps = &[_]*Package{ &_s84v9o48ucb0, &_2ta738wrqbaq, &_0npcrzfdlrvk, &_ejw82j2ipa0e, &_ocmr9rtohgcc, &_tnj3qf44tpeq, &_2ovav391ivak, &_c1xirp1ota5p, &_u7sysdckdymi, &_iecwp4b3bsfm },
+        .deps = &[_]*Package{ &_g982zq6e8wsv, &_s84v9o48ucb0, &_2ta738wrqbaq, &_0npcrzfdlrvk, &_ejw82j2ipa0e, &_ocmr9rtohgcc, &_tnj3qf44tpeq, &_2ovav391ivak, &_c1xirp1ota5p, &_u7sysdckdymi, &_iecwp4b3bsfm },
     };
     pub var _root = Package{
     };

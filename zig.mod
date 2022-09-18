@@ -5,27 +5,7 @@ license: MIT
 description: A package manager for the Zig programming language.
 min_zig_version: 0.10.0-dev.3998+c25ce5bba
 dependencies:
-  - src: git https://github.com/yaml/libyaml tag-0.2.5
-    id: 8mdbh0zuneb0i3hs5jby5je0heem1i6yxusl7c8y8qx68hqc
-    license: MIT
-    c_include_dirs:
-      - include
-    c_source_flags:
-      - -DYAML_VERSION_MAJOR=0
-      - -DYAML_VERSION_MINOR=2
-      - -DYAML_VERSION_PATCH=5
-      - -DYAML_VERSION_STRING="0.2.5"
-      - -DYAML_DECLARE_STATIC=1
-    c_source_files:
-      - src/api.c
-      - src/dumper.c
-      - src/emitter.c
-      - src/loader.c
-      - src/parser.c
-      - src/reader.c
-      - src/scanner.c
-      - src/writer.c
-
+  - src: git https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc # yaml
   - src: git https://github.com/nektro/zig-ansi
   - src: git https://github.com/ziglibs/known-folders
   - src: git https://github.com/nektro/zig-licenses

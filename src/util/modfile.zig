@@ -1,9 +1,9 @@
 const std = @import("std");
 const string = []const u8;
+const yaml = @import("yaml");
 
 const zigmod = @import("../lib.zig");
 const u = @import("index.zig");
-const yaml = @import("./yaml.zig");
 
 //
 //
