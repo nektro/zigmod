@@ -98,10 +98,10 @@ pub const Module = struct {
     pub fn is_for_this(self: Module) bool {
         const os = @tagName(builtin.os.tag);
         if (self.only_os.len > 0) {
-            return u.list_contains(self.only_os, os);
+            return extras.containsString(self.only_os, os);
         }
         if (self.except_os.len > 0) {
-            return !u.list_contains(self.except_os, os);
+            return !extras.containsString(self.except_os, os);
         }
         return true;
     }

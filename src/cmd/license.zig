@@ -2,6 +2,7 @@ const std = @import("std");
 const gpa = std.heap.c_allocator;
 const style = @import("ansi").style;
 const licenses = @import("licenses");
+const extras = @import("extras");
 
 const zigmod = @import("../lib.zig");
 const u = @import("./../util/index.zig");
@@ -77,7 +78,7 @@ pub fn execute(args: [][]u8) !void {
         first = false;
         try writer.writeAll(Bold);
         try writer.print("{s}:\n", .{entry.key_ptr.*});
-        if (u.list_contains(licenses.spdx, entry.key_ptr.*)) {
+        if (extras.containsString(licenses.spdx, entry.key_ptr.*)) {
             try writer.writeAll(Faint);
             try writer.print("= {s}{s}\n", .{ "https://spdx.org/licenses/", entry.key_ptr.* });
         }

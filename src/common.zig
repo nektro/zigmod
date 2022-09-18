@@ -104,8 +104,8 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
     const pv = try std.fs.path.join(options.alloc, &.{ cachepath, try d.clean_path_v(options.alloc) });
 
     const nocache = d.type.isLocal();
-    if (!nocache and u.list_contains(options.already_fetched.items, p)) return p;
-    if (!nocache and u.list_contains(options.already_fetched.items, pv)) return pv;
+    if (!nocache and extras.containsString(options.already_fetched.items, p)) return p;
+    if (!nocache and extras.containsString(options.already_fetched.items, pv)) return pv;
 
     if (options.log and d.type != .local) {
         std.debug.print("fetch: {s}: {s}\n", .{ @tagName(d.type), d.path });

@@ -75,15 +75,6 @@ pub fn trim_suffix(in: string, suffix: string) string {
     return in;
 }
 
-pub fn list_contains(haystack: []const string, needle: string) bool {
-    for (haystack) |item| {
-        if (std.mem.eql(u8, item, needle)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 pub fn list_contains_gen(comptime T: type, haystack: []const T, needle: T) bool {
     for (haystack) |item| {
         if (item.eql(needle)) {
