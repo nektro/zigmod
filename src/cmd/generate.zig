@@ -71,6 +71,8 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            var checkoutstep = std.build.RunStep.create(b, "checkout");
         \\            checkoutstep.addArgs(&.{ "git", "-C", repopath, "checkout", "-q", commit });
         \\            result.step.dependOn(&checkoutstep.step);
+        //            TODO rm the .git folder
+        //            TODO mark folder as read-only
         \\
         \\            return result;
         \\        }
