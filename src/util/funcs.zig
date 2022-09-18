@@ -59,15 +59,6 @@ pub fn does_folder_exist(fpath: string) !bool {
     return true;
 }
 
-pub fn _join(comptime delim: string, comptime xs: []const string) string {
-    var buf: string = "";
-    for (xs) |x, i| {
-        buf = buf ++ x;
-        if (i < xs.len - 1) buf = buf ++ delim;
-    }
-    return buf;
-}
-
 pub fn trim_suffix(in: string, suffix: string) string {
     if (std.mem.endsWith(u8, in, suffix)) {
         return in[0 .. in.len - suffix.len];
