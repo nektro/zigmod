@@ -2,21 +2,21 @@ MIT:
 = https://spdx.org/licenses/MIT
 - This
 - git https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc
-- git https://github.com/yaml/libyaml
-- git https://github.com/nektro/zig-extras
-- git https://github.com/nektro/zig-range
-- git https://github.com/nektro/zig-ansi
-- git https://github.com/ziglibs/known-folders
-- git https://github.com/nektro/zig-licenses
-- git https://github.com/truemedian/zfetch
-- git https://github.com/truemedian/hzzp
-- git https://github.com/nektro/iguanaTLS
 - git https://github.com/MasterQ32/zig-uri
-- git https://github.com/nektro/zig-json
-- git https://github.com/nektro/zig-detect-license
-- git https://github.com/nektro/zig-licenses-text
-- git https://github.com/nektro/zig-leven
-- git https://github.com/nektro/zig-inquirer
-- git https://github.com/nektro/arqv-ini
-- git https://github.com/nektro/zig-time
 - git https://github.com/marlersoft/zigwin32
+- git https://github.com/nektro/arqv-ini
+- git https://github.com/nektro/iguanaTLS
+- git https://github.com/nektro/zig-ansi
+- git https://github.com/nektro/zig-detect-license
+- git https://github.com/nektro/zig-extras
+- git https://github.com/nektro/zig-inquirer
+- git https://github.com/nektro/zig-json
+- git https://github.com/nektro/zig-leven
+- git https://github.com/nektro/zig-licenses
+- git https://github.com/nektro/zig-licenses-text
+- git https://github.com/nektro/zig-range
+- git https://github.com/nektro/zig-time
+- git https://github.com/truemedian/hzzp
+- git https://github.com/truemedian/zfetch
+- git https://github.com/ziglibs/known-folders
+- git https://github.com/yaml/libyaml

@@ -29,6 +29,7 @@ pub fn execute(args: [][]u8) !void {
     var master_list = List.init(gpa);
     errdefer master_list.deinit();
     try common.collect_pkgs(top_module, &master_list);
+    std.sort.sort(zigmod.Module, master_list.items, {}, zigmod.Module.lessThan);
 
     var map = Map.init(gpa);
     errdefer map.deinit();
