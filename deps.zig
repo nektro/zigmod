@@ -63,7 +63,7 @@ pub fn fetch(exe: *std.build.LibExeObjStep) void {
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-range", "4b2f12808aa09be4b27a163efc424dd4e0415992").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-time", "52a6050939b83e9f8b52b2236a36332dcb4c17a3").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/truemedian/hzzp", "d4fbade2d806fc93bc5f79ec8efdcc25ea625fa3").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/truemedian/zfetch", "12b1374aae32e8ebf719a096a22cdf4c49433458").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/truemedian/zfetch", "829973144f680cd16be16923041fa810c1dee417").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/ziglibs/known-folders", "24845b0103e611c108d6bc334231c464e699742c").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/yaml/libyaml", "2c891fc7a770e8ba2fec34fc6b545c672beb37e6").step);
 }
@@ -229,9 +229,9 @@ pub const package_data = struct {
         .entry = "/git/github.com/truemedian/hzzp/d4fbade2d806fc93bc5f79ec8efdcc25ea625fa3/src/main.zig",
     };
     pub var _ejw82j2ipa0e = Package{
-        .store = "/git/github.com/truemedian/zfetch/12b1374aae32e8ebf719a096a22cdf4c49433458",
+        .store = "/git/github.com/truemedian/zfetch/829973144f680cd16be16923041fa810c1dee417",
         .name = "zfetch",
-        .entry = "/git/github.com/truemedian/zfetch/12b1374aae32e8ebf719a096a22cdf4c49433458/src/main.zig",
+        .entry = "/git/github.com/truemedian/zfetch/829973144f680cd16be16923041fa810c1dee417/src/main.zig",
         .deps = &[_]*Package{ &_9k24gimke1an, &_csbnipaad8n7, &_u9w9dpp6p804 },
     };
     pub var _2ta738wrqbaq = Package{
