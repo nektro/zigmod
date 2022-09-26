@@ -139,7 +139,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            llc = true;
         \\        }
         \\        for (pkg.c_include_dirs) |item| {
-        \\            exe.addIncludeDir(b.fmt("{s}/{s}", .{ root, item }));
+        \\            exe.addIncludePath(b.fmt("{s}/{s}", .{ root, item }));
         \\            llc = true;
         \\        }
         \\        for (pkg.c_source_files) |item| {

@@ -52,7 +52,7 @@ pub fn fetch(exe: *std.build.LibExeObjStep) void {
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/MasterQ32/zig-uri", "e879df3a236869f92298fbe2db3c25e6e84cfd4c").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "209f07cc5861c7bd9c3010a37f32bf6244f9a158").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "1a9b2e90379895e197893b6e19c93bd213ad36e6").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/iguanaTLS", "c9403b8414d7f80b5e2c04c8f1f8780ca1d2827f").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/iguanaTLS", "bd003aa75c8bc00e8a61a1be575b9305249dc749").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-ansi", "d4a53bcac5b87abecc65491109ec22aaf5f3dc2f").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-detect-license", "de5c285d999eea68b9189b48bb000243fef0a689").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-extras", "01fae956e2f17aa992e717e041a3dd457d440b31").step);
@@ -104,7 +104,7 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
             llc = true;
         }
         for (pkg.c_include_dirs) |item| {
-            exe.addIncludeDir(b.fmt("{s}/{s}", .{ root, item }));
+            exe.addIncludePath(b.fmt("{s}/{s}", .{ root, item }));
             llc = true;
         }
         for (pkg.c_source_files) |item| {
@@ -143,7 +143,7 @@ pub const Package = struct {
 };
 
 fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {
-    const min = std.SemanticVersion.parse("0.10.0-dev.3998+c25ce5bba") catch return;
+    const min = std.SemanticVersion.parse("0.10.0-dev.4099+d3d24874c") catch return;
     if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{current, min}));
 }
 
@@ -164,9 +164,9 @@ pub const package_data = struct {
         .entry = "/git/github.com/nektro/arqv-ini/1a9b2e90379895e197893b6e19c93bd213ad36e6/src/ini.zig",
     };
     pub var _csbnipaad8n7 = Package{
-        .store = "/git/github.com/nektro/iguanaTLS/c9403b8414d7f80b5e2c04c8f1f8780ca1d2827f",
+        .store = "/git/github.com/nektro/iguanaTLS/bd003aa75c8bc00e8a61a1be575b9305249dc749",
         .name = "iguanaTLS",
-        .entry = "/git/github.com/nektro/iguanaTLS/c9403b8414d7f80b5e2c04c8f1f8780ca1d2827f/src/main.zig",
+        .entry = "/git/github.com/nektro/iguanaTLS/bd003aa75c8bc00e8a61a1be575b9305249dc749/src/main.zig",
     };
     pub var _s84v9o48ucb0 = Package{
         .store = "/git/github.com/nektro/zig-ansi/d4a53bcac5b87abecc65491109ec22aaf5f3dc2f",

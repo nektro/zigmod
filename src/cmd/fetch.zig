@@ -67,7 +67,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            llc = true;
         \\        }
         \\        inline for (pkg.c_include_dirs) |item| {
-        \\            exe.addIncludeDir(@field(dirs, decl.name) ++ "/" ++ item);
+        \\            exe.addIncludePath(@field(dirs, decl.name) ++ "/" ++ item);
         \\            llc = true;
         \\        }
         \\        inline for (pkg.c_source_files) |item| {
