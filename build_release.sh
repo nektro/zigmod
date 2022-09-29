@@ -7,7 +7,10 @@ rev=$(git log --format=%h -1)
 
 target=$1
 
-# TODO error if $target is empty
+if [[ "$1" == "" ]]
+then
+  exit 2
+fi
 
 echo "$tag.$rev $target"
 $(which time) zig build -Dtarget=$target -Duse-full-name -Dtag=$tag --prefix .
