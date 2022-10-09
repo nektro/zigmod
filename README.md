@@ -21,7 +21,6 @@ A package manager for the Zig programming language.
 - See [`zig.mod`](./zig.mod) and [`zigmod.lock`](./zigmod.lock)
 
 ### Build from Source
-Initially,
 ```
 $ git clone https://github.com/nektro/zigmod
 $ cd zigmod
