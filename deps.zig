@@ -264,11 +264,15 @@ pub const package_data = struct {
 pub const packages = [_]*const Package{
     &package_data._89ujp8gq842x,
     &package_data._o6ogpor87xc2,
+    &package_data._f7dubzb7cyqe,
+    &package_data._s84v9o48ucb0,
 };
 
 pub const pkgs = struct {
     pub const zigmod = &package_data._89ujp8gq842x;
     pub const win32 = &package_data._o6ogpor87xc2;
+    pub const extras = &package_data._f7dubzb7cyqe;
+    pub const ansi = &package_data._s84v9o48ucb0;
 };
 
 pub const imports = struct {
