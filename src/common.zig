@@ -305,11 +305,7 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
         }
     }
 
-    const cwdpath = try std.fs.cwd().realpathAlloc(alloc, ".");
-    const mpath = try mdir.realpathAlloc(alloc, ".");
-    var fpath = extras.trimPrefix(mpath, cwdpath);
-    if (fpath.len == 0) fpath = std.fs.path.sep_str;
-
+    const fpath = try mdir.realpathAlloc(alloc, ".");
     var cachedir = try std.fs.cwd().openDir(cachepath, .{});
     defer cachedir.close();
     try cachedir.makePath("files");
@@ -318,7 +314,7 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
     const rff = try destdir.createFile(fname, .{});
     defer rff.close();
     const w = rff.writer();
-    try w.print("const srcpath = \"../../../{}\";\n\n", .{std.zig.fmtEscapes(fpath[1..])});
+    try w.print("const srcpath = \"/{}\";\n\n", .{std.zig.fmtEscapes(fpath[1..])});
     var iter = map.iterator();
     while (iter.next()) |item| {
         try w.print("pub const @\"/{}\" = @embedFile(srcpath ++ \"/{}\");\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
