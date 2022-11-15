@@ -48,7 +48,7 @@ pub fn fetch(exe: *std.build.LibExeObjStep) void {
         const root = if (@field(package_data, decl.name).store) |_| b.cache_root else ".";
         if (path.* != null) path.* = b.fmt("{s}/zigmod/deps{s}", .{ root, path.*.? });
     }
-    exe.step.dependOn(&GitExactStep.create(b, "https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc", "0911d65210fe14467fa73afd5b09d781a3995adc").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc", "24c01e844396d18a90bbbfb91f8a5a12023e9379").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/MasterQ32/zig-uri", "e879df3a236869f92298fbe2db3c25e6e84cfd4c").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "209f07cc5861c7bd9c3010a37f32bf6244f9a158").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "1a9b2e90379895e197893b6e19c93bd213ad36e6").step);
@@ -195,9 +195,9 @@ pub const package_data = struct {
         .deps = &[_]*Package{ &_tnj3qf44tpeq },
     };
     pub var _g982zq6e8wsv = Package{
-        .store = "/git/gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc/0911d65210fe14467fa73afd5b09d781a3995adc",
+        .store = "/git/gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc/24c01e844396d18a90bbbfb91f8a5a12023e9379",
         .name = "yaml",
-        .entry = "/git/gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc/0911d65210fe14467fa73afd5b09d781a3995adc/yaml.zig",
+        .entry = "/git/gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc/24c01e844396d18a90bbbfb91f8a5a12023e9379/yaml.zig",
         .deps = &[_]*Package{ &_f7dubzb7cyqe },
     };
     pub var _c1xirp1ota5p = Package{
