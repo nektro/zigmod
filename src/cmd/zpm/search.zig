@@ -1,6 +1,7 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
-const range = @import("range").range;
+const extras = @import("extras");
+const range = extras.range;
 
 const zpm = @import("./../zpm.zig");
 
