@@ -49,7 +49,7 @@ pub fn fetch(exe: *std.build.LibExeObjStep) void {
         if (path.* != null) path.* = b.fmt("{s}/zigmod/deps{s}", .{ root, path.*.? });
     }
     exe.step.dependOn(&GitExactStep.create(b, "https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc", "24c01e844396d18a90bbbfb91f8a5a12023e9379").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/MasterQ32/zig-uri", "e879df3a236869f92298fbe2db3c25e6e84cfd4c").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/MasterQ32/zig-uri", "b7e688fc019e33f900fba0940eab74c81b480c13").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "209f07cc5861c7bd9c3010a37f32bf6244f9a158").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "1a9b2e90379895e197893b6e19c93bd213ad36e6").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/iguanaTLS", "bd003aa75c8bc00e8a61a1be575b9305249dc749").step);
@@ -149,9 +149,9 @@ fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void
 
 pub const package_data = struct {
     pub var _u9w9dpp6p804 = Package{
-        .store = "/git/github.com/MasterQ32/zig-uri/e879df3a236869f92298fbe2db3c25e6e84cfd4c",
+        .store = "/git/github.com/MasterQ32/zig-uri/b7e688fc019e33f900fba0940eab74c81b480c13",
         .name = "uri",
-        .entry = "/git/github.com/MasterQ32/zig-uri/e879df3a236869f92298fbe2db3c25e6e84cfd4c/uri.zig",
+        .entry = "/git/github.com/MasterQ32/zig-uri/b7e688fc019e33f900fba0940eab74c81b480c13/uri.zig",
     };
     pub var _o6ogpor87xc2 = Package{
         .store = "/git/github.com/marlersoft/zigwin32/209f07cc5861c7bd9c3010a37f32bf6244f9a158",
