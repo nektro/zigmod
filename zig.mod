@@ -3,7 +3,7 @@ name: zigmod
 main: src/lib.zig
 license: MIT
 description: A package manager for the Zig programming language.
-min_zig_version: 0.10.0-dev.4099+d3d24874c
+min_zig_version: 0.11.0-dev.193+eed82ca28
 dependencies:
   - src: git https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc # yaml
   - src: git https://github.com/nektro/zig-ansi
