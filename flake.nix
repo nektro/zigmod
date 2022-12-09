@@ -24,7 +24,10 @@
       pname = "zigmod";
       version = "0.1.0";
 
-      demo = pkgs.stdenv.mkDerivation {
+      zigVersion = "master";
+      z = pkgs.zigpkgs.${zigVersion};
+
+      zigmod = pkgs.stdenv.mkDerivation {
         inherit pname version;
         src = ./.;
         nativeBuildInputs = with pkgs; [
@@ -33,7 +36,7 @@
           wget
           unzip
           gnutar
-          zigpkgs.master
+          z
           pkg-config
         ];
         buildInputs = with pkgs; [ ];
@@ -44,25 +47,27 @@
 
         installPhase = ''
           runHook preInstall
-          zig build
+          zig build --prefix $out install
           runHook postInstall
         '';
 
         installFlags = ["DESTDIR=$(out)"];
 
-        meta = {
-          maintainers = [ "Jake Chvatal <jake@isnt.online>" ];
-          description = "zigmod";
+        meta = with pkgs.lib; {
+          description = "A package manager for the Zig programming language.";
+          license = licenses.mit;
+          platforms = platforms.linux;
+          maintainers = with maintainers; [ jakeisnt ];
         };
       };
 
     in rec {
-      # packages = {
-      #   demo = demo;
-      #   default = demo;
-      # };
+      packages = {
+        zigmod = zigmod;
+        default = zigmod;
+      };
 
-      defaultPackage = pkgs.zigpkgs.master;
+      defaultPackage = zigmod;
 
       devShells.default = pkgs.mkShell {
         nativeBuildInputs = with pkgs; [
