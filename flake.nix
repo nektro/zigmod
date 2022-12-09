@@ -55,12 +55,28 @@
           description = "zigmod";
         };
       };
+
     in rec {
-      packages = {
-        demo = demo;
-        default = demo;
+      # packages = {
+      #   demo = demo;
+      #   default = demo;
+      # };
+
+      defaultPackage = pkgs.zigpkgs.master;
+
+      devShells.default = pkgs.mkShell {
+        nativeBuildInputs = with pkgs; [
+          zigpkgs.master
+        ];
+
+        buildInputs = [
+          git
+          mercurial
+          wget
+          unzip
+          gnutar
+        ];
       };
 
-      defaultPackage = demo;
-    });
+      devShell = self.devShells.${system}.default;    });
 }
