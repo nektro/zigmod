@@ -27,7 +27,15 @@
       demo = pkgs.stdenv.mkDerivation {
         inherit pname version;
         src = ./.;
-        nativeBuildInputs = with pkgs; [ zigpkgs.master pkg-config ];
+        nativeBuildInputs = with pkgs; [
+          git
+          mercurial
+          wget
+          unzip
+          gnutar
+          zigpkgs.master
+          pkg-config
+        ];
         buildInputs = with pkgs; [ ];
         dontConfigure = true;
         preBuild = ''
