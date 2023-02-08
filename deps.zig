@@ -1,7 +1,7 @@
 // zig fmt: off
 const std = @import("std");
 const builtin = @import("builtin");
-const Pkg = std.build.Pkg;
+const ModuleDependency = std.build.ModuleDependency;
 const string = []const u8;
 
 pub const GitExactStep = struct {
@@ -87,7 +87,8 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
     const b = exe.builder;
     @setEvalBranchQuota(1_000_000);
     for (packages) |pkg| {
-        exe.addPackage(pkg.zp(b));
+        const moddep = pkg.zp(b);
+        exe.addModule(moddep.name, moddep.module);
     }
     var llc = false;
     var vcpkg = false;
@@ -129,21 +130,23 @@ pub const Package = struct {
     frameworks: []const string = &.{},
     vcpkg: bool = false,
 
-    pub fn zp(self: *const Package, b: *std.build.Builder) Pkg {
-        var temp: [100]Pkg = undefined;
+    pub fn zp(self: *const Package, b: *std.build.Builder) ModuleDependency {
+        var temp: [100]ModuleDependency = undefined;
         for (self.deps) |item, i| {
             temp[i] = item.zp(b);
         }
         return .{
             .name = self.name,
-            .source = .{ .path = self.entry.? },
-            .dependencies = b.allocator.dupe(Pkg, temp[0..self.deps.len]) catch @panic("oom"),
+            .module = b.createModule(.{
+                .source_file = .{ .path = self.entry.? },
+                .dependencies = b.allocator.dupe(ModuleDependency, temp[0..self.deps.len]) catch @panic("oom"),
+            }),
         };
     }
 };
 
 fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {
-    const min = std.SemanticVersion.parse("0.11.0-dev.874+40ed6ae84") catch return;
+    const min = std.SemanticVersion.parse("0.11.0-dev.1570+693b12f8e") catch return;
     if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{current, min}));
 }
 

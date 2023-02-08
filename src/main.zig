@@ -5,9 +5,6 @@ pub const build_options = @import("build_options");
 const zigmod = @import("zigmod");
 const win32 = @import("win32");
 
-pub const u = @import("./util/index.zig");
-pub const common = @import("./common.zig");
-
 //
 //
 
@@ -61,9 +58,27 @@ pub fn main() !void {
     const result = std.ChildProcess.exec(.{ .allocator = gpa, .argv = sub_cmd_args.items }) catch |e| switch (e) {
         else => |ee| return ee,
         error.FileNotFound => {
-            u.fail("unknown command \"{s}\" for \"zigmod\"", .{args[0]});
+            fail("unknown command \"{s}\" for \"zigmod\"", .{args[0]});
         },
     };
     try std.io.getStdOut().writeAll(result.stdout);
     try std.io.getStdErr().writeAll(result.stderr);
+}
+
+//
+//
+
+const ansi_red = "\x1B[31m";
+const ansi_reset = "\x1B[39m";
+
+pub fn assert(ok: bool, comptime fmt: string, args: anytype) void {
+    if (!ok) {
+        std.debug.print(ansi_red ++ fmt ++ ansi_reset ++ "\n", args);
+        std.os.exit(1);
+    }
+}
+
+pub fn fail(comptime fmt: string, args: anytype) noreturn {
+    assert(false, fmt, args);
+    unreachable;
 }
