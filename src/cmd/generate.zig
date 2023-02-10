@@ -39,7 +39,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     try w.writeAll("// zig fmt: off\n");
     try w.writeAll("const std = @import(\"std\");\n");
     try w.writeAll("const builtin = @import(\"builtin\");\n");
-    try w.writeAll("const Pkg = std.build.Pkg;\n");
+    try w.writeAll("const ModuleDependency = std.build.ModuleDependency;\n");
     try w.writeAll("const string = []const u8;\n");
     try w.writeAll("\n");
     try w.writeAll(
@@ -122,7 +122,8 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    const b = exe.builder;
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
-        \\        exe.addPackage(pkg.zp(b));
+        \\        const moddep = pkg.zp(b);
+        \\        exe.addModule(moddep.name, moddep.module);
         \\    }
         \\    var llc = false;
         \\    var vcpkg = false;
@@ -164,15 +165,17 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    frameworks: []const string = &.{},
         \\    vcpkg: bool = false,
         \\
-        \\    pub fn zp(self: *const Package, b: *std.build.Builder) Pkg {
-        \\        var temp: [100]Pkg = undefined;
+        \\    pub fn zp(self: *const Package, b: *std.build.Builder) ModuleDependency {
+        \\        var temp: [100]ModuleDependency = undefined;
         \\        for (self.deps) |item, i| {
         \\            temp[i] = item.zp(b);
         \\        }
         \\        return .{
         \\            .name = self.name,
-        \\            .source = .{ .path = self.entry.? },
-        \\            .dependencies = b.allocator.dupe(Pkg, temp[0..self.deps.len]) catch @panic("oom"),
+        \\            .module = b.createModule(.{
+        \\                .source_file = .{ .path = self.entry.? },
+        \\                .dependencies = b.allocator.dupe(ModuleDependency, temp[0..self.deps.len]) catch @panic("oom"),
+        \\            }),
         \\        };
         \\    }
         \\};

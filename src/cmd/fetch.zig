@@ -41,8 +41,8 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     try w.writeAll("// zig fmt: off\n");
     try w.writeAll("const std = @import(\"std\");\n");
     try w.writeAll("const builtin = @import(\"builtin\");\n");
-    try w.writeAll("const Pkg = std.build.Pkg;\n");
     try w.writeAll("const string = []const u8;\n");
+    try w.writeAll("const ModuleDependency = std.build.ModuleDependency;\n");
     try w.writeAll("\n");
     try w.print("pub const cache = \"{}\";\n", .{std.zig.fmtEscapes(cachepath)});
     try w.writeAll("\n");
@@ -51,7 +51,8 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    checkMinZig(builtin.zig_version, exe);
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
-        \\        exe.addPackage(pkg.pkg.?);
+        \\        const moddep = pkg.pkg.?.zp(exe.builder);
+        \\        exe.addModule(moddep.name, moddep.module);
         \\    }
         \\    var llc = false;
         \\    var vcpkg = false;
@@ -89,6 +90,26 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    system_libs: []const string = &.{},
         \\    frameworks: []const string = &.{},
         \\    vcpkg: bool = false,
+        \\};
+        \\
+        \\pub const Pkg = struct {
+        \\    name: string,
+        \\    source: std.build.FileSource,
+        \\    dependencies: []const Pkg,
+        \\
+        \\    pub fn zp(self: *const Pkg, b: *std.build.Builder) ModuleDependency {
+        \\        var temp: [100]ModuleDependency = undefined;
+        \\        for (self.dependencies) |item, i| {
+        \\            temp[i] = item.zp(b);
+        \\        }
+        \\        return .{
+        \\            .name = self.name,
+        \\            .module = b.createModule(.{
+        \\                .source_file = self.source,
+        \\                .dependencies = b.allocator.dupe(ModuleDependency, temp[0..self.dependencies.len]) catch @panic("oom"),
+        \\            }),
+        \\        };
+        \\    }
         \\};
         \\
         \\
@@ -290,7 +311,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                         mod.main,
                     });
                     if (mod.has_no_zig_deps()) {
-                        try w.writeAll(" null },\n");
+                        try w.writeAll(" &.{} },\n");
                     } else {
                         try w.writeAll(" &.{");
                         for (mod.deps) |moddep, j| {
