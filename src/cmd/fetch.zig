@@ -64,7 +64,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            llc = true;
         \\        }
         \\        for (pkg.frameworks) |item| {
-        \\            if (!std.Target.current.isDarwin()) @panic(exe.builder.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
+        \\            if (!builtin.target.isDarwin()) @panic(exe.builder.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
         \\            exe.linkFramework(item);
         \\            llc = true;
         \\        }
