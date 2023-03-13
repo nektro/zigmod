@@ -38,7 +38,6 @@ jobs:
       - run: ./zig-out/bin/zigmod zpm add apple_pie
       - run: ./zig-out/bin/zigmod zpm tags
       - run: ./zig-out/bin/zigmod aq add 1/vrischmann/sqlite
-      - run: ./zig-out/bin/zigmod aq install 1/nektro/ziglint
 
       # Github Release
       - run: ./changelog.sh
