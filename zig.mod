@@ -5,7 +5,7 @@ license: MIT
 description: A package manager for the Zig programming language.
 min_zig_version: 0.11.0-dev.1570+693b12f8e
 dependencies:
-  - src: git https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc # yaml
+  - src: git https://github.com/nektro/zig-yaml
   - src: git https://github.com/nektro/zig-ansi
   - src: git https://github.com/ziglibs/known-folders
   - src: git https://github.com/nektro/zig-licenses
