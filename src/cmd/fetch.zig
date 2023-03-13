@@ -49,6 +49,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     try w.writeAll(
         \\pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
         \\    checkMinZig(builtin.zig_version, exe);
+        \\    const b = exe.builder;
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
         \\        const moddep = pkg.pkg.?.zp(exe.builder);
@@ -67,12 +68,12 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            exe.linkFramework(item);
         \\            llc = true;
         \\        }
-        \\        inline for (pkg.c_include_dirs) |item| {
-        \\            exe.addIncludePath(@field(dirs, decl.name) ++ "/" ++ item);
+        \\        for (pkg.c_include_dirs) |item| {
+        \\            exe.addIncludePath(b.fmt("{s}/{s}", .{ @field(dirs, decl.name), item }));
         \\            llc = true;
         \\        }
-        \\        inline for (pkg.c_source_files) |item| {
-        \\            exe.addCSourceFile(@field(dirs, decl.name) ++ "/" ++ item, pkg.c_source_flags);
+        \\        for (pkg.c_source_files) |item| {
+        \\            exe.addCSourceFile(b.fmt("{s}/{s}", .{ @field(dirs, decl.name), item }), pkg.c_source_flags);
         \\            llc = true;
         \\        }
         \\        vcpkg = vcpkg or pkg.vcpkg;
