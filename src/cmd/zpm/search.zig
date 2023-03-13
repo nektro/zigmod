@@ -1,7 +1,6 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 const extras = @import("extras");
-const range = extras.range;
 
 const zpm = @import("./../zpm.zig");
 
@@ -57,7 +56,7 @@ pub fn execute(args: [][]u8) !void {
 }
 
 fn print_c_n(out: anytype, c: u8, n: usize) !void {
-    for (range(n)) |_| {
+    for (0..n) |_| {
         try out.writeAll(&.{c});
     }
 }

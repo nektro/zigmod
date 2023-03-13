@@ -1,20 +1,20 @@
 2
 git https://github.com/MasterQ32/zig-uri commit-d4299ad6043ad19f2ce0676687b0bff57273eae2
-git https://github.com/marlersoft/zigwin32 commit-56cf335ddcdb72a6d7059c5b6f131263830b3eca
+git https://github.com/marlersoft/zigwin32 commit-79c0144225dc015a5c0253b5af30356aa6dc6426
 git https://github.com/nektro/arqv-ini commit-ee395fd34e152d9067def609d86b7af5382b83b1
 git https://github.com/nektro/iguanaTLS commit-5dee3ead2b289319080834add91b5f35dfdb1847
 git https://github.com/nektro/zig-ansi commit-8d6fdb4983a616940c1d5137110292a7862f6a7e
 git https://github.com/nektro/zig-detect-license commit-de5c285d999eea68b9189b48bb000243fef0a689
-git https://github.com/nektro/zig-extras commit-b45c99e2e747e3bb8df5e1051078cacb1470a430
+git https://github.com/nektro/zig-extras commit-d34ac633f0a0af8d348b66a38e7497d031f027b1
 git https://github.com/nektro/zig-inquirer commit-25e35a46400cfa1d7278436c0b7d14d314889d7c
 git https://github.com/nektro/zig-json commit-0e7d026b0d3889ed7f96e1b24566a66cd9df6cb3
 git https://github.com/nektro/zig-leven commit-ab852cf74fa0b4edc530d925f0654b62c60365bf
 git https://github.com/nektro/zig-licenses commit-c9b8cbf3565675a056ad4e9b57cb4f84020e7680
 git https://github.com/nektro/zig-licenses-text commit-3c07c6e4eb0965dafd0b029c632f823631b3169c
 git https://github.com/nektro/zig-range commit-4b2f12808aa09be4b27a163efc424dd4e0415992
-git https://github.com/nektro/zig-time commit-aff2df866eb16ad781e26a25f8b664d498e2211a
-git https://github.com/truemedian/hzzp commit-2d2ab34b666e6806a6f6c98cc50ca94e606c9103
+git https://github.com/nektro/zig-time commit-bfb7da7b8ee92b6c07f90a14b044a9b8f4df182c
 git https://github.com/nektro/zig-yaml commit-3f3641e90697546e7f8aeef365815c4ccab168b0
+git https://github.com/truemedian/hzzp commit-9b5de4d8626ddedf925bf82dbe49610513485b9d
 git https://github.com/truemedian/zfetch commit-829973144f680cd16be16923041fa810c1dee417
 git https://github.com/ziglibs/known-folders commit-6b37490ac7285133bf09441850b8102c9728a776
 git https://github.com/yaml/libyaml tag-0.2.5

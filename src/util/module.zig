@@ -151,7 +151,7 @@ pub const Module = struct {
     }
 
     pub fn lessThan(_: void, lhs: Module, rhs: Module) bool {
-        for (lhs.clean_path) |_, i| {
+        for (lhs.clean_path, 0..) |_, i| {
             if (i == rhs.clean_path.len) return false;
             if (lhs.clean_path[i] < rhs.clean_path[i]) return true;
             if (lhs.clean_path[i] > rhs.clean_path[i]) return false;

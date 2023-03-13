@@ -244,7 +244,7 @@ pub fn indexOfN(haystack: string, needle: u8, n: usize) ?usize {
 }
 
 pub fn indexOfAfter(haystack: string, needle: u8, after: usize) ?usize {
-    for (haystack) |c, i| {
+    for (haystack, 0..) |c, i| {
         if (i <= after) continue;
         if (c == needle) return i;
     }

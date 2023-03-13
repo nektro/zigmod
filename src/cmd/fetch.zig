@@ -314,7 +314,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                         try w.writeAll(" &.{} },\n");
                     } else {
                         try w.writeAll(" &.{");
-                        for (mod.deps) |moddep, j| {
+                        for (mod.deps, 0..) |moddep, j| {
                             if (moddep.main.len == 0) continue;
                             try w.print(" _{s}.pkg.?", .{moddep.id[0..12]});
                             if (j != mod.deps.len - 1) try w.writeAll(",");
@@ -324,7 +324,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                 }
                 if (mod.c_include_dirs.len > 0) {
                     try w.writeAll("        .c_include_dirs = &.{");
-                    for (mod.c_include_dirs) |item, j| {
+                    for (mod.c_include_dirs, 0..) |item, j| {
                         try w.print(" \"{}\"", .{std.zig.fmtEscapes(item)});
                         if (j != mod.c_include_dirs.len - 1) try w.writeAll(",");
                     }
@@ -332,7 +332,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                 }
                 if (mod.c_source_files.len > 0) {
                     try w.writeAll("        .c_source_files = &.{");
-                    for (mod.c_source_files) |item, j| {
+                    for (mod.c_source_files, 0..) |item, j| {
                         try w.print(" \"{}\"", .{std.zig.fmtEscapes(item)});
                         if (j != mod.c_source_files.len - 1) try w.writeAll(",");
                     }
@@ -340,7 +340,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                 }
                 if (mod.c_source_flags.len > 0) {
                     try w.writeAll("        .c_source_flags = &.{");
-                    for (mod.c_source_flags) |item, j| {
+                    for (mod.c_source_flags, 0..) |item, j| {
                         try w.print(" \"{}\"", .{std.zig.fmtEscapes(item)});
                         if (j != mod.c_source_flags.len - 1) try w.writeAll(",");
                     }
@@ -348,7 +348,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                 }
                 if (mod.has_syslib_deps()) {
                     try w.writeAll("        .system_libs = &.{");
-                    for (mod.deps) |item, j| {
+                    for (mod.deps, 0..) |item, j| {
                         if (!(item.type == .system_lib)) continue;
                         try w.print(" \"{}\"", .{std.zig.fmtEscapes(item.name)});
                         if (j != mod.deps.len - 1) try w.writeAll(",");
@@ -357,7 +357,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                 }
                 if (mod.has_framework_deps()) {
                     try w.writeAll("        .frameworks = &.{");
-                    for (mod.deps) |item, j| {
+                    for (mod.deps, 0..) |item, j| {
                         if (!(item.type == .system_lib)) continue;
                         try w.print(" \"{}\"", .{std.zig.fmtEscapes(item.name)});
                         if (j != mod.deps.len - 1) try w.writeAll(",");
