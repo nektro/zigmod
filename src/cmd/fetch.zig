@@ -52,7 +52,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    const b = exe.builder;
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
-        \\        const moddep = pkg.pkg.?.zp(exe.builder);
+        \\        const moddep = pkg.zp(b);
         \\        exe.addModule(moddep.name, moddep.module);
         \\    }
         \\    var llc = false;
@@ -91,26 +91,33 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    system_libs: []const string = &.{},
         \\    frameworks: []const string = &.{},
         \\    vcpkg: bool = false,
+        \\    module: ?ModuleDependency = null,
+        \\
+        \\    pub fn zp(self: *Package, b: *std.build.Builder) ModuleDependency {
+        \\        var temp: [100]ModuleDependency = undefined;
+        \\        const pkg = self.pkg.?;
+        \\        for (pkg.dependencies, 0..) |item, i| {
+        \\            temp[i] = item.zp(b);
+        \\        }
+        \\        if (self.module) |mod| {
+        \\            return mod;
+        \\        }
+        \\        const result = ModuleDependency{
+        \\            .name = pkg.name,
+        \\            .module = b.createModule(.{
+        \\                .source_file = pkg.source,
+        \\                .dependencies = b.allocator.dupe(ModuleDependency, temp[0..pkg.dependencies.len]) catch @panic("oom"),
+        \\            }),
+        \\        };
+        \\        self.module = result;
+        \\        return result;
+        \\    }
         \\};
         \\
         \\pub const Pkg = struct {
         \\    name: string,
         \\    source: std.build.FileSource,
-        \\    dependencies: []const Pkg,
-        \\
-        \\    pub fn zp(self: *const Pkg, b: *std.build.Builder) ModuleDependency {
-        \\        var temp: [100]ModuleDependency = undefined;
-        \\        for (self.dependencies) |item, i| {
-        \\            temp[i] = item.zp(b);
-        \\        }
-        \\        return .{
-        \\            .name = self.name,
-        \\            .module = b.createModule(.{
-        \\                .source_file = self.source,
-        \\                .dependencies = b.allocator.dupe(ModuleDependency, temp[0..self.dependencies.len]) catch @panic("oom"),
-        \\            }),
-        \\        };
-        \\    }
+        \\    dependencies: []const *Package,
         \\};
         \\
         \\
@@ -277,7 +284,7 @@ fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module) !void {
 }
 
 fn print_deps(w: std.fs.File.Writer, m: zigmod.Module) !void {
-    try w.writeAll("&[_]Package{\n");
+    try w.writeAll("&[_]*Package{\n");
     for (m.deps) |d| {
         if (d.main.len == 0) {
             continue;
@@ -285,7 +292,7 @@ fn print_deps(w: std.fs.File.Writer, m: zigmod.Module) !void {
         if (d.for_build) {
             continue;
         }
-        try w.print("    package_data._{s},\n", .{d.id[0..12]});
+        try w.print("    &package_data._{s},\n", .{d.id[0..12]});
     }
     try w.writeAll("}");
 }
@@ -293,10 +300,10 @@ fn print_deps(w: std.fs.File.Writer, m: zigmod.Module) !void {
 fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Module), done: *std.ArrayList(zigmod.Module)) !void {
     var len: usize = notdone.items.len;
     while (notdone.items.len > 0) {
-        for (notdone.items) |mod, i| {
+        for (notdone.items, 0..) |mod, i| {
             if (contains_all(mod.deps, done.items)) {
                 try w.print(
-                    \\    pub const _{s} = Package{{
+                    \\    pub var _{s} = Package{{
                     \\        .directory = dirs._{s},
                     \\
                 , .{
@@ -317,7 +324,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                         try w.writeAll(" &.{");
                         for (mod.deps, 0..) |moddep, j| {
                             if (moddep.main.len == 0) continue;
-                            try w.print(" _{s}.pkg.?", .{moddep.id[0..12]});
+                            try w.print(" &_{s}", .{moddep.id[0..12]});
                             if (j != mod.deps.len - 1) try w.writeAll(",");
                         }
                         try w.writeAll(" } },\n");
@@ -402,7 +409,7 @@ fn print_pkgs(alloc: std.mem.Allocator, w: std.fs.File.Writer, m: zigmod.Module)
             continue;
         }
         const ident = try zig_name_from_pkg_name(alloc, d.name);
-        try w.print("    pub const {s} = package_data._{s};\n", .{ ident, d.id[0..12] });
+        try w.print("    pub const {s} = &package_data._{s};\n", .{ ident, d.id[0..12] });
     }
     try w.writeAll("}");
 }
