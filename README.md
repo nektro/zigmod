@@ -16,14 +16,6 @@ A package manager for the Zig programming language.
 ## Download
 - https://github.com/nektro/zigmod/releases
 
-0.11.0-dev.389+e35f297ae ArrayList.toOwnedSlice
-0.11.0-dev.874+40ed6ae84 field_type -> type, layout field
-0.11.0-dev.692+023b597ab ascii rename
-0.11.0-dev.632+d69e97ae1 compileError is comptime
-0.11.0-dev.67+1d6804591  .i386 -> .x86
-0.11.0-dev.1570+693b12f8e std.build.Pkg removed, updated to new system
-0.11.0-dev.1567+60935decd std.zig.Ast.parse
-
 ## Built With
 - Zig master (at least `0.11.0-dev.1570+693b12f8e`)
 - See [`zig.mod`](./zig.mod) and [`zigmod.lock`](./zigmod.lock)
