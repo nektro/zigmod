@@ -19,19 +19,19 @@ jobs:
       - name: Setup Zig
         uses: goto-bus-stop/setup-zig@v1
         with:
-          version: "0.10.0-dev.4099+d3d24874c"
+          version: "0.11.0-dev.1570+693b12f8e"
 
       - run: zig version
       - run: zig env
       - run: zig build
 
       # Build All
-      - run: ./build_release.sh aarch64-linux-musl
-      - run: ./build_release.sh aarch64-macos-none
-      - run: ./build_release.sh aarch64-windows-gnu
       - run: ./build_release.sh x86_64-linux-musl
       - run: ./build_release.sh x86_64-macos-none
       - run: ./build_release.sh x86_64-windows-gnu
+      - run: ./build_release.sh aarch64-linux-musl
+      - run: ./build_release.sh aarch64-macos-none
+      - run: ./build_release.sh aarch64-windows-gnu
 
       # Test
       - run: ./zig-out/bin/zigmod version

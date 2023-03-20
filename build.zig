@@ -5,19 +5,12 @@ const deps = @import("./deps.zig");
 
 pub fn build(b: *std.build.Builder) void {
     b.prominent_compile_errors = true;
-    // currently blocked on https://github.com/ziglang/zig/issues/12403
-    b.use_stage1 = !(b.option(bool, "stage2", "use the stage2 compiler") orelse false);
     const target = b.standardTargetOptions(.{});
-
-    b.setPreferredReleaseMode(.ReleaseSafe);
-    const mode = b.standardReleaseOptions();
-
+    const optimize = b.standardOptimizeOption(.{});
     const use_full_name = b.option(bool, "use-full-name", "") orelse false;
     const with_arch_os = b.fmt("-{s}-{s}", .{ @tagName(target.cpu_arch orelse builtin.cpu.arch), @tagName(target.os_tag orelse builtin.os.tag) });
     const exe_name = b.fmt("{s}{s}", .{ "zigmod", if (use_full_name) with_arch_os else "" });
-    const exe = b.addExecutable(exe_name, "src/main.zig");
-    exe.setTarget(target);
-    exe.setBuildMode(mode);
+    const exe = b.addExecutable(.{ .name = exe_name, .root_source_file = .{ .path = "src/main.zig" }, .target = target, .optimize = optimize });
 
     const exe_options = b.addOptions();
     exe.addOptions("build_options", exe_options);

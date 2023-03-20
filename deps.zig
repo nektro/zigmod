@@ -1,7 +1,7 @@
 // zig fmt: off
 const std = @import("std");
 const builtin = @import("builtin");
-const Pkg = std.build.Pkg;
+const ModuleDependency = std.build.ModuleDependency;
 const string = []const u8;
 
 pub const GitExactStep = struct {
@@ -48,24 +48,24 @@ pub fn fetch(exe: *std.build.LibExeObjStep) void {
         const root = if (@field(package_data, decl.name).store) |_| b.cache_root else ".";
         if (path.* != null) path.* = b.fmt("{s}/zigmod/deps{s}", .{ root, path.*.? });
     }
-    exe.step.dependOn(&GitExactStep.create(b, "https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc", "0911d65210fe14467fa73afd5b09d781a3995adc").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/MasterQ32/zig-uri", "e879df3a236869f92298fbe2db3c25e6e84cfd4c").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "209f07cc5861c7bd9c3010a37f32bf6244f9a158").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "1a9b2e90379895e197893b6e19c93bd213ad36e6").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/iguanaTLS", "bd003aa75c8bc00e8a61a1be575b9305249dc749").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-ansi", "d4a53bcac5b87abecc65491109ec22aaf5f3dc2f").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc", "00f00febc5ad7c485fb101583d5a74930f6ac313").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/MasterQ32/zig-uri", "d4299ad6043ad19f2ce0676687b0bff57273eae2").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "56cf335ddcdb72a6d7059c5b6f131263830b3eca").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "ee395fd34e152d9067def609d86b7af5382b83b1").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/iguanaTLS", "5dee3ead2b289319080834add91b5f35dfdb1847").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-ansi", "8d6fdb4983a616940c1d5137110292a7862f6a7e").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-detect-license", "de5c285d999eea68b9189b48bb000243fef0a689").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-extras", "01fae956e2f17aa992e717e041a3dd457d440b31").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-inquirer", "14c3492c46f9765c3e77436741794d1a3118cbee").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-json", "a091eaa9f9ae91c3875630ba1983b33ea04971a3").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-extras", "b45c99e2e747e3bb8df5e1051078cacb1470a430").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-inquirer", "25e35a46400cfa1d7278436c0b7d14d314889d7c").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-json", "0e7d026b0d3889ed7f96e1b24566a66cd9df6cb3").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-leven", "ab852cf74fa0b4edc530d925f0654b62c60365bf").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-licenses", "c9b8cbf3565675a056ad4e9b57cb4f84020e7680").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-licenses-text", "3c07c6e4eb0965dafd0b029c632f823631b3169c").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-range", "4b2f12808aa09be4b27a163efc424dd4e0415992").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-time", "52a6050939b83e9f8b52b2236a36332dcb4c17a3").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/truemedian/hzzp", "d4fbade2d806fc93bc5f79ec8efdcc25ea625fa3").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-time", "aff2df866eb16ad781e26a25f8b664d498e2211a").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/truemedian/hzzp", "2d2ab34b666e6806a6f6c98cc50ca94e606c9103").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/truemedian/zfetch", "829973144f680cd16be16923041fa810c1dee417").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/ziglibs/known-folders", "24845b0103e611c108d6bc334231c464e699742c").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/ziglibs/known-folders", "6b37490ac7285133bf09441850b8102c9728a776").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/yaml/libyaml", "2c891fc7a770e8ba2fec34fc6b545c672beb37e6").step);
 }
 
@@ -87,7 +87,8 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
     const b = exe.builder;
     @setEvalBranchQuota(1_000_000);
     for (packages) |pkg| {
-        exe.addPackage(pkg.zp(b));
+        const moddep = pkg.zp(b);
+        exe.addModule(moddep.name, moddep.module);
     }
     var llc = false;
     var vcpkg = false;
@@ -129,49 +130,51 @@ pub const Package = struct {
     frameworks: []const string = &.{},
     vcpkg: bool = false,
 
-    pub fn zp(self: *const Package, b: *std.build.Builder) Pkg {
-        var temp: [100]Pkg = undefined;
+    pub fn zp(self: *const Package, b: *std.build.Builder) ModuleDependency {
+        var temp: [100]ModuleDependency = undefined;
         for (self.deps) |item, i| {
             temp[i] = item.zp(b);
         }
         return .{
             .name = self.name,
-            .source = .{ .path = self.entry.? },
-            .dependencies = b.allocator.dupe(Pkg, temp[0..self.deps.len]) catch @panic("oom"),
+            .module = b.createModule(.{
+                .source_file = .{ .path = self.entry.? },
+                .dependencies = b.allocator.dupe(ModuleDependency, temp[0..self.deps.len]) catch @panic("oom"),
+            }),
         };
     }
 };
 
 fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {
-    const min = std.SemanticVersion.parse("0.10.0-dev.4099+d3d24874c") catch return;
+    const min = std.SemanticVersion.parse("0.11.0-dev.1570+693b12f8e") catch return;
     if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{current, min}));
 }
 
 pub const package_data = struct {
     pub var _u9w9dpp6p804 = Package{
-        .store = "/git/github.com/MasterQ32/zig-uri/e879df3a236869f92298fbe2db3c25e6e84cfd4c",
+        .store = "/git/github.com/MasterQ32/zig-uri/d4299ad6043ad19f2ce0676687b0bff57273eae2",
         .name = "uri",
-        .entry = "/git/github.com/MasterQ32/zig-uri/e879df3a236869f92298fbe2db3c25e6e84cfd4c/uri.zig",
+        .entry = "/git/github.com/MasterQ32/zig-uri/d4299ad6043ad19f2ce0676687b0bff57273eae2/uri.zig",
     };
     pub var _o6ogpor87xc2 = Package{
-        .store = "/git/github.com/marlersoft/zigwin32/209f07cc5861c7bd9c3010a37f32bf6244f9a158",
+        .store = "/git/github.com/marlersoft/zigwin32/56cf335ddcdb72a6d7059c5b6f131263830b3eca",
         .name = "win32",
-        .entry = "/git/github.com/marlersoft/zigwin32/209f07cc5861c7bd9c3010a37f32bf6244f9a158/win32.zig",
+        .entry = "/git/github.com/marlersoft/zigwin32/56cf335ddcdb72a6d7059c5b6f131263830b3eca/win32.zig",
     };
     pub var _u7sysdckdymi = Package{
-        .store = "/git/github.com/nektro/arqv-ini/1a9b2e90379895e197893b6e19c93bd213ad36e6",
+        .store = "/git/github.com/nektro/arqv-ini/ee395fd34e152d9067def609d86b7af5382b83b1",
         .name = "ini",
-        .entry = "/git/github.com/nektro/arqv-ini/1a9b2e90379895e197893b6e19c93bd213ad36e6/src/ini.zig",
+        .entry = "/git/github.com/nektro/arqv-ini/ee395fd34e152d9067def609d86b7af5382b83b1/src/ini.zig",
     };
     pub var _csbnipaad8n7 = Package{
-        .store = "/git/github.com/nektro/iguanaTLS/bd003aa75c8bc00e8a61a1be575b9305249dc749",
+        .store = "/git/github.com/nektro/iguanaTLS/5dee3ead2b289319080834add91b5f35dfdb1847",
         .name = "iguanaTLS",
-        .entry = "/git/github.com/nektro/iguanaTLS/bd003aa75c8bc00e8a61a1be575b9305249dc749/src/main.zig",
+        .entry = "/git/github.com/nektro/iguanaTLS/5dee3ead2b289319080834add91b5f35dfdb1847/src/main.zig",
     };
     pub var _s84v9o48ucb0 = Package{
-        .store = "/git/github.com/nektro/zig-ansi/d4a53bcac5b87abecc65491109ec22aaf5f3dc2f",
+        .store = "/git/github.com/nektro/zig-ansi/8d6fdb4983a616940c1d5137110292a7862f6a7e",
         .name = "ansi",
-        .entry = "/git/github.com/nektro/zig-ansi/d4a53bcac5b87abecc65491109ec22aaf5f3dc2f/src/lib.zig",
+        .entry = "/git/github.com/nektro/zig-ansi/8d6fdb4983a616940c1d5137110292a7862f6a7e/src/lib.zig",
     };
     pub var _0npcrzfdlrvk = Package{
         .store = "/git/github.com/nektro/zig-licenses/c9b8cbf3565675a056ad4e9b57cb4f84020e7680",
@@ -189,27 +192,27 @@ pub const package_data = struct {
         .entry = "/git/github.com/nektro/zig-range/4b2f12808aa09be4b27a163efc424dd4e0415992/src/lib.zig",
     };
     pub var _f7dubzb7cyqe = Package{
-        .store = "/git/github.com/nektro/zig-extras/01fae956e2f17aa992e717e041a3dd457d440b31",
+        .store = "/git/github.com/nektro/zig-extras/b45c99e2e747e3bb8df5e1051078cacb1470a430",
         .name = "extras",
-        .entry = "/git/github.com/nektro/zig-extras/01fae956e2f17aa992e717e041a3dd457d440b31/src/lib.zig",
+        .entry = "/git/github.com/nektro/zig-extras/b45c99e2e747e3bb8df5e1051078cacb1470a430/src/lib.zig",
         .deps = &[_]*Package{ &_tnj3qf44tpeq },
     };
     pub var _g982zq6e8wsv = Package{
-        .store = "/git/gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc/0911d65210fe14467fa73afd5b09d781a3995adc",
+        .store = "/git/gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc/00f00febc5ad7c485fb101583d5a74930f6ac313",
         .name = "yaml",
-        .entry = "/git/gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc/0911d65210fe14467fa73afd5b09d781a3995adc/yaml.zig",
+        .entry = "/git/gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc/00f00febc5ad7c485fb101583d5a74930f6ac313/yaml.zig",
         .deps = &[_]*Package{ &_f7dubzb7cyqe },
     };
     pub var _c1xirp1ota5p = Package{
-        .store = "/git/github.com/nektro/zig-inquirer/14c3492c46f9765c3e77436741794d1a3118cbee",
+        .store = "/git/github.com/nektro/zig-inquirer/25e35a46400cfa1d7278436c0b7d14d314889d7c",
         .name = "inquirer",
-        .entry = "/git/github.com/nektro/zig-inquirer/14c3492c46f9765c3e77436741794d1a3118cbee/src/lib.zig",
+        .entry = "/git/github.com/nektro/zig-inquirer/25e35a46400cfa1d7278436c0b7d14d314889d7c/src/lib.zig",
         .deps = &[_]*Package{ &_s84v9o48ucb0, &_tnj3qf44tpeq },
     };
     pub var _ocmr9rtohgcc = Package{
-        .store = "/git/github.com/nektro/zig-json/a091eaa9f9ae91c3875630ba1983b33ea04971a3",
+        .store = "/git/github.com/nektro/zig-json/0e7d026b0d3889ed7f96e1b24566a66cd9df6cb3",
         .name = "json",
-        .entry = "/git/github.com/nektro/zig-json/a091eaa9f9ae91c3875630ba1983b33ea04971a3/src/lib.zig",
+        .entry = "/git/github.com/nektro/zig-json/0e7d026b0d3889ed7f96e1b24566a66cd9df6cb3/src/lib.zig",
         .deps = &[_]*Package{ &_f7dubzb7cyqe },
     };
     pub var _96h80ezrvj7i = Package{
@@ -225,15 +228,15 @@ pub const package_data = struct {
         .deps = &[_]*Package{ &_pt88y5d80m25, &_96h80ezrvj7i },
     };
     pub var _iecwp4b3bsfm = Package{
-        .store = "/git/github.com/nektro/zig-time/52a6050939b83e9f8b52b2236a36332dcb4c17a3",
+        .store = "/git/github.com/nektro/zig-time/aff2df866eb16ad781e26a25f8b664d498e2211a",
         .name = "time",
-        .entry = "/git/github.com/nektro/zig-time/52a6050939b83e9f8b52b2236a36332dcb4c17a3/time.zig",
-        .deps = &[_]*Package{ &_tnj3qf44tpeq, &_f7dubzb7cyqe },
+        .entry = "/git/github.com/nektro/zig-time/aff2df866eb16ad781e26a25f8b664d498e2211a/time.zig",
+        .deps = &[_]*Package{ &_f7dubzb7cyqe },
     };
     pub var _9k24gimke1an = Package{
-        .store = "/git/github.com/truemedian/hzzp/d4fbade2d806fc93bc5f79ec8efdcc25ea625fa3",
+        .store = "/git/github.com/truemedian/hzzp/2d2ab34b666e6806a6f6c98cc50ca94e606c9103",
         .name = "hzzp",
-        .entry = "/git/github.com/truemedian/hzzp/d4fbade2d806fc93bc5f79ec8efdcc25ea625fa3/src/main.zig",
+        .entry = "/git/github.com/truemedian/hzzp/2d2ab34b666e6806a6f6c98cc50ca94e606c9103/src/main.zig",
     };
     pub var _ejw82j2ipa0e = Package{
         .store = "/git/github.com/truemedian/zfetch/829973144f680cd16be16923041fa810c1dee417",
@@ -242,14 +245,14 @@ pub const package_data = struct {
         .deps = &[_]*Package{ &_9k24gimke1an, &_csbnipaad8n7, &_u9w9dpp6p804 },
     };
     pub var _2ta738wrqbaq = Package{
-        .store = "/git/github.com/ziglibs/known-folders/24845b0103e611c108d6bc334231c464e699742c",
+        .store = "/git/github.com/ziglibs/known-folders/6b37490ac7285133bf09441850b8102c9728a776",
         .name = "known-folders",
-        .entry = "/git/github.com/ziglibs/known-folders/24845b0103e611c108d6bc334231c464e699742c/known-folders.zig",
+        .entry = "/git/github.com/ziglibs/known-folders/6b37490ac7285133bf09441850b8102c9728a776/known-folders.zig",
     };
     pub var _89ujp8gq842x = Package{
         .name = "zigmod",
         .entry = "/../..//src/lib.zig",
-        .deps = &[_]*Package{ &_g982zq6e8wsv, &_s84v9o48ucb0, &_2ta738wrqbaq, &_0npcrzfdlrvk, &_ejw82j2ipa0e, &_ocmr9rtohgcc, &_tnj3qf44tpeq, &_2ovav391ivak, &_c1xirp1ota5p, &_u7sysdckdymi, &_iecwp4b3bsfm, &_f7dubzb7cyqe },
+        .deps = &[_]*Package{ &_g982zq6e8wsv, &_s84v9o48ucb0, &_2ta738wrqbaq, &_0npcrzfdlrvk, &_ejw82j2ipa0e, &_ocmr9rtohgcc, &_2ovav391ivak, &_c1xirp1ota5p, &_u7sysdckdymi, &_iecwp4b3bsfm, &_f7dubzb7cyqe },
     };
     pub var _root = Package{
     };
@@ -264,11 +267,15 @@ pub const package_data = struct {
 pub const packages = [_]*const Package{
     &package_data._89ujp8gq842x,
     &package_data._o6ogpor87xc2,
+    &package_data._f7dubzb7cyqe,
+    &package_data._s84v9o48ucb0,
 };
 
 pub const pkgs = struct {
     pub const zigmod = &package_data._89ujp8gq842x;
     pub const win32 = &package_data._o6ogpor87xc2;
+    pub const extras = &package_data._f7dubzb7cyqe;
+    pub const ansi = &package_data._s84v9o48ucb0;
 };
 
 pub const imports = struct {

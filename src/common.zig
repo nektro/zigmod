@@ -49,7 +49,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
         .id = "root",
         .name = "root",
         .main = m.main,
-        .deps = moduledeps.toOwnedSlice(),
+        .deps = try moduledeps.toOwnedSlice(),
         .clean_path = "",
         .yaml = m.yaml,
         .dep = null,
@@ -80,7 +80,7 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, dtype: zigmod.Dep.Type,
         .c_include_dirs = m.c_include_dirs,
         .c_source_flags = m.c_source_flags,
         .c_source_files = m.c_source_files,
-        .deps = moduledeps.toOwnedSlice(),
+        .deps = try moduledeps.toOwnedSlice(),
         .clean_path = "../..",
         .yaml = m.yaml,
         .dep = null,
@@ -250,7 +250,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                     }
                     const moddirO = try std.fs.cwd().openDir(modpath, .{});
                     const tryname = try u.detect_pkgname(options.alloc, d.name, modpath);
-                    const trymain = u.detct_mainfile(options.alloc, d.main, moddirO, tryname) catch |err| switch (err) {
+                    const trymain: ?string = u.detct_mainfile(options.alloc, d.main, moddirO, tryname) catch |err| switch (err) {
                         error.CantFindMain => null,
                         else => |ee| return ee,
                     };
@@ -305,11 +305,7 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
         }
     }
 
-    const cwdpath = try std.fs.cwd().realpathAlloc(alloc, ".");
-    const mpath = try mdir.realpathAlloc(alloc, ".");
-    var fpath = extras.trimPrefix(mpath, cwdpath);
-    if (fpath.len == 0) fpath = std.fs.path.sep_str;
-
+    const fpath = try mdir.realpathAlloc(alloc, ".");
     var cachedir = try std.fs.cwd().openDir(cachepath, .{});
     defer cachedir.close();
     try cachedir.makePath("files");
@@ -318,7 +314,7 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
     const rff = try destdir.createFile(fname, .{});
     defer rff.close();
     const w = rff.writer();
-    try w.print("const srcpath = \"../../../{}\";\n\n", .{std.zig.fmtEscapes(fpath[1..])});
+    try w.print("const srcpath = \"/{}\";\n\n", .{std.zig.fmtEscapes(fpath[1..])});
     var iter = map.iterator();
     while (iter.next()) |item| {
         try w.print("pub const @\"/{}\" = @embedFile(srcpath ++ \"/{}\");\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
