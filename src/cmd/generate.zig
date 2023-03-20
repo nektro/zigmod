@@ -61,7 +61,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            var urlpath = url;
         \\            urlpath = trimPrefix(u8, urlpath, "https://");
         \\            urlpath = trimPrefix(u8, urlpath, "git://");
-        \\            const repopath = b.fmt("{s}/zigmod/deps/git/{s}/{s}", .{ b.cache_root, urlpath, commit });
+        \\            const repopath = b.fmt("{s}/zigmod/deps/git/{s}/{s}", .{ b.cache_root.path.?, urlpath, commit });
         \\            flip(std.fs.cwd().access(repopath, .{})) catch return result;
         \\
         \\            var clonestep = std.build.RunStep.create(b, "clone");
@@ -86,7 +86,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    const b = exe.builder;
         \\    inline for (comptime std.meta.declarations(package_data)) |decl| {
         \\        const path = &@field(package_data, decl.name).entry;
-        \\        const root = if (@field(package_data, decl.name).store) |_| b.cache_root else ".";
+        \\        const root = if (@field(package_data, decl.name).store) |_| b.cache_root.path.? else ".";
         \\        if (path.* != null) path.* = b.fmt("{s}/zigmod/deps{s}", .{ root, path.*.? });
         \\    }
         \\
@@ -129,7 +129,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    var vcpkg = false;
         \\    inline for (comptime std.meta.declarations(package_data)) |decl| {
         \\        const pkg = @as(Package, @field(package_data, decl.name));
-        \\        const root = if (pkg.store) |st| b.fmt("{s}/zigmod/deps/{s}", .{ b.cache_root, st }) else ".";
+        \\        const root = if (pkg.store) |st| b.fmt("{s}/zigmod/deps/{s}", .{ b.cache_root.path.?, st }) else ".";
         \\        for (pkg.system_libs) |item| {
         \\            exe.linkSystemLibrary(item);
         \\            llc = true;
@@ -164,19 +164,25 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    system_libs: []const string = &.{},
         \\    frameworks: []const string = &.{},
         \\    vcpkg: bool = false,
+        \\    module: ?ModuleDependency = null,
         \\
-        \\    pub fn zp(self: *const Package, b: *std.build.Builder) ModuleDependency {
+        \\    pub fn zp(self: *Package, b: *std.build.Builder) ModuleDependency {
         \\        var temp: [100]ModuleDependency = undefined;
         \\        for (self.deps, 0..) |item, i| {
         \\            temp[i] = item.zp(b);
         \\        }
-        \\        return .{
+        \\        if (self.module) |mod| {
+        \\            return mod;
+        \\        }
+        \\        const result = ModuleDependency{
         \\            .name = self.name,
         \\            .module = b.createModule(.{
         \\                .source_file = .{ .path = self.entry.? },
         \\                .dependencies = b.allocator.dupe(ModuleDependency, temp[0..self.deps.len]) catch @panic("oom"),
         \\            }),
         \\        };
+        \\        self.module = result;
+        \\        return result;
         \\    }
         \\};
         \\
@@ -229,7 +235,7 @@ fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module) !void {
 }
 
 fn print_deps(w: std.fs.File.Writer, m: zigmod.Module) !void {
-    try w.writeAll("[_]*const Package{\n");
+    try w.writeAll("[_]*Package{\n");
     for (m.deps) |d| {
         if (d.main.len == 0) {
             continue;
