@@ -1,6 +1,6 @@
 2
 git https://github.com/MasterQ32/zig-uri commit-d4299ad6043ad19f2ce0676687b0bff57273eae2
-git https://github.com/marlersoft/zigwin32 commit-79c0144225dc015a5c0253b5af30356aa6dc6426
+git https://github.com/marlersoft/zigwin32 commit-b70e7f818d77a0c0f39b0bd9c549e16439ff5780
 git https://github.com/nektro/arqv-ini commit-ee395fd34e152d9067def609d86b7af5382b83b1
 git https://github.com/nektro/iguanaTLS commit-9356ff1d2edf627b531a2829a679a7b6d908a6ca
 git https://github.com/nektro/zig-ansi commit-faf9585bfe5980c24748ee8a3e6a22faaa50b437
@@ -16,5 +16,5 @@ git https://github.com/nektro/zig-time commit-bfb7da7b8ee92b6c07f90a14b044a9b8f4
 git https://github.com/nektro/zig-yaml commit-3f3641e90697546e7f8aeef365815c4ccab168b0
 git https://github.com/truemedian/hzzp commit-9b5de4d8626ddedf925bf82dbe49610513485b9d
 git https://github.com/truemedian/zfetch commit-829973144f680cd16be16923041fa810c1dee417
-git https://github.com/ziglibs/known-folders commit-6b37490ac7285133bf09441850b8102c9728a776
+git https://github.com/ziglibs/known-folders commit-d13ba6137084e55f873f6afb67447fe8906cc951
 git https://github.com/yaml/libyaml tag-0.2.5
