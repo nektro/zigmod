@@ -243,7 +243,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
             var dd = collect_deps(cachepath, moddir, d.type, options) catch |e| switch (e) {
                 error.ManifestNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0 or d.keep) {
-                        var mod_from = try zigmod.Module.from(options.alloc, d.*, modpath, options);
+                        var mod_from = try zigmod.Module.from(options.alloc, d.*, cachepath, options);
                         if (d.type != .local) mod_from.clean_path = extras.trimPrefix(modpath, cachepath)[1..];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;

@@ -29,12 +29,12 @@ pub const Module = struct {
     min_zig_version: ?std.SemanticVersion,
     vcpkg: bool,
 
-    pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, modpath: string, options: *common.CollectOptions) !Module {
+    pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, cachepath: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(alloc);
         errdefer moddeps.deinit();
 
         for (dep.deps) |*d| {
-            if (try common.get_module_from_dep(d, modpath, options)) |founddep| {
+            if (try common.get_module_from_dep(d, cachepath, options)) |founddep| {
                 try moddeps.append(founddep);
             }
         }
