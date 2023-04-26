@@ -2,7 +2,7 @@
 
 set -e
 
-read-log() {
+readlog() {
     git log --format=format:"%h%n%H%n%an%n%s%n%d%n"
 }
 
@@ -16,7 +16,7 @@ title=''
 
 c=0
 t=0
-read-log |
+readlog |
 while IFS= read -r lineVAR; do
     if [[ "$c" == '0' ]]; then
         hash_abrev="$lineVAR"
