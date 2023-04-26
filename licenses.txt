@@ -1,7 +1,6 @@
 MIT:
 = https://spdx.org/licenses/MIT
 - This
-- git https://gist.github.com/nektro/d468fea84f8217e4c26ee8fbeeea38cc
 - git https://github.com/MasterQ32/zig-uri
 - git https://github.com/marlersoft/zigwin32
 - git https://github.com/nektro/arqv-ini
@@ -16,6 +15,7 @@ MIT:
 - git https://github.com/nektro/zig-licenses-text
 - git https://github.com/nektro/zig-range
 - git https://github.com/nektro/zig-time
+- git https://github.com/nektro/zig-yaml
 - git https://github.com/truemedian/hzzp
 - git https://github.com/truemedian/zfetch
 - git https://github.com/ziglibs/known-folders
