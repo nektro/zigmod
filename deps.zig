@@ -13,7 +13,12 @@ pub const GitExactStep = struct {
         pub fn create(b: *std.build.Builder, url: string, commit: string) *GitExactStep {
             var result = b.allocator.create(GitExactStep) catch @panic("memory");
             result.* = GitExactStep{
-                .step = std.build.Step.init(.custom, b.fmt("git clone {s} @ {s}", .{ url, commit }), b.allocator, make),
+                .step = std.build.Step.init(.{
+                    .id = .custom,
+                    .name = b.fmt("git clone {s} @ {s}", .{ url, commit }),
+                    .owner = b,
+                    .makeFn = make,
+                }),
                 .builder = b,
                 .url = url,
                 .commit = commit,
@@ -36,13 +41,14 @@ pub const GitExactStep = struct {
             return result;
         }
 
-        fn make(step: *std.build.Step) !void {
+        fn make(step: *std.build.Step, prog_node: *std.Progress.Node) !void {
             _ = step;
+            _ = prog_node;
         }
 };
 
 pub fn fetch(exe: *std.build.LibExeObjStep) void {
-    const b = exe.builder;
+    const b = exe.step.owner;
     inline for (comptime std.meta.declarations(package_data)) |decl| {
         const path = &@field(package_data, decl.name).entry;
         const root = if (@field(package_data, decl.name).store) |_| b.cache_root.path.? else ".";
@@ -84,7 +90,7 @@ fn flip(foo: anytype) !void {
 pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
     checkMinZig(builtin.zig_version, exe);
     fetch(exe);
-    const b = exe.builder;
+    const b = exe.step.owner;
     @setEvalBranchQuota(1_000_000);
     for (packages) |pkg| {
         const moddep = pkg.zp(b);
@@ -100,7 +106,7 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
             llc = true;
         }
         for (pkg.frameworks) |item| {
-            if (!builtin.target.isDarwin()) @panic(exe.builder.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
+            if (!builtin.target.isDarwin()) @panic(exe.step.owner.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
             exe.linkFramework(item);
             llc = true;
         }
@@ -152,8 +158,8 @@ pub const Package = struct {
 };
 
 fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {
-    const min = std.SemanticVersion.parse("0.11.0-dev.1681+0bb178bbb") catch return;
-    if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{current, min}));
+    const min = std.SemanticVersion.parse("0.11.0-dev.2777+b95cdf0ae") catch return;
+    if (current.order(min).compare(.lt)) @panic(exe.step.owner.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{current, min}));
 }
 
 pub const package_data = struct {

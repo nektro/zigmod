@@ -49,7 +49,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     try w.writeAll(
         \\pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
         \\    checkMinZig(builtin.zig_version, exe);
-        \\    const b = exe.builder;
+        \\    const b = exe.step.owner;
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
         \\        const moddep = pkg.zp(b);
@@ -64,7 +64,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            llc = true;
         \\        }
         \\        for (pkg.frameworks) |item| {
-        \\            if (!builtin.target.isDarwin()) @panic(exe.builder.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
+        \\            if (!builtin.target.isDarwin()) @panic(b.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
         \\            exe.linkFramework(item);
         \\            llc = true;
         \\        }
@@ -126,7 +126,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     try w.print(
         \\fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {{
         \\    const min = std.SemanticVersion.parse("{?}") catch return;
-        \\    if (current.order(min).compare(.lt)) @panic(exe.builder.fmt("Your Zig version v{{}} does not meet the minimum build requirement of v{{}}", .{{current, min}}));
+        \\    if (current.order(min).compare(.lt)) @panic(exe.step.owner.fmt("Your Zig version v{{}} does not meet the minimum build requirement of v{{}}", .{{current, min}}));
         \\}}
         \\
         \\
