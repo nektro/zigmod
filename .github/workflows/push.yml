@@ -23,7 +23,7 @@ jobs:
 
       - run: zig version
       - run: zig env
-      - run: zig build
+      - run: zig build -j1
 
       # Build All
       - run: ./build_release.sh x86_64-linux-musl
