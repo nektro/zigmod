@@ -2,7 +2,7 @@ const std = @import("std");
 const string = []const u8;
 const gpa = std.heap.c_allocator;
 const zfetch = @import("zfetch");
-const json = @import("json");
+const extras = @import("extras");
 
 const u = @import("./../util/index.zig");
 
@@ -55,14 +55,13 @@ pub fn execute(args: [][]u8) !void {
     u.fail("unknown command \"{s}\" for \"zigmod zpm\"", .{args[0]});
 }
 
-pub fn server_fetch(url: string) !json.Value {
+pub fn server_fetch(url: string) !std.json.ValueTree {
     const req = try zfetch.Request.init(gpa, url, null);
     defer req.deinit();
     try req.do(.GET, null, null);
     const r = req.reader();
     const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
-    const val = try json.parse(gpa, body_content);
-    return val;
+    return extras.parse_json(gpa, body_content);
 }
 
 pub fn server_fetchArray(url: string) ![]const Package {
@@ -70,39 +69,39 @@ pub fn server_fetchArray(url: string) ![]const Package {
     var list = std.ArrayList(Package).init(gpa);
     errdefer list.deinit();
 
-    for (val.Array) |item| {
-        if (item.getT("root_file", .String) == null) continue;
+    for (val.root.array.items) |item| {
+        if (item.object.get("root_file") == null) continue;
         try list.append(Package{
-            .name = item.getT("name", .String).?,
-            .author = item.getT("author", .String).?,
-            .description = item.getT("description", .String).?,
-            .tags = try valueStrArray(item.getT("tags", .Array).?),
-            .git = item.getT("git", .String).?,
-            .root_file = item.getT("root_file", .String).?,
-            .source = @intCast(u32, item.getT("source", .Int).?),
-            .links = try valueLinks(item.get("links").?),
+            .name = item.object.get("name").?.string,
+            .author = item.object.get("author").?.string,
+            .description = item.object.get("description").?.string,
+            .tags = try valueStrArray(item.object.get("tags").?.array.items),
+            .git = item.object.get("git").?.string,
+            .root_file = item.object.get("root_file").?.string,
+            .source = @intCast(u32, item.object.get("source").?.integer),
+            .links = try valueLinks(item.object.get("links").?),
         });
     }
     return list.toOwnedSlice();
 }
 
-fn valueStrArray(vals: []json.Value) ![]string {
+fn valueStrArray(vals: []std.json.Value) ![]string {
     var list = std.ArrayList(string).init(gpa);
     errdefer list.deinit();
 
     for (vals) |item| {
-        if (item != .String) continue;
-        try list.append(item.String);
+        if (item != .string) continue;
+        try list.append(item.string);
     }
     return list.toOwnedSlice();
 }
 
-fn valueLinks(vals: json.Value) ![]?string {
+fn valueLinks(vals: std.json.Value) ![]?string {
     var list = std.ArrayList(?string).init(gpa);
     errdefer list.deinit();
 
-    try list.append(vals.getT("github", .String));
-    try list.append(vals.getT("aquila", .String));
-    try list.append(vals.getT("astrolabe", .String));
+    if (vals.object.get("github")) |x| try list.append(x.string);
+    if (vals.object.get("aquila")) |x| try list.append(x.string);
+    if (vals.object.get("astrolabe")) |x| try list.append(x.string);
     return list.toOwnedSlice();
 }

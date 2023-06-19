@@ -297,7 +297,7 @@ pub fn add_files_package(alloc: std.mem.Allocator, cachepath: string, pkg_name: 
         var walker = try dir.walk(alloc);
         defer walker.deinit();
         while (try walker.next()) |p| {
-            if (p.kind == .Directory) {
+            if (p.kind == .directory) {
                 continue;
             }
             const path = try alloc.dupe(u8, p.path);

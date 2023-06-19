@@ -74,7 +74,7 @@ pub const Module = struct {
             try file_list_2.append(_b);
         }
 
-        std.sort.sort(string, file_list_2.items, void{}, struct {
+        std.mem.sort(string, file_list_2.items, void{}, struct {
             pub fn lt(context: void, lhs: string, rhs: string) bool {
                 _ = context;
                 return std.mem.lessThan(u8, lhs, rhs);

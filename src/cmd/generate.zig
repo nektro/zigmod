@@ -26,7 +26,7 @@ pub fn execute(args: [][]u8) !void {
     var list = std.ArrayList(zigmod.Module).init(gpa);
     try common.collect_pkgs(top_module, &list);
 
-    std.sort.sort(zigmod.Module, list.items, {}, zigmod.Module.lessThan);
+    std.mem.sort(zigmod.Module, list.items, {}, zigmod.Module.lessThan);
 
     try create_depszig(gpa, cachepath, dir, top_module, list.items);
 }

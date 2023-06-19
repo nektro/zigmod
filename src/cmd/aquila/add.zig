@@ -19,8 +19,8 @@ pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
     const val = try aq.server_fetch(url);
 
     const pkg_url = try std.fmt.allocPrint(gpa, "https://{s}/{s}", .{
-        val.getT(.{ "repo", "domain" }, .String).?,
-        val.getT(.{ "package", "remote_name" }, .String).?,
+        val.root.object.get("repo").?.object.get("domain").?.string,
+        val.root.object.get("package").?.object.get("remote_name").?.string,
     });
 
     const m = try zigmod.ModFile.from_dir(gpa, dir);
