@@ -31,7 +31,8 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
     var moduledeps = std.ArrayList(zigmod.Module).init(options.alloc);
     errdefer moduledeps.deinit();
     if (m.root_files.len > 0) {
-        try moduledeps.append(try add_files_package(options.alloc, cachepath, "root", mdir, m.root_files));
+        const builddotzig = try extras.hashFile(mdir, "build.zig", std.crypto.hash.Sha1);
+        try moduledeps.append(try add_files_package(options.alloc, cachepath, "root_" ++ &builddotzig, mdir, m.root_files));
     }
     try moduledeps.append(try collect_deps(cachepath, mdir, .local, options));
     for (m.rootdeps) |*d| {
