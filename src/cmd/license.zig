@@ -1,5 +1,6 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
+const string = []const u8;
 const style = @import("ansi").style;
 const licenses = @import("licenses");
 const extras = @import("extras");
@@ -24,7 +25,12 @@ pub fn execute(args: [][]u8) !void {
         .update = false,
         .alloc = gpa,
     };
-    const top_module = try common.collect_deps_deep(cachepath, dir, &options);
+
+    try do(cachepath, dir, &options, std.io.getStdOut());
+}
+
+pub fn do(cachepath: string, dir: std.fs.Dir, options: *common.CollectOptions, outfile: std.fs.File) !void {
+    const top_module = try common.collect_deps_deep(cachepath, dir, options);
 
     var master_list = List.init(gpa);
     errdefer master_list.deinit();
@@ -63,9 +69,8 @@ pub fn execute(args: [][]u8) !void {
         try tracking_list.append(item);
     }
 
-    const stdout = std.io.getStdOut();
-    const istty = stdout.isTty();
-    const writer = stdout.writer();
+    const istty = outfile.isTty();
+    const writer = outfile.writer();
     const Bold = if (!istty) "" else style.Bold;
     const Faint = if (!istty) "" else style.Faint;
     const ResetIntensity = if (!istty) "" else style.ResetIntensity;
@@ -91,6 +96,7 @@ pub fn execute(args: [][]u8) !void {
         }
     }
     if (unspecified_list.items.len > 0) {
+        if (!first) try writer.writeAll("\n");
         try writer.writeAll(Bold);
         try writer.writeAll("Unspecified:\n");
         try writer.writeAll(ResetIntensity);
