@@ -5,6 +5,7 @@ const ansi = @import("ansi");
 const zigmod = @import("../lib.zig");
 const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
+const license = @import("./license.zig");
 
 //
 //
@@ -31,6 +32,13 @@ pub fn execute(args: [][]u8) !void {
     try create_lockfile(gpa, &list, cachepath, dir);
 
     try diff_lockfile(gpa);
+
+    options.update = false;
+
+    var outfile = try dir.createFile("licenses.txt", .{});
+    defer outfile.close();
+
+    try license.do(cachepath, dir, &options, outfile);
 }
 
 pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.Dir, top_module: zigmod.Module, list: *std.ArrayList(zigmod.Module)) !void {
