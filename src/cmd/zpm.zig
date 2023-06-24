@@ -70,7 +70,7 @@ pub fn server_fetchArray(url: string) ![]const Package {
     errdefer list.deinit();
 
     for (val.root.array.items) |item| {
-        if (item.object.get("root_file") == null) continue;
+        if (item.object.get("root_file").? == .null) continue;
         try list.append(Package{
             .name = item.object.get("name").?.string,
             .author = item.object.get("author").?.string,
