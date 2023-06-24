@@ -106,10 +106,9 @@ fn valueLinks(vals: std.json.Value) ![]?string {
     return list.toOwnedSlice();
 }
 
-fn get(obj: std.json, key: string) ?std.json.Value {
-    if (obj != .object) return;
+fn get(obj: std.json.Value, key: string) ?std.json.Value {
     const v = obj.object.get(key);
     if (v == null) return null;
-    if (v == .null) return null;
-    return v;
+    if (v.? == .null) return null;
+    return v.?;
 }
