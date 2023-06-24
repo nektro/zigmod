@@ -23,7 +23,7 @@ A package manager for the Zig programming language.
 ```
 $ git clone https://github.com/nektro/zigmod
 $ cd zigmod
-$ zig build
+$ zig build -j1
 ```
 
 ## Usage

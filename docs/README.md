@@ -19,7 +19,7 @@ You may download a precompiled binary from https://github.com/nektro/zigmod/rele
 ```
 $ git clone https://github.com/nektro/zigmod
 $ cd zigmod
-$ zig build
+$ zig build -j1
 ```
 
 ## Getting Started
