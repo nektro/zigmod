@@ -70,7 +70,7 @@ pub fn server_fetchArray(url: string) ![]const Package {
     errdefer list.deinit();
 
     for (val.root.array.items) |item| {
-        if (item.object.get("root_file").? == .null) continue;
+        if (get(item, "root_file") == null) continue;
         try list.append(Package{
             .name = item.object.get("name").?.string,
             .author = item.object.get("author").?.string,
@@ -100,8 +100,16 @@ fn valueLinks(vals: std.json.Value) ![]?string {
     var list = std.ArrayList(?string).init(gpa);
     errdefer list.deinit();
 
-    if (vals.object.get("github")) |x| try list.append(x.string);
-    if (vals.object.get("aquila")) |x| try list.append(x.string);
-    if (vals.object.get("astrolabe")) |x| try list.append(x.string);
+    if (get(vals, "github")) |x| try list.append(x.string);
+    if (get(vals, "aquila")) |x| try list.append(x.string);
+    if (get(vals, "astrolabe")) |x| try list.append(x.string);
     return list.toOwnedSlice();
+}
+
+fn get(obj: std.json, key: string) ?std.json.Value {
+    if (obj != .object) return;
+    const v = obj.object.get(key);
+    if (v == null) return null;
+    if (v == .null) return null;
+    return v;
 }
