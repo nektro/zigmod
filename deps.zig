@@ -37,6 +37,7 @@ pub const GitExactStep = struct {
             var checkoutstep = std.build.RunStep.create(b, "checkout");
             checkoutstep.addArgs(&.{ "git", "-C", repopath, "checkout", "-q", commit });
             result.step.dependOn(&checkoutstep.step);
+            checkoutstep.step.dependOn(&clonestep.step);
 
             return result;
         }
