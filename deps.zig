@@ -56,7 +56,7 @@ pub fn fetch(exe: *std.build.LibExeObjStep) void {
         if (path.* != null) path.* = b.fmt("{s}/zigmod/deps{s}", .{ root, path.*.? });
     }
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/MasterQ32/zig-uri", "d4299ad6043ad19f2ce0676687b0bff57273eae2").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "b70e7f818d77a0c0f39b0bd9c549e16439ff5780").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "007649ade45ffb544de3aafbb112de25064d3d92").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "ee395fd34e152d9067def609d86b7af5382b83b1").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/iguanaTLS", "e70995575b397f33d798339d4f1656bcdf0ab82f").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-ansi", "faf9585bfe5980c24748ee8a3e6a22faaa50b437").step);
@@ -111,11 +111,11 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
             llc = true;
         }
         for (pkg.c_include_dirs) |item| {
-            exe.addIncludePath(b.fmt("{s}/{s}", .{ root, item }));
+            exe.addIncludePath(std.build.LazyPath {.path = b.fmt("{s}/{s}", .{ root, item })});
             llc = true;
         }
         for (pkg.c_source_files) |item| {
-            exe.addCSourceFile(b.fmt("{s}/{s}", .{ root, item }), pkg.c_source_flags);
+            exe.addCSourceFile(std.Build.Step.Compile.CSourceFile {.file = std.Build.LazyPath { .path = b.fmt("{s}/{s}", .{ root, item }) }, .flags = pkg.c_source_flags });
             llc = true;
         }
         vcpkg = vcpkg or pkg.vcpkg;
