@@ -111,11 +111,11 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
             llc = true;
         }
         for (pkg.c_include_dirs) |item| {
-            exe.addIncludePath(b.fmt("{s}/{s}", .{ root, item }));
+            exe.addIncludePath(std.build.LazyPath {.path = b.fmt("{s}/{s}", .{ root, item })});
             llc = true;
         }
         for (pkg.c_source_files) |item| {
-            exe.addCSourceFile(b.fmt("{s}/{s}", .{ root, item }), pkg.c_source_flags);
+            exe.addCSourceFile(std.Build.Step.Compile.CSourceFile {.file = std.Build.LazyPath { .path = b.fmt("{s}/{s}", .{ root, item }) }, .flags = pkg.c_source_flags });
             llc = true;
         }
         vcpkg = vcpkg or pkg.vcpkg;
