@@ -53,9 +53,9 @@ pub const ModFile = struct {
     }
 
     pub fn from_mapping(alloc: std.mem.Allocator, mapping: yaml.Mapping) !Self {
-        const id = mapping.get_string("id");
-        const name = mapping.get("name").?.string;
-        const main = mapping.get_string("main");
+        const id = mapping.get_string("id") orelse "";
+        const name = mapping.get_string("name") orelse "";
+        const main = mapping.get_string("main") orelse "";
 
         if (std.mem.indexOf(u8, name, "/")) |_| {
             u.fail("name may not contain any '/'", .{});
@@ -74,8 +74,8 @@ pub const ModFile = struct {
             .files = try mapping.get_string_array(alloc, "files"),
             .rootdeps = try dep_list_by_name(alloc, mapping, &.{ "dev_dependencies", "root_dependencies" }, false),
             .builddeps = try dep_list_by_name(alloc, mapping, &.{ "dev_dependencies", "build_dependencies" }, true),
-            .min_zig_version = std.SemanticVersion.parse(mapping.get_string("min_zig_version")) catch null,
-            .vcpkg = std.mem.eql(u8, "true", mapping.get_string("vcpkg")),
+            .min_zig_version = std.SemanticVersion.parse(mapping.get_string("min_zig_version") orelse "") catch null,
+            .vcpkg = std.mem.eql(u8, "true", mapping.get_string("vcpkg") orelse ""),
         };
     }
 
@@ -90,8 +90,8 @@ pub const ModFile = struct {
                     var dtype: string = undefined;
                     var path: string = undefined;
                     var version: ?string = null;
-                    var name = item.mapping.get_string("name");
-                    var main = item.mapping.get_string("main");
+                    var name = item.mapping.get_string("name") orelse "";
+                    var main = item.mapping.get_string("main") orelse "";
 
                     if (item.mapping.get("src")) |val| {
                         var src_iter = std.mem.tokenize(u8, val.string, " ");
@@ -125,19 +125,19 @@ pub const ModFile = struct {
                     try dep_list.append(zigmod.Dep{
                         .type = dep_type,
                         .path = path,
-                        .id = item.mapping.get_string("id"),
+                        .id = item.mapping.get_string("id") orelse "",
                         .name = name,
                         .main = main,
                         .version = version.?,
                         .c_include_dirs = try item.mapping.get_string_array(alloc, "c_include_dirs"),
                         .c_source_flags = try item.mapping.get_string_array(alloc, "c_source_flags"),
                         .c_source_files = try item.mapping.get_string_array(alloc, "c_source_files"),
-                        .only_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("only_os"), ","), ""),
-                        .except_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("except_os"), ","), ""),
+                        .only_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("only_os") orelse "", ","), ""),
+                        .except_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("except_os") orelse "", ","), ""),
                         .yaml = item.mapping,
                         .deps = try dep_list_by_name(alloc, item.mapping, &.{"dependencies"}, for_build),
-                        .keep = std.mem.eql(u8, "true", item.mapping.get_string("keep")),
-                        .vcpkg = std.mem.eql(u8, "true", item.mapping.get_string("vcpkg")),
+                        .keep = std.mem.eql(u8, "true", item.mapping.get_string("keep") orelse ""),
+                        .vcpkg = std.mem.eql(u8, "true", item.mapping.get_string("vcpkg") orelse ""),
                         .for_build = for_build,
                     });
                 }

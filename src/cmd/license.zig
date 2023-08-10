@@ -54,7 +54,7 @@ pub fn do(cachepath: string, dir: std.fs.Dir, options: *common.CollectOptions, o
             try unspecified_list.append(item);
             continue;
         }
-        const license_code = item.yaml.?.get_string("license");
+        const license_code = item.yaml.?.get_string("license") orelse "";
         if (license_code.len == 0) {
             try unspecified_list.append(item);
             continue;

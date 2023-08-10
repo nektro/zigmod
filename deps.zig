@@ -67,8 +67,8 @@ pub fn fetch(exe: *std.build.LibExeObjStep) void {
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-licenses", "c9b8cbf3565675a056ad4e9b57cb4f84020e7680").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-licenses-text", "3c07c6e4eb0965dafd0b029c632f823631b3169c").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-range", "4b2f12808aa09be4b27a163efc424dd4e0415992").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-yaml", "e56b9fed6c0afd1c4d29bedc08c3899ffe1165e9").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-time", "12fad367a5282827aad7e12f0e9cd36f672c4010").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-yaml", "0d17fb99cba338aedc1abac12d78d5e5f04f0b6b").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/truemedian/hzzp", "305aca97fce78eb3e787d57691a5eed5512bece7").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/ziglibs/known-folders", "fa75e1bc672952efa0cf06160bbd942b47f6d59b").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/yaml/libyaml", "2c891fc7a770e8ba2fec34fc6b545c672beb37e6").step);
@@ -227,9 +227,9 @@ pub const package_data = struct {
         .deps = &[_]*Package{ &_f7dubzb7cyqe },
     };
     pub var _g982zq6e8wsv = Package{
-        .store = "/git/github.com/nektro/zig-yaml/e56b9fed6c0afd1c4d29bedc08c3899ffe1165e9",
+        .store = "/git/github.com/nektro/zig-yaml/0d17fb99cba338aedc1abac12d78d5e5f04f0b6b",
         .name = "yaml",
-        .entry = "/git/github.com/nektro/zig-yaml/e56b9fed6c0afd1c4d29bedc08c3899ffe1165e9/yaml.zig",
+        .entry = "/git/github.com/nektro/zig-yaml/0d17fb99cba338aedc1abac12d78d5e5f04f0b6b/yaml.zig",
         .deps = &[_]*Package{ &_f7dubzb7cyqe },
     };
     pub var _9k24gimke1an = Package{
