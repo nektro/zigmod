@@ -118,7 +118,7 @@ pub fn last(in: []string) !string {
 const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 pub fn random_string(alloc: std.mem.Allocator, len: usize) !string {
-    const now = @intCast(u64, std.time.nanoTimestamp());
+    const now: u64 = @intCast(std.time.nanoTimestamp());
     var rand = std.rand.DefaultPrng.init(now);
     var r = rand.random();
     var buf = try alloc.alloc(u8, len);
@@ -191,8 +191,8 @@ pub fn git_rev_HEAD(alloc: std.mem.Allocator, dir: std.fs.Dir) !string {
 }
 
 pub fn slice(comptime T: type, input: []const T, from: usize, to: usize) []const T {
-    const f = std.math.max(from, 0);
-    const t = std.math.min(to, input.len);
+    const f = @max(from, 0);
+    const t = @min(to, input.len);
     return input[f..t];
 }
 

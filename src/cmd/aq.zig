@@ -43,7 +43,7 @@ pub fn execute(args: [][]u8) !void {
     u.fail("unknown command \"{s}\" for \"zigmod aq\"", .{args[0]});
 }
 
-pub fn server_fetch(url: string) !std.json.ValueTree {
+pub fn server_fetch(url: string) !std.json.Parsed(std.json.Value) {
     const req = try zfetch.Request.init(gpa, url, null);
     defer req.deinit();
 
@@ -57,7 +57,7 @@ pub fn server_fetch(url: string) !std.json.ValueTree {
     const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
     const val = try extras.parse_json(gpa, body_content);
 
-    if (val.root.object.get("message")) |msg| {
+    if (val.value.object.get("message")) |msg| {
         std.log.err("server: {s}", .{msg.string});
         return error.AquilaBadResponse;
     }

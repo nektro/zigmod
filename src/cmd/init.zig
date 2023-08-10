@@ -118,7 +118,7 @@ pub fn execute(args: [][]u8) !void {
                     if (run >= 79) {
                         const s_ind = (std.mem.lastIndexOfScalar(u8, realtext[start..end], ' ') orelse end) + start;
                         const n_ind = (std.mem.lastIndexOfScalar(u8, realtext[start .. end - 1], '\n') orelse end) + start;
-                        const ind = std.math.min(s_ind, n_ind);
+                        const ind = @min(s_ind, n_ind);
                         try w.print("{s}\n", .{realtext[start..ind]});
                         end = ind + 1;
                         start = end;

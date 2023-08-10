@@ -44,14 +44,14 @@ pub fn execute(args: [][]u8) !void {
         const _req = try zfetch.Request.init(gpa, _url, null);
         defer _req.deinit();
         try _req.do(.GET, null, null);
-        break :blk _req.status.code == 200;
+        break :blk @intFromEnum(_req.status) == 200;
     };
     const has_zigmodyml = blk: {
         const _url = try std.mem.join(gpa, "/", &.{ found.git, "blob", "HEAD", "zigmod.yml" });
         const _req = try zfetch.Request.init(gpa, _url, null);
         defer _req.deinit();
         try _req.do(.GET, null, null);
-        break :blk _req.status.code == 200;
+        break :blk @intFromEnum(_req.status) == 200;
     };
 
     const file = try zigmod.ModFile.openFile(std.fs.cwd(), .{ .mode = .read_write });

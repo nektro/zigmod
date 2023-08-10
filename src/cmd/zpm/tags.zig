@@ -17,7 +17,7 @@ pub fn execute(args: [][]u8) !void {
 
     const name_col_width = blk: {
         var w: usize = 4;
-        for (val.root.array.items) |tag| {
+        for (val.value.array.items) |tag| {
             const len = tag.object.get("name").?.string.len;
             if (len > w) {
                 w = len;
@@ -30,7 +30,7 @@ pub fn execute(args: [][]u8) !void {
     try print_c_n(out, ' ', name_col_width - 4);
     try out.writeAll("DESCRIPTION\n");
 
-    for (val.root.array.items) |tag| {
+    for (val.value.array.items) |tag| {
         const name = tag.object.get("name").?.string;
         try out.writeAll(name);
         try print_c_n(out, ' ', name_col_width - name.len);

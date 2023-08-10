@@ -55,7 +55,7 @@ pub fn execute(args: [][]u8) !void {
     u.fail("unknown command \"{s}\" for \"zigmod zpm\"", .{args[0]});
 }
 
-pub fn server_fetch(url: string) !std.json.ValueTree {
+pub fn server_fetch(url: string) !std.json.Parsed(std.json.Value) {
     const req = try zfetch.Request.init(gpa, url, null);
     defer req.deinit();
     try req.do(.GET, null, null);
@@ -69,7 +69,7 @@ pub fn server_fetchArray(url: string) ![]const Package {
     var list = std.ArrayList(Package).init(gpa);
     errdefer list.deinit();
 
-    for (val.root.array.items) |item| {
+    for (val.value.array.items) |item| {
         if (get(item, "root_file") == null) continue;
         try list.append(Package{
             .name = item.object.get("name").?.string,
@@ -78,7 +78,7 @@ pub fn server_fetchArray(url: string) ![]const Package {
             .tags = try valueStrArray(item.object.get("tags").?.array.items),
             .git = item.object.get("git").?.string,
             .root_file = item.object.get("root_file").?.string,
-            .source = @intCast(u32, item.object.get("source").?.integer),
+            .source = @intCast(item.object.get("source").?.integer),
             .links = try valueLinks(item.object.get("links").?),
         });
     }
