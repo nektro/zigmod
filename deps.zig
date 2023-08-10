@@ -60,7 +60,7 @@ pub fn fetch(exe: *std.build.LibExeObjStep) void {
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/iguanaTLS", "c932f557865abaa1d06cd88e9b22a9f3e583fa59").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zfetch", "f51277414a2309f776fb79f3d55f26e37f9a54da").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-ansi", "ac607e4e7ac36d46cc67c8786262578330543a36").step);
-    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-detect-license", "8f13721bd18c0e546841b6f2e11da839550d6287").step);
+    exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-detect-license", "3ff57d0681b7bd7f8ca9bd092afa0b4bfe2f1afd").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-extras", "54abdc5bce0b243601ef4808bce1c29e1a46cdec").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-inquirer", "5cc2a5565d04fe2c0085f0d6818590e800d9dcf7").step);
     exe.step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-leven", "550cabd5a18ace5e67761bc5b867c10e926f4314").step);
@@ -215,9 +215,9 @@ pub const package_data = struct {
         .deps = &[_]*Package{ &_tnj3qf44tpeq },
     };
     pub var _2ovav391ivak = Package{
-        .store = "/git/github.com/nektro/zig-detect-license/8f13721bd18c0e546841b6f2e11da839550d6287",
+        .store = "/git/github.com/nektro/zig-detect-license/3ff57d0681b7bd7f8ca9bd092afa0b4bfe2f1afd",
         .name = "detect-license",
-        .entry = "/git/github.com/nektro/zig-detect-license/8f13721bd18c0e546841b6f2e11da839550d6287/src/lib.zig",
+        .entry = "/git/github.com/nektro/zig-detect-license/3ff57d0681b7bd7f8ca9bd092afa0b4bfe2f1afd/src/lib.zig",
         .deps = &[_]*Package{ &_pt88y5d80m25, &_96h80ezrvj7i },
     };
     pub var _iecwp4b3bsfm = Package{

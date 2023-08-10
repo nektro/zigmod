@@ -40,7 +40,8 @@ pub fn execute(args: [][]u8) !void {
         else => |ee| return ee,
     }) else null;
 
-    const license = try inquirer.forString(stdout, stdin, "license:", gpa, try detectlicense.detectInDir(gpa, cwd));
+    const maybe_license_text = try detectlicense.detectInDir(gpa, cwd);
+    const license = try inquirer.forString(stdout, stdin, "license:", gpa, maybe_license_text);
 
     const description = try inquirer.forString(stdout, stdin, "description:", gpa, null);
 
@@ -73,7 +74,7 @@ pub fn execute(args: [][]u8) !void {
     }
 
     // ask about LICENSE
-    if (!(try extras.doesFileExist(null, "LICENSE"))) {
+    if (maybe_license_text == null) {
         if (detectlicense.licenses.find(license)) |text| {
             if (try inquirer.forConfirm(stdout, stdin, "It appears you don't have a LICENSE file defined, would you like init to add it for you?", gpa)) {
                 var realtext = text;
