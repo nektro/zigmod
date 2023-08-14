@@ -34,8 +34,8 @@ pub const Dep = struct {
     pub const Type = @import("./dep_type.zig").DepType;
 
     pub fn clean_path(self: Dep, alloc: std.mem.Allocator) !string {
-        if (self.type == .local) {
-            return if (self.path.len == 0) "../.." else self.path;
+        if (self.type == .local or self.type == .files) {
+            return self.path;
         }
         var p = self.path;
         p = extras.trimPrefix(p, "http://");

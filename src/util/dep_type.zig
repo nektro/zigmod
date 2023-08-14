@@ -14,6 +14,7 @@ pub const DepType = enum {
     git,        // https://git-scm.com/
     hg,         // https://www.mercurial-scm.org/
     http,       // https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
+    files,      // TEMP also local
 
     // zig fmt: on
     pub fn pull(self: DepType, alloc: std.mem.Allocator, rpath: string, dpath: string) !void {
@@ -38,6 +39,7 @@ pub const DepType = enum {
                     u.assert((try u.run_cmd(alloc, dpath, &.{ "tar", "-xf", f, "-C", "." })) == 0, "un-tar {s} failed", .{f});
                 }
             },
+            .files => {},
         }
     }
 
@@ -58,6 +60,7 @@ pub const DepType = enum {
             .http => {
                 //
             },
+            .files => {},
         }
     }
 
@@ -71,6 +74,7 @@ pub const DepType = enum {
             .git => try std.fmt.allocPrint(alloc, "commit-{s}", .{(try u.git_rev_HEAD(alloc, mdir))}),
             .hg => "",
             .http => "",
+            .files => "",
         };
     }
 
@@ -82,6 +86,7 @@ pub const DepType = enum {
             .git => false,
             .hg => false,
             .http => false,
+            .files => true,
         };
     }
 

@@ -148,6 +148,7 @@ pub fn execute(args: [][]u8) !void {
             if (!exists) try w.writeAll("zig-*\n");
             try w.writeAll(".zigmod\n");
             try w.writeAll("deps.zig\n");
+            try w.writeAll("files.zig\n");
         }
     }
 
