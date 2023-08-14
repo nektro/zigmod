@@ -139,6 +139,7 @@ pub const ModFile = struct {
                         .keep = std.mem.eql(u8, "true", item.mapping.get_string("keep") orelse ""),
                         .vcpkg = std.mem.eql(u8, "true", item.mapping.get_string("vcpkg") orelse ""),
                         .for_build = for_build,
+                        .parent_id = mapping.get_string("id") orelse "",
                     });
                 }
             }

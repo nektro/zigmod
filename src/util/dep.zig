@@ -29,6 +29,7 @@ pub const Dep = struct {
     keep: bool = false,
     vcpkg: bool = false,
     for_build: bool = false,
+    parent_id: string,
 
     pub const Type = @import("./dep_type.zig").DepType;
 
