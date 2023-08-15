@@ -15,6 +15,7 @@ aarch64-macos-none
 aarch64-windows-gnu
 riscv64-linux-musl
 powerpc64le-linux-musl
+mips64-linux-musl
 "
 
 for item in $targets
