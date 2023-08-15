@@ -8,4 +8,4 @@ rev=$(git log --format=%h -1)
 target=$1
 
 echo "$tag.$rev $target"
-$(which time) zig build -Dtarget=$target -Duse-full-name -Dtag=$tag --prefix .
+$(which time) zig build -Dtarget=$target -Duse-full-name -Dtag=$tag --prefix . -Dmode=ReleaseSafe
