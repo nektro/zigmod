@@ -13,6 +13,7 @@ x86_64-windows-gnu
 aarch64-linux-musl
 aarch64-macos-none
 aarch64-windows-gnu
+riscv64-linux-musl
 "
 
 for item in $targets
