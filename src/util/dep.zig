@@ -34,7 +34,7 @@ pub const Dep = struct {
     pub const Type = @import("./dep_type.zig").DepType;
 
     pub fn clean_path(self: Dep, alloc: std.mem.Allocator) !string {
-        if (self.type == .local or self.type == .files) {
+        if (self.type == .local) {
             return self.path;
         }
         var p = self.path;

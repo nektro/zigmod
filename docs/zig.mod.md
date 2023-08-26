@@ -36,11 +36,11 @@ This is a list of relative paths to C source files to compile along with this pr
 
 ### `files`
 - Type: `[]string`
-This accepts a list of local directories to embed static assets. These files will be provided through a `self/files` package to `@import(main)`.
+This accepts a list of local directories to embed static assets. These files will be provided through a `files.zig` files in the module root. It generates a list of `@embedFile` calls.
 
 ### `root_files`
 - Type: `[]string`
-This accepts a list of local directories to embed static assets. These files will be provided through a `self/files` package to `@import("root")`.
+This accepts a list of local directories to embed static assets. These files will be provided through a `files.zig` files in the package root. It generates a list of `@embedFile` calls.
 
 ### `dependencies`
 - Type: `[]Dep`

@@ -106,7 +106,6 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
             .git => try w.print("    exe.step.dependOn(&GitExactStep.create(b, \"{s}\", \"{s}\").step);\n", .{ module.dep.?.path, try module.pin(alloc, cachepath) }),
             .hg => @panic("TODO"),
             .http => @panic("TODO"),
-            .files => {},
         }
     }
     try w.writeAll(
@@ -274,7 +273,6 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
                     .git => try w.print("        .store = \"/{}/{s}\",\n", .{ std.zig.fmtEscapes(fixed_path), try mod.pin(alloc, cachepath) }),
                     .hg => @panic("TODO"),
                     .http => @panic("TODO"),
-                    .files => {},
                 }
                 if (mod.main.len > 0 and !std.mem.eql(u8, mod.id, "root")) {
                     try w.print("        .name = \"{s}\",\n", .{mod.name});

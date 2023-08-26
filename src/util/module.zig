@@ -174,7 +174,6 @@ pub const Module = struct {
                     .git => try u.git_rev_HEAD(alloc, mdir),
                     .hg => @panic("TODO"),
                     .http => @panic("TODO"),
-                    .files => unreachable,
                 };
             },
         };
