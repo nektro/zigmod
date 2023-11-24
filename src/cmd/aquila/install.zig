@@ -62,7 +62,7 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
 
     // zigmod ci
     const ci = @import("../ci.zig");
-    try ci.do(gpa, modpath, moddir);
+    try ci.do(gpa, cachepath, moddir);
 
     // zig build
     const argv: []const string = &.{
