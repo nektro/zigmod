@@ -324,7 +324,8 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
     if (!try extras.doesFileExist(dir, "zigmod.lock")) return &[_][4]string{};
     var f = try dir.openFile("zigmod.lock", .{});
     defer f.close();
-    const r = f.reader();
+    var br = std.io.bufferedReader(f.reader());
+    const r = br.reader();
     var i: usize = 0;
     var v: usize = 1;
     while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line| : (i += 1) {
