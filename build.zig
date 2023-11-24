@@ -10,10 +10,11 @@ pub fn build(b: *std.build.Builder) void {
     const with_arch_os = b.fmt("-{s}-{s}", .{ @tagName(target.cpu_arch orelse builtin.cpu.arch), @tagName(target.os_tag orelse builtin.os.tag) });
     const exe_name = b.fmt("{s}{s}", .{ "zigmod", if (use_full_name) with_arch_os else "" });
     const exe = b.addExecutable(.{ .name = exe_name, .root_source_file = .{ .path = "src/main.zig" }, .target = target, .optimize = mode });
+    const tag = b.option(string, "tag", "") orelse "dev";
 
     const exe_options = b.addOptions();
     exe.addOptions("build_options", exe_options);
-    exe_options.addOption(string, "version", b.option(string, "tag", "") orelse "dev");
+    exe_options.addOption(string, "version", tag);
 
     deps.addAllTo(exe);
     b.installArtifact(exe);
