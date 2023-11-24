@@ -153,6 +153,9 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                     defer pvd.close();
                     try pvd.deleteTree(".git");
                 }
+                var pvd = try std.fs.cwd().openIterableDir(pv, .{});
+                defer pvd.close();
+                try setTreeReadOnly(pvd, options.alloc);
                 return pv;
             }
             if (!try u.does_folder_exist(p)) {
@@ -187,6 +190,9 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 try d.type.pull(options.alloc, d.path, pv);
                 if (try u.validate_hash(options.alloc, d.version, file_path)) {
                     try std.fs.cwd().deleteFile(file_path);
+                    var pvd = try std.fs.cwd().openIterableDir(pv, .{});
+                    defer pvd.close();
+                    try setTreeReadOnly(pvd, options.alloc);
                     return pv;
                 }
                 try std.fs.cwd().deleteTree(pv);
@@ -369,4 +375,19 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
         }
     }
     return list.toOwnedSlice();
+}
+
+fn setTreeReadOnly(idir: std.fs.IterableDir, alloc: std.mem.Allocator) !void {
+    var walker = try idir.walk(alloc);
+    defer walker.deinit();
+
+    while (try walker.next()) |entry| {
+        if (entry.kind != .file) continue;
+        var file = try idir.dir.openFile(entry.path, .{});
+        defer file.close();
+        var metadata = try file.metadata();
+        var perms = metadata.permissions();
+        perms.setReadOnly(true);
+        try file.setPermissions(perms);
+    }
 }
