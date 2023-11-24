@@ -29,7 +29,7 @@ pub const Package = struct {
     links: []const ?string,
 };
 
-pub fn execute(args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][]u8) !void {
     if (args.len == 0) {
         std.debug.print("{s}\n", .{
             \\This is a subcommand for use with https://github.com/zigtools/zpm-server instances but has no default behavior on its own aside from showing you this nice help text.
@@ -48,7 +48,7 @@ pub fn execute(args: [][]u8) !void {
     inline for (comptime std.meta.declarations(commands)) |decl| {
         if (std.mem.eql(u8, args[0], decl.name)) {
             const cmd = @field(commands, decl.name);
-            try cmd.execute(args[1..]);
+            try cmd.execute(self_name, args[1..]);
             return;
         }
     }

@@ -13,7 +13,9 @@ const u = @import("./../util/index.zig");
 //
 //
 
-pub fn execute(args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][]u8) !void {
+    _ = self_name;
+
     std.debug.print("This utility will walk you through creating a zigmod.yml file.\n", .{});
     std.debug.print("That will give a good launching off point to get your next project started.\n", .{});
     std.debug.print("Use `zigmod aq add <pkg>` to add a dependency from https://aquila.red/\n", .{});

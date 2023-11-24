@@ -45,7 +45,7 @@ pub fn main() !void {
     inline for (comptime std.meta.declarations(zigmod.commands)) |decl| {
         if (std.mem.eql(u8, args[0], decl.name)) {
             const cmd = @field(zigmod.commands, decl.name);
-            try cmd.execute(args[1..]);
+            try cmd.execute(proc_args[0], args[1..]);
             return;
         }
     }

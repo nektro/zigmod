@@ -9,7 +9,9 @@ const zpm = @import("./../zpm.zig");
 //
 //
 
-pub fn execute(args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][]u8) !void {
+    _ = self_name;
+
     const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, "packages" });
     const val = try zpm.server_fetchArray(url);
 

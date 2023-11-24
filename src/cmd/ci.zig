@@ -7,7 +7,8 @@ const common = @import("./../common.zig");
 // Inspired by:
 // https://docs.npmjs.com/cli/v7/commands/npm-ci
 
-pub fn execute(args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][]u8) !void {
+    _ = self_name;
     _ = args;
 
     const gpa = std.heap.c_allocator;

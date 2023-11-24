@@ -8,7 +8,9 @@ const zigmod = @import("../../lib.zig");
 const u = @import("./../../util/index.zig");
 const common = @import("./../../common.zig");
 
-pub fn execute(args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][]u8) !void {
+    _ = self_name;
+
     const home = try knownfolders.getPath(gpa, .home);
     const homepath = home.?;
     const homedir = try std.fs.cwd().openDir(homepath, .{});

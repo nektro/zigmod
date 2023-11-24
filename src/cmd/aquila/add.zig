@@ -8,7 +8,9 @@ const aq = @import("./../aq.zig");
 //
 //
 
-pub fn execute(args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][]u8) !void {
+    _ = self_name;
+
     const pkg_id = args[0];
     _ = try do(std.fs.cwd(), pkg_id);
     std.log.info("Successfully added package {s}", .{pkg_id});
