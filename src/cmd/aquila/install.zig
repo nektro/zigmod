@@ -20,7 +20,7 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
         defer f.close();
         const w = f.writer();
         const init = @import("../init.zig");
-        try init.writeExeManifest(w, try u.random_string(gpa, 48), "zigmod_installation", null, null);
+        try init.writeExeManifest(w, &u.random_string(48), "zigmod_installation", null, null);
     }
 
     // add to ~/zigmod.yml for later

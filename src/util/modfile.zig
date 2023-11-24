@@ -62,7 +62,7 @@ pub const ModFile = struct {
         }
 
         return Self{
-            .id = if (id.len == 0) try u.random_string(alloc, 48) else id,
+            .id = if (id.len == 0) &u.random_string(48) else id,
             .name = name,
             .main = main,
             .c_include_dirs = try mapping.get_string_array(alloc, "c_include_dirs"),

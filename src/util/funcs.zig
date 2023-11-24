@@ -97,11 +97,11 @@ pub fn last(in: []string) !string {
 
 const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-pub fn random_string(alloc: std.mem.Allocator, len: usize) !string {
+pub fn random_string(comptime len: usize) [len]u8 {
     const now: u64 = @intCast(std.time.nanoTimestamp());
     var rand = std.rand.DefaultPrng.init(now);
     var r = rand.random();
-    var buf = try alloc.alloc(u8, len);
+    var buf: [len]u8 = undefined;
     var i: usize = 0;
     while (i < len) : (i += 1) {
         buf[i] = alphabet[r.int(usize) % alphabet.len];
