@@ -15,6 +15,10 @@ A helper function to automatically pull in dependencies, purely from the `zig bu
 - Type: `pub fn (exe: *std.build.LibExeObjStep) void`
 A helper function to add all of the packages, C files, and system libraries to the passed exectuable. It will also automatically link libC in the event that any C files are found in the dependency tree.
 
+### `addAllLibrariesTo`
+- Type: `pub fn (exe: *std.build.LibExeObjStep) void`
+A helper function called by `addAllTo` that adds the C files and libraries.
+
 ### `Package`
 ```zig
 pub const Package = struct {

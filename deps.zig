@@ -95,6 +95,11 @@ pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
         const moddep = pkg.zp(b);
         exe.addModule(moddep.name, moddep.module);
     }
+    addAllLibrariesTo(exe);
+}
+
+pub fn addAllLibrariesTo(exe: *std.build.LibExeObjStep) void {
+    const b = exe.step.owner;
     var llc = false;
     var vcpkg = false;
     inline for (comptime std.meta.declarations(package_data)) |decl| {
