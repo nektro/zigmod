@@ -46,15 +46,6 @@ pub fn split(alloc: std.mem.Allocator, in: string, delim: string) ![]string {
     return list.toOwnedSlice();
 }
 
-pub fn list_contains_gen(comptime T: type, haystack: []const T, needle: T) bool {
-    for (haystack) |item| {
-        if (item.eql(needle)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 pub fn file_list(alloc: std.mem.Allocator, dpath: string) ![]const string {
     var dir = try std.fs.cwd().openIterableDir(dpath, .{});
     defer dir.close();

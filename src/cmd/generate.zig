@@ -1,5 +1,6 @@
 const std = @import("std");
 const string = []const u8;
+const extras = @import("extras");
 
 const zigmod = @import("../lib.zig");
 const u = @import("./../util/index.zig");
@@ -356,7 +357,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
 /// returns if all of the zig modules in needles are in haystack
 fn contains_all(needles: []zigmod.Module, haystack: []const zigmod.Module) bool {
     for (needles) |item| {
-        if (item.main.len > 0 and !u.list_contains_gen(zigmod.Module, haystack, item)) {
+        if (item.main.len > 0 and !extras.containsAggregate(zigmod.Module, haystack, item)) {
             return false;
         }
     }

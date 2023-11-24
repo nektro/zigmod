@@ -90,7 +90,7 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, dtype: zigmod.Dep.Type,
 }
 
 pub fn collect_pkgs(mod: zigmod.Module, list: *std.ArrayList(zigmod.Module)) anyerror!void {
-    if (u.list_contains_gen(zigmod.Module, list.items, mod)) {
+    if (extras.containsAggregate(zigmod.Module, list.items, mod)) {
         return;
     }
     try list.append(mod);
