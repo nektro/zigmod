@@ -46,13 +46,6 @@ pub fn split(alloc: std.mem.Allocator, in: string, delim: string) ![]string {
     return list.toOwnedSlice();
 }
 
-pub fn trim_suffix(in: string, suffix: string) string {
-    if (std.mem.endsWith(u8, in, suffix)) {
-        return in[0 .. in.len - suffix.len];
-    }
-    return in;
-}
-
 pub fn list_contains_gen(comptime T: type, haystack: []const T, needle: T) bool {
     for (haystack) |item| {
         if (item.eql(needle)) {

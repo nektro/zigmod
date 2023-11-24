@@ -1,6 +1,7 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 const zfetch = @import("zfetch");
+const extras = @import("extras");
 
 const zigmod = @import("../../lib.zig");
 const u = @import("./../../util/index.zig");
@@ -62,7 +63,7 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
 
     const file_w = file.writer();
     try file_w.writeAll("\n");
-    try file_w.print("  - src: git {s}\n", .{u.trim_suffix(found.git, ".git")});
+    try file_w.print("  - src: git {s}\n", .{extras.trimSuffix(found.git, ".git")});
     if (!(has_zigdotmod or has_zigmodyml)) {
         try file_w.print("    name: {s}\n", .{found.name});
         try file_w.print("    main: {s}\n", .{found.root_file[1..]});

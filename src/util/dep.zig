@@ -41,7 +41,7 @@ pub const Dep = struct {
         p = extras.trimPrefix(p, "http://");
         p = extras.trimPrefix(p, "https://");
         p = extras.trimPrefix(p, "git://");
-        p = u.trim_suffix(p, ".git");
+        p = extras.trimSuffix(p, ".git");
         p = try std.mem.join(alloc, "/", &.{ @tagName(self.type), p });
         return p;
     }
