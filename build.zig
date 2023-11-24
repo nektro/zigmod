@@ -11,12 +11,14 @@ pub fn build(b: *std.build.Builder) void {
     const exe_name = b.fmt("{s}{s}", .{ "zigmod", if (use_full_name) with_arch_os else "" });
     const exe = b.addExecutable(.{ .name = exe_name, .root_source_file = .{ .path = "src/main.zig" }, .target = target, .optimize = mode });
     const tag = b.option(string, "tag", "") orelse "dev";
+    const strip = b.option(bool, "strip", "Build without debug info.") orelse false;
 
     const exe_options = b.addOptions();
     exe.addOptions("build_options", exe_options);
     exe_options.addOption(string, "version", tag);
 
     deps.addAllTo(exe);
+    exe.strip = strip;
     b.installArtifact(exe);
 
     const run_cmd = b.addRunArtifact(exe);
