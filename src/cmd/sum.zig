@@ -2,6 +2,7 @@ const std = @import("std");
 const gpa = std.heap.c_allocator;
 
 const zigmod = @import("../lib.zig");
+const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
 
 //
@@ -11,7 +12,7 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
     _ = self_name;
     _ = args;
 
-    const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const cachepath = try u.find_cachepath();
     const dir = std.fs.cwd();
 
     var options = common.CollectOptions{

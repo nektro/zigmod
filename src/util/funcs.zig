@@ -1,5 +1,6 @@
 const std = @import("std");
 const string = []const u8;
+const gpa = std.heap.c_allocator;
 const extras = @import("extras");
 
 const u = @import("index.zig");
@@ -249,4 +250,14 @@ pub fn indexOfAfter(haystack: string, needle: u8, after: usize) ?usize {
         if (c == needle) return i;
     }
     return null;
+}
+
+pub fn find_cachepath() !string {
+    const haystack = try std.fs.cwd().realpathAlloc(gpa, ".");
+    const needle = "/.zigmod/deps";
+
+    if (std.mem.indexOf(u8, haystack, needle)) |index| {
+        return haystack[0 .. index + needle.len];
+    }
+    return try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
 }

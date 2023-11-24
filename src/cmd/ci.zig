@@ -2,6 +2,7 @@ const std = @import("std");
 const string = []const u8;
 
 const zigmod = @import("../lib.zig");
+const u = @import("./../util/index.zig");
 const common = @import("./../common.zig");
 
 // Inspired by:
@@ -12,7 +13,7 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
     _ = args;
 
     const gpa = std.heap.c_allocator;
-    const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const cachepath = try u.find_cachepath();
     const dir = std.fs.cwd();
     try do(gpa, cachepath, dir);
 }

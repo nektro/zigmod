@@ -13,9 +13,8 @@ const license = @import("./license.zig");
 pub fn execute(self_name: []const u8, args: [][]u8) !void {
     _ = self_name;
 
-    //
     const gpa = std.heap.c_allocator;
-    const cachepath = try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    const cachepath = try u.find_cachepath();
     const dir = std.fs.cwd();
     const should_update = !(args.len >= 1 and std.mem.eql(u8, args[0], "--no-update"));
 
