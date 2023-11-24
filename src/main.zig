@@ -13,6 +13,7 @@ pub fn main() !void {
 
     const proc_args = try std.process.argsAlloc(gpa);
     const args = proc_args[1..];
+    const self_path = try std.fs.selfExePathAlloc(gpa);
 
     if (args.len == 0) {
         std.debug.print("zigmod {s} {s} {s} {s}\n", .{
@@ -45,7 +46,7 @@ pub fn main() !void {
     inline for (comptime std.meta.declarations(zigmod.commands)) |decl| {
         if (std.mem.eql(u8, args[0], decl.name)) {
             const cmd = @field(zigmod.commands, decl.name);
-            try cmd.execute(proc_args[0], args[1..]);
+            try cmd.execute(self_path, args[1..]);
             return;
         }
     }
