@@ -149,7 +149,8 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                     u.fail("fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
                 }
                 if (builtin.os.tag != .windows and vers.id == .commit) {
-                    const pvd = try std.fs.cwd().openDir(pv, .{});
+                    var pvd = try std.fs.cwd().openDir(pv, .{});
+                    defer pvd.close();
                     try pvd.deleteTree(".git");
                 }
                 return pv;
@@ -321,7 +322,8 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
     var list = std.ArrayList([4]string).init(alloc);
     const max = std.math.maxInt(usize);
     if (!try extras.doesFileExist(dir, "zigmod.lock")) return &[_][4]string{};
-    const f = try dir.openFile("zigmod.lock", .{});
+    var f = try dir.openFile("zigmod.lock", .{});
+    defer f.close();
     const r = f.reader();
     var i: usize = 0;
     var v: usize = 1;
