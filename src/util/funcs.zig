@@ -46,20 +46,6 @@ pub fn split(alloc: std.mem.Allocator, in: string, delim: string) ![]string {
     return list.toOwnedSlice();
 }
 
-pub fn does_folder_exist(fpath: string) !bool {
-    const file = std.fs.cwd().openFile(fpath, .{}) catch |e| switch (e) {
-        error.FileNotFound => return false,
-        error.IsDir => return true,
-        else => |ee| return ee,
-    };
-    defer file.close();
-    const s = try file.stat();
-    if (s.kind != .directory) {
-        return false;
-    }
-    return true;
-}
-
 pub fn trim_suffix(in: string, suffix: string) string {
     if (std.mem.endsWith(u8, in, suffix)) {
         return in[0 .. in.len - suffix.len];

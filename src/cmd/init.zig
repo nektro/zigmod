@@ -135,7 +135,7 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
     }
 
     // ask about .gitignore
-    if (try u.does_folder_exist(".git")) {
+    if (try extras.doesFolderExist(null, ".git")) {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitignore?", gpa);
         if (do) {
             const exists = try extras.doesFileExist(null, ".gitignore");
@@ -155,7 +155,7 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
     }
 
     // ask about .gitattributes
-    if (try u.does_folder_exist(".git")) {
+    if (try extras.doesFolderExist(null, ".git")) {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitattributes?", gpa);
         if (do) {
             const exists = try extras.doesFileExist(null, ".gitattributes");

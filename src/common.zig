@@ -136,7 +136,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                         u.fail("fetch: git: version type '{s}' is invalid.", .{vtype});
                     },
                 };
-                if (try u.does_folder_exist(pv)) {
+                if (try extras.doesFolderExist(null, pv)) {
                     if (vers.id == .branch) {
                         if (options.update) {
                             try d.type.update(options.alloc, pv, d.path);
@@ -158,7 +158,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 try setTreeReadOnly(pvd, options.alloc);
                 return pv;
             }
-            if (!try u.does_folder_exist(p)) {
+            if (!try extras.doesFolderExist(null, p)) {
                 try d.type.pull(options.alloc, d.path, p);
             } else {
                 if (options.update) {
@@ -168,7 +168,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             return p;
         },
         .hg => {
-            if (!try u.does_folder_exist(p)) {
+            if (!try extras.doesFolderExist(null, p)) {
                 try d.type.pull(options.alloc, d.path, p);
             } else {
                 if (options.update) {
@@ -178,12 +178,12 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             return p;
         },
         .http => {
-            if (try u.does_folder_exist(pv)) {
+            if (try extras.doesFolderExist(null, pv)) {
                 return pv;
             }
             const file_name = try u.last(try u.split(options.alloc, d.path, "/"));
             if (d.version.len > 0) {
-                if (try u.does_folder_exist(pv)) {
+                if (try extras.doesFolderExist(null, pv)) {
                     return pv;
                 }
                 const file_path = try std.fs.path.join(options.alloc, &.{ pv, file_name });
@@ -199,7 +199,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 u.fail("{s} does not match hash {s}", .{ d.path, d.version });
                 return p;
             }
-            if (try u.does_folder_exist(p)) {
+            if (try extras.doesFolderExist(null, p)) {
                 try std.fs.cwd().deleteTree(p);
             }
             const file_path = try std.fs.path.resolve(options.alloc, &.{ p, file_name });

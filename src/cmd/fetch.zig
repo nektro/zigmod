@@ -1,6 +1,7 @@
 const std = @import("std");
 const string = []const u8;
 const ansi = @import("ansi");
+const extras = @import("extras");
 
 const zigmod = @import("../lib.zig");
 const u = @import("./../util/index.zig");
@@ -201,7 +202,7 @@ const DiffChange = struct {
 fn diff_lockfile(alloc: std.mem.Allocator) !void {
     const max = std.math.maxInt(usize);
 
-    if (try u.does_folder_exist(".git")) {
+    if (try extras.doesFolderExist(null, ".git")) {
         const result = try u.run_cmd_raw(alloc, null, &.{ "git", "diff", "zigmod.lock" });
         var stdout = std.io.fixedBufferStream(result.stdout);
         const r = stdout.reader();
