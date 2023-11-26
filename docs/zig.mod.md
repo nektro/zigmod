@@ -112,12 +112,12 @@ Version types available to each Dep type:
 - Type: `comma-split string[]`
 - Example: `windows`
 - Example: `macos,tvos,ios`
-This attribute specifies a way to filter when the dependency will be generated into the contents of `deps.zig`. `only_os` is an inclusive filter in which the dependency will only be in the output if the host target operating system is in the list specified or if this field is ommitted.
+This attribute specifies a way to filter when the dependency will be generated into the contents of `deps.zig`. `only_os` is an inclusive filter in which the dependency will only be in the output if the host target operating system is in the list specified or if this field is omitted.
 
 #### Dep `except_os`
 - Type: `comma-split string[]`
 - Example: `linux`
-This attribute specifies a way to filter when the dependency will be generated into the contents of `deps.zig`. `except_os` is an exlusive filter in which the dependency will only be in the output if the host target operating is \*not\* in the list specified or if the field is ommitted.
+This attribute specifies a way to filter when the dependency will be generated into the contents of `deps.zig`. `except_os` is an exclusive filter in which the dependency will only be in the output if the host target operating is \*not\* in the list specified or if the field is omitted.
 
 #### Dep `keep`
 - Type: `string`
