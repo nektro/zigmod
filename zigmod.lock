@@ -5,13 +5,13 @@ git https://github.com/nektro/iguanaTLS commit-f5c7c3fe880c5a23fbcdc21dfcb83c277
 git https://github.com/nektro/zfetch commit-f947a0211e96026acf68acf6e57ce8dfdf995e1c
 git https://github.com/nektro/zig-ansi commit-ac607e4e7ac36d46cc67c8786262578330543a36
 git https://github.com/nektro/zig-detect-license commit-3ff57d0681b7bd7f8ca9bd092afa0b4bfe2f1afd
-git https://github.com/nektro/zig-extras commit-05f0e90a185cb04a09b96f686dffc6375c420e9b
+git https://github.com/nektro/zig-extras commit-905e29b6760035e63b7dc027a4c355ff392bb454
 git https://github.com/nektro/zig-inquirer commit-5cc2a5565d04fe2c0085f0d6818590e800d9dcf7
 git https://github.com/nektro/zig-leven commit-550cabd5a18ace5e67761bc5b867c10e926f4314
 git https://github.com/nektro/zig-licenses commit-c9b8cbf3565675a056ad4e9b57cb4f84020e7680
 git https://github.com/nektro/zig-licenses-text commit-3c07c6e4eb0965dafd0b029c632f823631b3169c
 git https://github.com/nektro/zig-range commit-4b2f12808aa09be4b27a163efc424dd4e0415992
-git https://github.com/nektro/zig-time commit-12fad367a5282827aad7e12f0e9cd36f672c4010
+git https://github.com/nektro/zig-time commit-a01155929e335518792f38f404aa359bbf751de0
 git https://github.com/nektro/zig-yaml commit-0d17fb99cba338aedc1abac12d78d5e5f04f0b6b
 git https://github.com/truemedian/hzzp commit-92e6072d8a385d8b08fdcae3ae2021fe5293528f
 git https://github.com/ziglibs/known-folders commit-855473062efac722624737f1adc56f9c0dd92017
