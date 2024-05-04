@@ -151,6 +151,7 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
             try w.writeAll(".zigmod\n");
             try w.writeAll("deps.zig\n");
             try w.writeAll("files.zig\n");
+            if (ptype == .lib) try w.writeAll("zigmod.lock\n");
         }
     }
 
