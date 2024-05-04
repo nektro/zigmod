@@ -3,7 +3,7 @@ git https://github.com/marlersoft/zigwin32 commit-c778640d3dc153e900fbe37e2816b5
 git https://github.com/nektro/arqv-ini commit-ddbe89bb0d9085e939bcbc713caeb2b7cf852bae
 git https://github.com/nektro/iguanaTLS commit-f5c7c3fe880c5a23fbcdc21dfcb83c2776931f40
 git https://github.com/nektro/zfetch commit-478031843703fef875ca347898208c01869c7c9d
-git https://github.com/nektro/zig-ansi commit-ac607e4e7ac36d46cc67c8786262578330543a36
+git https://github.com/nektro/zig-ansi commit-407a70207ee818f6920096f40779e3fb52db49b0
 git https://github.com/nektro/zig-detect-license commit-3ff57d0681b7bd7f8ca9bd092afa0b4bfe2f1afd
 git https://github.com/nektro/zig-extras commit-905e29b6760035e63b7dc027a4c355ff392bb454
 git https://github.com/nektro/zig-inquirer commit-5cc2a5565d04fe2c0085f0d6818590e800d9dcf7
