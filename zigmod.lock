@@ -5,7 +5,7 @@ git https://github.com/nektro/iguanaTLS commit-f5c7c3fe880c5a23fbcdc21dfcb83c277
 git https://github.com/nektro/zfetch commit-478031843703fef875ca347898208c01869c7c9d
 git https://github.com/nektro/zig-ansi commit-407a70207ee818f6920096f40779e3fb52db49b0
 git https://github.com/nektro/zig-detect-license commit-3ff57d0681b7bd7f8ca9bd092afa0b4bfe2f1afd
-git https://github.com/nektro/zig-extras commit-905e29b6760035e63b7dc027a4c355ff392bb454
+git https://github.com/nektro/zig-extras commit-c95c2301565603856ff6fcaecaa63bdcdd689bc1
 git https://github.com/nektro/zig-inquirer commit-5cc2a5565d04fe2c0085f0d6818590e800d9dcf7
 git https://github.com/nektro/zig-leven commit-550cabd5a18ace5e67761bc5b867c10e926f4314
 git https://github.com/nektro/zig-licenses commit-c9b8cbf3565675a056ad4e9b57cb4f84020e7680
