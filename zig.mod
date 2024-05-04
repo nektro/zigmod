@@ -18,5 +18,7 @@ dependencies:
 
 root_dependencies:
   - src: git https://github.com/marlersoft/zigwin32
+    id: zg4wbiyyfn2fdpmia0jjh2d5k0xb7v1l7zn3xcyv
+    keep: true
   - src: git https://github.com/nektro/zig-extras
   - src: git https://github.com/nektro/zig-ansi
