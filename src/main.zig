@@ -33,11 +33,11 @@ pub fn main() !void {
     if (builtin.os.tag == .windows) {
         const console = win32.system.console;
         const h_out = console.GetStdHandle(console.STD_OUTPUT_HANDLE);
-        _ = console.SetConsoleMode(h_out, console.CONSOLE_MODE.initFlags(.{
+        _ = console.SetConsoleMode(h_out, console.CONSOLE_MODE{
             .ENABLE_PROCESSED_INPUT = 1, //ENABLE_PROCESSED_OUTPUT
             .ENABLE_LINE_INPUT = 1, //ENABLE_WRAP_AT_EOL_OUTPUT
             .ENABLE_ECHO_INPUT = 1, //ENABLE_VIRTUAL_TERMINAL_PROCESSING
-        }));
+        });
     }
 
     try zigmod.init();
