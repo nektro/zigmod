@@ -72,7 +72,6 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\
         \\            var clonestep = std.Build.Step.Run.create(b, "clone");
         \\            clonestep.addArgs(&.{ "git", "clone", "-q", "--progress", url, repopath });
-        \\            result.step.dependOn(&clonestep.step);
         \\
         \\            var checkoutstep = std.Build.Step.Run.create(b, "checkout");
         \\            checkoutstep.addArgs(&.{ "git", "-C", repopath, "checkout", "-q", commit });
@@ -90,8 +89,9 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        }
         \\};
         \\
-        \\pub fn fetch(exe: *std.Build.Step.Compile) void {
+        \\pub fn fetch(exe: *std.Build.Step.Compile) *std.Build.Step {
         \\    const b = exe.step.owner;
+        \\    const step = b.step("fetch", "");
         \\    inline for (comptime std.meta.declarations(package_data)) |decl| {
         \\          const path = &@field(package_data, decl.name).entry;
         \\          const root = if (@field(package_data, decl.name).store) |_| b.cache_root.path.? else ".";
@@ -104,12 +104,13 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
             .local => {},
             .system_lib => {},
             .framework => {},
-            .git => try w.print("    exe.step.dependOn(&GitExactStep.create(b, \"{s}\", \"{s}\").step);\n", .{ module.dep.?.path, try module.pin(alloc, cachepath) }),
+            .git => try w.print("    step.dependOn(&GitExactStep.create(b, \"{s}\", \"{s}\").step);\n", .{ module.dep.?.path, try module.pin(alloc, cachepath) }),
             .hg => @panic("TODO"),
             .http => @panic("TODO"),
         }
     }
     try w.writeAll(
+        \\    return step;
         \\}
         \\
         \\fn trimPrefix(comptime T: type, haystack: []const T, needle: []const T) []const T {
@@ -126,10 +127,10 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\
         \\pub fn addAllTo(exe: *std.Build.Step.Compile) void {
         \\    checkMinZig(builtin.zig_version, exe);
-        \\    fetch(exe);
+        \\    const fetch_step = fetch(exe);
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
-        \\        const module = pkg.module(exe);
+        \\        const module = pkg.module(exe, fetch_step);
         \\        exe.root_module.addImport(pkg.name, module);
         \\    }
         \\}
@@ -147,7 +148,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\    frameworks: []const string = &.{},
         \\    module_memo: ?*std.Build.Module = null,
         \\
-        \\    pub fn module(self: *Package, exe: *std.Build.Step.Compile) *std.Build.Module {
+        \\    pub fn module(self: *Package, exe: *std.Build.Step.Compile, fetch_step: *std.Build.Step) *std.Build.Module {
         \\        if (self.module_memo) |cached| {
         \\            return cached;
         \\        }
@@ -159,11 +160,12 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            .target = exe.root_module.resolved_target orelse b.host,
         \\            .optimize = exe.root_module.optimize.?,
         \\        });
+        \\        dummy_library.step.dependOn(fetch_step);
         \\        if (self.entry) |capture| {
         \\            result.root_source_file = .{ .path = capture };
         \\        }
         \\        for (self.deps) |item| {
-        \\            const module_dep = item.module(exe);
+        \\            const module_dep = item.module(exe, fetch_step);
         \\            if (module_dep.root_source_file != null) {
         \\                result.addImport(item.name, module_dep);
         \\            }
