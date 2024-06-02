@@ -56,7 +56,7 @@ pub fn main() !void {
     for (args[1..]) |item| {
         try sub_cmd_args.append(item);
     }
-    const result = std.ChildProcess.exec(.{ .allocator = gpa, .argv = sub_cmd_args.items }) catch |e| switch (e) {
+    const result = std.ChildProcess.run(.{ .allocator = gpa, .argv = sub_cmd_args.items }) catch |e| switch (e) {
         else => |ee| return ee,
         error.FileNotFound => {
             fail("unknown command \"{s}\" for \"zigmod\"", .{args[0]});
@@ -75,7 +75,7 @@ const ansi_reset = "\x1B[39m";
 pub fn assert(ok: bool, comptime fmt: string, args: anytype) void {
     if (!ok) {
         std.debug.print(ansi_red ++ fmt ++ ansi_reset ++ "\n", args);
-        std.os.exit(1);
+        std.process.exit(1);
     }
 }
 

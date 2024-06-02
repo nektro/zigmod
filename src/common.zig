@@ -54,7 +54,6 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
         .yaml = m.yaml,
         .dep = null,
         .min_zig_version = m.min_zig_version,
-        .vcpkg = m.vcpkg,
     };
 }
 
@@ -85,7 +84,6 @@ pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, dtype: zigmod.Dep.Type,
         .yaml = m.yaml,
         .dep = null,
         .min_zig_version = m.min_zig_version,
-        .vcpkg = m.vcpkg,
     };
 }
 
@@ -153,7 +151,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                     defer pvd.close();
                     try pvd.deleteTree(".git");
                 }
-                var pvd = try std.fs.cwd().openIterableDir(pv, .{});
+                var pvd = try std.fs.cwd().openDir(pv, .{ .iterate = true });
                 defer pvd.close();
                 try setTreeReadOnly(pvd, options.alloc);
                 return pv;
@@ -190,7 +188,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 try d.type.pull(options.alloc, d.path, pv);
                 if (try u.validate_hash(options.alloc, d.version, file_path)) {
                     try std.fs.cwd().deleteFile(file_path);
-                    var pvd = try std.fs.cwd().openIterableDir(pv, .{});
+                    var pvd = try std.fs.cwd().openDir(pv, .{ .iterate = true });
                     defer pvd.close();
                     try setTreeReadOnly(pvd, options.alloc);
                     return pv;
@@ -243,7 +241,6 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                 .dep = d.*,
                 .for_build = d.for_build,
                 .min_zig_version = null,
-                .vcpkg = false,
             };
         },
         else => {
@@ -297,7 +294,7 @@ pub fn gen_files_package(alloc: std.mem.Allocator, cachepath: string, mdir: std.
     defer map.deinit();
 
     for (dirs) |dir_path| {
-        const dir = try mdir.openIterableDir(dir_path, .{});
+        const dir = try mdir.openDir(dir_path, .{ .iterate = true });
         var walker = try dir.walk(alloc);
         defer walker.deinit();
         while (try walker.next()) |p| {
@@ -377,13 +374,13 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
     return list.toOwnedSlice();
 }
 
-fn setTreeReadOnly(idir: std.fs.IterableDir, alloc: std.mem.Allocator) !void {
-    var walker = try idir.walk(alloc);
+fn setTreeReadOnly(dir: std.fs.Dir, alloc: std.mem.Allocator) !void {
+    var walker = try dir.walk(alloc);
     defer walker.deinit();
 
     while (try walker.next()) |entry| {
         if (entry.kind != .file) continue;
-        var file = try idir.dir.openFile(entry.path, .{});
+        var file = try dir.openFile(entry.path, .{});
         defer file.close();
         var metadata = try file.metadata();
         var perms = metadata.permissions();

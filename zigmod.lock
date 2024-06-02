@@ -1,18 +1,18 @@
 2
 git https://github.com/marlersoft/zigwin32 commit-c778640d3dc153e900fbe37e2816b5176af3c802
-git https://github.com/nektro/arqv-ini commit-ddbe89bb0d9085e939bcbc713caeb2b7cf852bae
-git https://github.com/nektro/iguanaTLS commit-f5c7c3fe880c5a23fbcdc21dfcb83c2776931f40
-git https://github.com/nektro/zfetch commit-478031843703fef875ca347898208c01869c7c9d
-git https://github.com/nektro/zig-ansi commit-407a70207ee818f6920096f40779e3fb52db49b0
+git https://github.com/nektro/arqv-ini commit-38a018ad3a19d5b4663a5364d2d31271f250846b
+git https://github.com/nektro/iguanaTLS commit-4dc8850883b49e4a452871298788b06b1af9fe24
+git https://github.com/nektro/zfetch commit-863be236188e5f24d16554f9dcd7df96dd254a13
+git https://github.com/nektro/zig-ansi commit-c3e439f86b0484e4428f38c4d8b07b7b5ae1634b
 git https://github.com/nektro/zig-detect-license commit-3ff57d0681b7bd7f8ca9bd092afa0b4bfe2f1afd
-git https://github.com/nektro/zig-extras commit-c95c2301565603856ff6fcaecaa63bdcdd689bc1
+git https://github.com/nektro/zig-extras commit-74f0ddb0a4dfa7921739b88cc381951a6b6e73ce
 git https://github.com/nektro/zig-inquirer commit-9e1d873db79e9ffa6ae6e06bd372428c9be85d97
 git https://github.com/nektro/zig-leven commit-e548b0bcc7b6f34f636c0b6b905928d31254c54d
 git https://github.com/nektro/zig-licenses commit-f46d9f774df929885eef66c733a1e2a46bf16aec
 git https://github.com/nektro/zig-licenses-text commit-b01e5a2dffcc564bddd8f514fe64bab9b5c52572
 git https://github.com/nektro/zig-range commit-4b2f12808aa09be4b27a163efc424dd4e0415992
-git https://github.com/nektro/zig-time commit-913d3ff01878326955bb3b265dcb3fdb3607d232
+git https://github.com/nektro/zig-time commit-ba546bbf2e8438c9b2325f36f392c9d95b432e8e
 git https://github.com/nektro/zig-yaml commit-0d17fb99cba338aedc1abac12d78d5e5f04f0b6b
-git https://github.com/truemedian/hzzp commit-31563ce8173038aff326f83b18d49d84e2737255
-git https://github.com/ziglibs/known-folders commit-bf79988adcfce166f848e4b11e718c1966365329
+git https://github.com/truemedian/hzzp commit-a7f03a1e652abe8c89b376d090cec50acb0d2a1a
+git https://github.com/ziglibs/known-folders commit-0ad514dcfb7525e32ae349b9acc0a53976f3a9fa
 git https://github.com/yaml/libyaml tag-0.2.5

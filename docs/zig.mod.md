@@ -58,11 +58,6 @@ Similar to `dependencies` but will only get added to the project if the current 
 - Type: `string`
 Parsed as a `std.SemanticVersion`, this attribute refers to the minimum compatible Zig version for this package/application and will cause `zig build` to panic if violated.
 
-#### `vcpkg`
-- Type: `bool`
-- Example: `true`|any
-This attribute is a flag to call `try exe.addVcpkgPaths(.static);` when on Windows. Likely used in conjunction with adding system libraries/C code. `true` is the only value that will enable this flag.
-
 ----
 
 ### Dep Object
@@ -123,11 +118,6 @@ This attribute specifies a way to filter when the dependency will be generated i
 - Type: `string`
 - Example: `true`|any
 This attribute is a manual override for having an external repo that contains no Zig or C code but other files be managed through Zigmod and `deps.zig`. `true` is the only value that will enable this flag.
-
-#### Dep `vcpkg`
-- Type: `string`
-- Example: `true`|any
-This attribute is a flag to call `try exe.addVcpkgPaths(.static);` when on Windows. Likely used in conjunction with adding system libraries/C code. `true` is the only value that will enable this flag.
 
 #### Dep Overrides
 There are a number of fields you can add to a `Dep` object that will override it's top-level value. This is most useful in the case where a project you want to use does not have a `zigmod.yml` manifest. You can then use overrides to define the values for them. The only top-level value you can not override is `dependencies`.

@@ -52,94 +52,89 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     try w.writeAll("const std = @import(\"std\");\n");
     try w.writeAll("const builtin = @import(\"builtin\");\n");
     try w.writeAll("const string = []const u8;\n");
-    try w.writeAll("const ModuleDependency = std.build.ModuleDependency;\n");
     try w.writeAll("\n");
     try w.print("pub const cache = \"{}\";\n", .{std.zig.fmtEscapes(cachepath)});
     try w.writeAll("\n");
     try w.writeAll(
-        \\pub fn addAllTo(exe: *std.build.LibExeObjStep) void {
+        \\pub fn addAllTo(exe: *std.Build.Step.Compile) void {
         \\    checkMinZig(builtin.zig_version, exe);
-        \\    const b = exe.step.owner;
         \\    @setEvalBranchQuota(1_000_000);
         \\    for (packages) |pkg| {
-        \\        const moddep = pkg.zp(b);
-        \\        exe.addModule(moddep.name, moddep.module);
+        \\        const module = pkg.module(exe);
+        \\        exe.root_module.addImport(pkg.import.?[0], module);
         \\    }
-        \\    addAllLibrariesTo(exe);
         \\}
         \\
-        \\pub fn addAllLibrariesTo(exe: *std.build.LibExeObjStep) void {
-        \\    const b = exe.step.owner;
-        \\    var llc = false;
-        \\    var vcpkg = false;
-        \\    inline for (comptime std.meta.declarations(package_data)) |decl| {
-        \\        const pkg = @as(Package, @field(package_data, decl.name));
-        \\        for (pkg.system_libs) |item| {
-        \\            exe.linkSystemLibrary(item);
-        \\            llc = true;
-        \\        }
-        \\        for (pkg.frameworks) |item| {
-        \\            if (!builtin.target.isDarwin()) @panic(b.fmt("a dependency is attempting to link to the framework {s}, which is only possible under Darwin", .{item}));
-        \\            exe.linkFramework(item);
-        \\            llc = true;
-        \\        }
-        \\        for (pkg.c_include_dirs) |item| {
-        \\            exe.addIncludePath(.{.path = b.fmt("{s}/{s}", .{ @field(dirs, decl.name), item })});
-        \\            llc = true;
-        \\        }
-        \\        for (pkg.c_source_files) |item| {
-        \\            exe.addCSourceFile(.{ .file = .{ .path = b.fmt("{s}/{s}", .{ @field(dirs, decl.name), item }) }, .flags = pkg.c_source_flags });
-        \\            llc = true;
-        \\        }
-        \\        vcpkg = vcpkg or pkg.vcpkg;
-        \\    }
-        \\    if (llc) exe.linkLibC();
-        \\    if (builtin.os.tag == .windows and vcpkg) exe.addVcpkgPaths(.static) catch |err| @panic(@errorName(err));
-        \\}
-        \\
+        \\var link_lib_c = false;
         \\pub const Package = struct {
         \\    directory: string,
-        \\    pkg: ?Pkg = null,
+        \\    import: ?struct { string, std.Build.LazyPath } = null,
+        \\    dependencies: []const *Package,
         \\    c_include_dirs: []const string = &.{},
         \\    c_source_files: []const string = &.{},
         \\    c_source_flags: []const string = &.{},
         \\    system_libs: []const string = &.{},
         \\    frameworks: []const string = &.{},
-        \\    vcpkg: bool = false,
-        \\    module: ?ModuleDependency = null,
+        \\    module_memo: ?*std.Build.Module = null,
         \\
-        \\    pub fn zp(self: *Package, b: *std.build.Builder) ModuleDependency {
-        \\        var temp: [100]ModuleDependency = undefined;
-        \\        const pkg = self.pkg.?;
-        \\        for (pkg.dependencies, 0..) |item, i| {
-        \\            temp[i] = item.zp(b);
+        \\    pub fn module(self: *Package, exe: *std.Build.Step.Compile) *std.Build.Module {
+        \\        if (self.module_memo) |cached| {
+        \\            return cached;
         \\        }
-        \\        if (self.module) |mod| {
-        \\            return mod;
+        \\        const b = exe.step.owner;
+        \\        const result = b.createModule(.{});
+        \\        const dummy_library = b.addStaticLibrary(.{
+        \\            .name = "dummy",
+        \\            .target = exe.root_module.resolved_target orelse b.host,
+        \\            .optimize = exe.root_module.optimize.?,
+        \\        });
+        \\        if (self.import) |capture| {
+        \\            result.root_source_file = capture[1];
         \\        }
-        \\        const result = ModuleDependency{
-        \\            .name = pkg.name,
-        \\            .module = b.createModule(.{
-        \\                .source_file = pkg.source,
-        \\                .dependencies = b.allocator.dupe(ModuleDependency, temp[0..pkg.dependencies.len]) catch @panic("oom"),
-        \\            }),
-        \\        };
-        \\        self.module = result;
+        \\        for (self.dependencies) |item| {
+        \\            const module_dep = item.module(exe);
+        \\            if (module_dep.root_source_file != null) {
+        \\                result.addImport(item.import.?[0], module_dep);
+        \\            }
+        \\            for (module_dep.include_dirs.items) |jtem| {
+        \\                switch (jtem) {
+        \\                    .path => result.addIncludePath(jtem.path),
+        \\                    .path_system, .path_after, .framework_path, .framework_path_system, .other_step, .config_header_step => {},
+        \\                }
+        \\            }
+        \\        }
+        \\        for (self.c_include_dirs) |item| {
+        \\            result.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
+        \\            dummy_library.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
+        \\            link_lib_c = true;
+        \\        }
+        \\        for (self.c_source_files) |item| {
+        \\            dummy_library.addCSourceFile(.{ .file = b.path(b.fmt("{s}/{s}", .{ self.directory, item })), .flags = self.c_source_flags });
+        \\        }
+        \\        for (self.system_libs) |item| {
+        \\            dummy_library.linkSystemLibrary(item);
+        \\        }
+        \\        for (self.frameworks) |item| {
+        \\            dummy_library.linkFramework(item);
+        \\        }
+        \\        if (self.c_source_files.len > 0 or self.system_libs.len > 0 or self.frameworks.len > 0) {
+        \\            dummy_library.linkLibC();
+        \\            exe.root_module.linkLibrary(dummy_library);
+        \\            link_lib_c = true;
+        \\        }
+        \\        if (link_lib_c) {
+        \\            result.link_libc = true;
+        \\        }
+        \\        self.module_memo = result;
         \\        return result;
         \\    }
-        \\};
-        \\
-        \\pub const Pkg = struct {
-        \\    name: string,
-        \\    source: std.build.FileSource,
-        \\    dependencies: []const *Package,
         \\};
         \\
         \\
     );
 
     try w.print(
-        \\fn checkMinZig(current: std.SemanticVersion, exe: *std.build.LibExeObjStep) void {{
+        \\fn checkMinZig(current: std.SemanticVersion, exe: *std.Build.Step.Compile) void {{
         \\    const min = std.SemanticVersion.parse("{?}") catch return;
         \\    if (current.order(min).compare(.lt)) @panic(exe.step.owner.fmt("Your Zig version v{{}} does not meet the minimum build requirement of v{{}}", .{{current, min}}));
         \\}}
@@ -148,7 +143,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     , .{top_module.minZigVersion()});
 
     try w.writeAll("pub const dirs = struct {\n");
-    try print_dirs(w, list.items);
+    try print_dirs(w, list.items, alloc);
     try w.writeAll("};\n\n");
 
     try w.writeAll("pub const package_data = struct {\n");
@@ -215,7 +210,7 @@ fn diff_lockfile(alloc: std.mem.Allocator) !void {
         while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line| {
             if (line[0] == ' ') continue;
             if (line[0] == '-') try rems.append(line[1..]);
-            if (line[0] == '+') if (line[1] == '2') continue else try adds.append(line[1..]);
+            if (line[0] == '+') if (line[1] == '2') break else try adds.append(line[1..]);
         }
 
         var changes = std.StringHashMap(DiffChange).init(alloc);
@@ -287,11 +282,16 @@ fn diff_printchange(comptime testt: string, comptime replacement: string, item: 
     return false;
 }
 
-fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module) !void {
+fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module, alloc: std.mem.Allocator) !void {
     for (list) |mod| {
         if (mod.type == .system_lib or mod.type == .framework) continue;
         if (std.mem.eql(u8, mod.id, "root")) {
             try w.writeAll("    pub const _root = \"\";\n");
+            continue;
+        }
+        if (std.mem.eql(u8, mod.clean_path, "../..")) {
+            const cwd_realpath = try std.fs.cwd().realpathAlloc(alloc, ".");
+            try w.print("    pub const _{s} = \"{}\";\n", .{ mod.short_id(), std.zig.fmtEscapes(cwd_realpath) });
             continue;
         }
         try w.print("    pub const _{s} = cache ++ \"/{}\";\n", .{ mod.short_id(), std.zig.fmtEscapes(mod.clean_path) });
@@ -327,23 +327,22 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                 });
                 if (mod.main.len > 0 and !std.mem.eql(u8, mod.id, "root")) {
                     try w.print(
-                        \\        .pkg = Pkg{{ .name = "{s}", .source = .{{ .path = dirs._{s} ++ "/{s}" }}, .dependencies =
+                        \\        .import = .{{ "{s}", .{{ .path = dirs._{s} ++ "/{s}" }} }},
+                        \\
                     , .{
                         mod.name,
                         mod.short_id(),
                         mod.main,
                     });
-                    if (mod.has_no_zig_deps()) {
-                        try w.writeAll(" &.{} },\n");
-                    } else {
-                        try w.writeAll(" &.{");
-                        for (mod.deps, 0..) |moddep, j| {
-                            if (moddep.main.len == 0) continue;
-                            try w.print(" &_{s}", .{moddep.id[0..12]});
-                            if (j != mod.deps.len - 1) try w.writeAll(",");
-                        }
-                        try w.writeAll(" } },\n");
+                }
+                {
+                    try w.writeAll("        .dependencies =");
+                    try w.writeAll(" &.{");
+                    for (mod.deps, 0..) |moddep, j| {
+                        try w.print(" &_{s}", .{moddep.id[0..12]});
+                        if (j != mod.deps.len - 1) try w.writeAll(",");
                     }
+                    try w.writeAll(" },\n");
                 }
                 if (mod.c_include_dirs.len > 0) {
                     try w.writeAll("        .c_include_dirs = &.{");
@@ -386,9 +385,6 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                         if (j != mod.deps.len - 1) try w.writeAll(",");
                     }
                     try w.writeAll(" },\n");
-                }
-                if (mod.vcpkg) {
-                    try w.writeAll("        .vcpkg = true,\n");
                 }
                 try w.writeAll("    };\n");
 

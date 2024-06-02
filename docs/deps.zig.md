@@ -15,10 +15,6 @@ A helper function to automatically pull in dependencies, purely from the `zig bu
 - Type: `pub fn (exe: *std.build.LibExeObjStep) void`
 A helper function to add all of the packages, C files, and system libraries to the passed exectuable. It will also automatically link libC in the event that any C files are found in the dependency tree.
 
-### `addAllLibrariesTo`
-- Type: `pub fn (exe: *std.build.LibExeObjStep) void`
-A helper function called by `addAllTo` that adds the C files and libraries.
-
 ### `Package`
 ```zig
 pub const Package = struct {
@@ -29,7 +25,6 @@ pub const Package = struct {
     c_source_flags: []const string = &.{},
     system_libs: []const string = &.{},
     frameworks: []const string = &.{},
-    vcpkg: bool = false,
 };
 ```
 
@@ -43,7 +38,7 @@ This is a an array of all of the items in `package_data`, but only contains the 
 
 ### `pkgs`
 - Type: `struct<NAME, Package>`
-This is a struct that associates the package name to the relavant `Package`. The only packages listed are the dependencies of the root project. 
+This is a struct that associates the package name to the relavant `Package`. The only packages listed are the dependencies of the root project.
 
 ### `imports`
 - Type: `struct<NAME, @import(main)>`

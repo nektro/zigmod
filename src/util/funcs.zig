@@ -19,7 +19,7 @@ const ansi_reset = "\x1B[39m";
 pub fn assert(ok: bool, comptime fmt: string, args: anytype) void {
     if (!ok) {
         std.debug.print(ansi_red ++ fmt ++ ansi_reset ++ "\n", args);
-        std.os.exit(1);
+        std.process.exit(1);
     }
 }
 
@@ -47,13 +47,13 @@ pub fn split(alloc: std.mem.Allocator, in: string, delim: string) ![]string {
 }
 
 pub fn file_list(alloc: std.mem.Allocator, dpath: string) ![]const string {
-    var dir = try std.fs.cwd().openIterableDir(dpath, .{});
+    var dir = try std.fs.cwd().openDir(dpath, .{ .iterate = true });
     defer dir.close();
     return try extras.fileList(alloc, dir);
 }
 
-pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.ChildProcess.ExecResult {
-    return std.ChildProcess.exec(.{ .allocator = alloc, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
+pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.ChildProcess.RunResult {
+    return std.ChildProcess.run(.{ .allocator = alloc, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
         error.FileNotFound => {
             u.fail("\"{s}\" command not found", .{args[0]});
         },

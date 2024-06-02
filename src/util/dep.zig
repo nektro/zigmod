@@ -27,7 +27,6 @@ pub const Dep = struct {
     yaml: ?yaml.Mapping,
     deps: []zigmod.Dep,
     keep: bool = false,
-    vcpkg: bool = false,
     for_build: bool = false,
     parent_id: string,
 

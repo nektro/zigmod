@@ -27,7 +27,6 @@ pub const Module = struct {
     dep: ?zigmod.Dep,
     for_build: bool = false,
     min_zig_version: ?std.SemanticVersion,
-    vcpkg: bool,
 
     pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, cachepath: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(alloc);
@@ -54,7 +53,6 @@ pub const Module = struct {
             .dep = dep,
             .for_build = dep.for_build,
             .min_zig_version = null,
-            .vcpkg = dep.vcpkg,
         };
     }
 
