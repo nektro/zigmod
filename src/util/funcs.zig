@@ -2,6 +2,7 @@ const std = @import("std");
 const string = []const u8;
 const gpa = std.heap.c_allocator;
 const extras = @import("extras");
+const git = @import("git");
 
 const u = @import("index.zig");
 
@@ -147,11 +148,10 @@ pub fn do_hash(comptime algo: type, data: string) ![algo.digest_length * 2]u8 {
 
 /// Returns the result of running `git rev-parse HEAD`
 pub fn git_rev_HEAD(alloc: std.mem.Allocator, dir: std.fs.Dir) !string {
-    const dirg = try dir.openDir(".git", .{});
-    const h = std.mem.trim(u8, try dirg.readFileAlloc(alloc, "HEAD", 50), "\n");
-    if (!std.mem.startsWith(u8, h, "ref:")) return h;
-    const r = std.mem.trim(u8, try dirg.readFileAlloc(alloc, h[5..], 50), "\n");
-    return r;
+    var dirg = try dir.openDir(".git", .{});
+    defer dirg.close();
+    const commitid = try git.getHEAD(alloc, dirg);
+    return if (commitid) |_| commitid.?.id else error.NotAGitRepo;
 }
 
 pub fn slice(comptime T: type, input: []const T, from: usize, to: usize) []const T {

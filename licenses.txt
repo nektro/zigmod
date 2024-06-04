@@ -8,12 +8,14 @@ MIT:
 - git https://github.com/nektro/zig-ansi
 - git https://github.com/nektro/zig-detect-license
 - git https://github.com/nektro/zig-extras
+- git https://github.com/nektro/zig-git
 - git https://github.com/nektro/zig-inquirer
 - git https://github.com/nektro/zig-leven
 - git https://github.com/nektro/zig-licenses
 - git https://github.com/nektro/zig-licenses-text
 - git https://github.com/nektro/zig-range
 - git https://github.com/nektro/zig-time
+- git https://github.com/nektro/zig-tracer
 - git https://github.com/nektro/zig-yaml
 - git https://github.com/truemedian/hzzp
 - git https://github.com/ziglibs/known-folders
