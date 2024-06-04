@@ -179,7 +179,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             if (try extras.doesFolderExist(null, pv)) {
                 return pv;
             }
-            const file_name = try u.last(try u.split(options.alloc, d.path, "/"));
+            const file_name = u.last(try u.split(options.alloc, d.path, "/")).?;
             if (d.version.len > 0) {
                 if (try extras.doesFolderExist(null, pv)) {
                     return pv;

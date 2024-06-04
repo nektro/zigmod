@@ -79,10 +79,8 @@ pub fn list_remove(alloc: std.mem.Allocator, input: []string, search: string) ![
     return list.toOwnedSlice();
 }
 
-pub fn last(in: []string) !string {
-    if (in.len == 0) {
-        return error.EmptyArray;
-    }
+pub fn last(in: []string) ?string {
+    if (in.len == 0) return null;
     return in[in.len - 1];
 }
 
