@@ -46,7 +46,7 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
     }
     return zigmod.Module{
         .type = .local,
-        .id = "root",
+        .id = zigmod.Module.ROOT,
         .name = "root",
         .main = m.main,
         .deps = try moduledeps.toOwnedSlice(),
@@ -230,7 +230,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
         .system_lib, .framework => {
             return zigmod.Module{
                 .type = d.type,
-                .id = try u.do_hash(options.alloc, std.crypto.hash.sha3.Sha3_384, d.path),
+                .id = try u.do_hash(options.alloc, std.crypto.hash.sha3.Shake(96), d.path),
                 .name = d.path,
                 .only_os = d.only_os,
                 .except_os = d.except_os,
@@ -274,7 +274,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
             dd.for_build = d.for_build;
             const save = dd;
             if (d.type != .local) dd.clean_path = extras.trimPrefix(modpath, cachepath)[1..];
-            if (dd.id.len == 0) dd.id = &u.random_string(48);
+            if (std.mem.eql(u8, &dd.id, &zigmod.Dep.EMPTY)) dd.id = u.random_string(48);
             if (d.name.len > 0) dd.name = d.name;
             if (d.main.len > 0) dd.main = d.main;
             if (d.c_include_dirs.len > 0) dd.c_include_dirs = d.c_include_dirs;
@@ -352,12 +352,11 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
                     .type = std.meta.stringToEnum(zigmod.Dep.Type, iter.next().?).?,
                     .path = iter.next().?,
                     .version = iter.next().?,
-                    .id = "",
+                    .id = zigmod.Dep.EMPTY,
                     .name = "",
                     .main = "",
                     .yaml = null,
                     .deps = &.{},
-                    .parent_id = "",
                 };
                 try list.append([4]string{
                     try asdep.clean_path(alloc),

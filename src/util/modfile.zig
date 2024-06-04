@@ -15,7 +15,7 @@ const mb = kb * 1024;
 pub const ModFile = struct {
     const Self = @This();
 
-    id: string,
+    id: [48]u8,
     name: string,
     main: string,
     c_include_dirs: []const string,
@@ -52,7 +52,9 @@ pub const ModFile = struct {
     }
 
     pub fn from_mapping(alloc: std.mem.Allocator, mapping: yaml.Mapping) !Self {
-        const id = mapping.get_string("id") orelse "";
+        var id = zigmod.Dep.EMPTY;
+        std.mem.copyForwards(u8, &id, mapping.get_string("id") orelse &u.random_string(48));
+
         const name = mapping.get_string("name") orelse "";
         const main = mapping.get_string("main") orelse "";
 
@@ -61,7 +63,7 @@ pub const ModFile = struct {
         }
 
         return Self{
-            .id = if (id.len == 0) &u.random_string(48) else id,
+            .id = id,
             .name = name,
             .main = main,
             .c_include_dirs = try mapping.get_string_array(alloc, "c_include_dirs"),
@@ -120,10 +122,13 @@ pub const ModFile = struct {
                         }
                     }
 
+                    var id = zigmod.Dep.EMPTY;
+                    std.mem.copyForwards(u8, &id, item.mapping.get_string("id") orelse "");
+
                     try dep_list.append(zigmod.Dep{
                         .type = dep_type,
                         .path = path,
-                        .id = item.mapping.get_string("id") orelse "",
+                        .id = id,
                         .name = name,
                         .main = main,
                         .version = version.?,
@@ -136,7 +141,6 @@ pub const ModFile = struct {
                         .deps = try dep_list_by_name(alloc, item.mapping, &.{"dependencies"}, for_build),
                         .keep = std.mem.eql(u8, "true", item.mapping.get_string("keep") orelse ""),
                         .for_build = for_build,
-                        .parent_id = mapping.get_string("id") orelse "",
                     });
                 }
             }

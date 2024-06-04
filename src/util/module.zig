@@ -13,7 +13,7 @@ const common = @import("./../common.zig");
 
 pub const Module = struct {
     type: zigmod.Dep.Type,
-    id: string,
+    id: [48]u8,
     name: string,
     main: string,
     c_include_dirs: []const string = &.{},
@@ -28,6 +28,8 @@ pub const Module = struct {
     for_build: bool = false,
     min_zig_version: ?std.SemanticVersion,
 
+    pub const ROOT: [48]u8 = ("root" ++ (" " ** 44)).*;
+
     pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, cachepath: string, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(alloc);
         errdefer moddeps.deinit();
@@ -37,9 +39,13 @@ pub const Module = struct {
                 try moddeps.append(founddep);
             }
         }
+
+        var id = dep.id;
+        if (std.mem.eql(u8, &id, &zigmod.Dep.EMPTY)) id = u.random_string(48);
+
         return Module{
             .type = dep.type,
-            .id = if (dep.id.len > 0) dep.id else &u.random_string(48),
+            .id = id,
             .name = dep.name,
             .main = dep.main,
             .c_include_dirs = dep.c_include_dirs,
@@ -57,7 +63,7 @@ pub const Module = struct {
     }
 
     pub fn eql(self: Module, another: Module) bool {
-        return std.mem.eql(u8, self.id, another.id);
+        return std.mem.eql(u8, &self.id, &another.id);
     }
 
     pub fn get_hash(self: Module, alloc: std.mem.Allocator, cdpath: string) !string {
@@ -131,8 +137,8 @@ pub const Module = struct {
         return false;
     }
 
-    pub fn short_id(self: Module) string {
-        return u.slice(u8, self.id, 0, 12);
+    pub fn short_id(self: *const Module) string {
+        return u.slice(u8, &self.id, 0, @min(12, std.mem.indexOfScalar(u8, &self.id, ' ') orelse self.id.len));
     }
 
     pub fn minZigVersion(self: Module) ?std.SemanticVersion {

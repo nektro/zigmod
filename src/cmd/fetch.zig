@@ -285,7 +285,7 @@ fn diff_printchange(comptime testt: string, comptime replacement: string, item: 
 fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module, alloc: std.mem.Allocator) !void {
     for (list) |mod| {
         if (mod.type == .system_lib or mod.type == .framework) continue;
-        if (std.mem.eql(u8, mod.id, "root")) {
+        if (std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
             try w.writeAll("    pub const _root = \"\";\n");
             continue;
         }
@@ -325,7 +325,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                     mod.short_id(),
                     mod.short_id(),
                 });
-                if (mod.main.len > 0 and !std.mem.eql(u8, mod.id, "root")) {
+                if (mod.main.len > 0 and !std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
                     try w.print(
                         \\        .import = .{{ "{s}", .{{ .path = dirs._{s} ++ "/{s}" }} }},
                         \\
