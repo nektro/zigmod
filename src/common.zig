@@ -230,7 +230,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
         .system_lib, .framework => {
             return zigmod.Module{
                 .type = d.type,
-                .id = try u.do_hash(options.alloc, std.crypto.hash.sha3.Shake(96), d.path),
+                .id = try u.do_hash(std.crypto.hash.sha3.Shake(96), d.path),
                 .name = d.path,
                 .only_os = d.only_os,
                 .except_os = d.except_os,
