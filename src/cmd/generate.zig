@@ -83,7 +83,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            return result;
         \\        }
         \\
-        \\        fn make(step: *std.Build.Step, prog_node: *std.Progress.Node) !void {
+        \\        fn make(step: *std.Build.Step, prog_node: std.Progress.Node) anyerror!void {
         \\            _ = step;
         \\            _ = prog_node;
         \\        }
@@ -162,7 +162,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        });
         \\        dummy_library.step.dependOn(fetch_step);
         \\        if (self.entry) |capture| {
-        \\            result.root_source_file = .{ .path = capture };
+        \\            result.root_source_file = .{ .cwd_relative = capture };
         \\        }
         \\        for (self.deps) |item| {
         \\            const module_dep = item.module(exe, fetch_step);

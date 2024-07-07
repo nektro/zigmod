@@ -12,7 +12,6 @@ MIT:
 - git https://github.com/nektro/zig-leven
 - git https://github.com/nektro/zig-licenses
 - git https://github.com/nektro/zig-licenses-text
-- git https://github.com/nektro/zig-range
 - git https://github.com/nektro/zig-time
 - git https://github.com/nektro/zig-yaml
 - git https://github.com/truemedian/hzzp

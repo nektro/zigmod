@@ -56,7 +56,7 @@ pub fn main() !void {
     for (args[1..]) |item| {
         try sub_cmd_args.append(item);
     }
-    const result = std.ChildProcess.run(.{ .allocator = gpa, .argv = sub_cmd_args.items }) catch |e| switch (e) {
+    const result = std.process.Child.run(.{ .allocator = gpa, .argv = sub_cmd_args.items }) catch |e| switch (e) {
         else => |ee| return ee,
         error.FileNotFound => {
             fail("unknown command \"{s}\" for \"zigmod\"", .{args[0]});

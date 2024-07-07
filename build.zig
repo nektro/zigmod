@@ -11,7 +11,7 @@ pub fn build(b: *std.Build) void {
     const exe_name = b.fmt("{s}{s}", .{ "zigmod", if (use_full_name) with_arch_os else "" });
     const exe = b.addExecutable(.{
         .name = exe_name,
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = mode,
     });
