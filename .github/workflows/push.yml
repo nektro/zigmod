@@ -43,6 +43,7 @@ jobs:
       - run: ./zig-out/bin/zigmod aq add 1/vrischmann/sqlite
 
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-basic
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-git-dep
 
       # Github Release
       - run: ./changelog.sh
