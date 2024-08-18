@@ -36,3 +36,5 @@ jobs:
       - run: ./zig-out/bin/zigmod zpm add apple_pie
       - run: ./zig-out/bin/zigmod zpm tags
       - run: ./zig-out/bin/zigmod aq add 1/vrischmann/sqlite
+
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-basic
