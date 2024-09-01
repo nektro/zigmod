@@ -45,6 +45,7 @@ jobs:
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-basic
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-git-dep
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-hg-dep
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-http-dep
 
       # Github Release
       - run: ./changelog.sh
