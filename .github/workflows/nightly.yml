@@ -43,3 +43,4 @@ jobs:
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-http-dep
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-systemlib-dep
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-local-dep
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-c-code
