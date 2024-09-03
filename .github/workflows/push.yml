@@ -39,10 +39,10 @@ jobs:
       - run: ./build_release.sh mips64-linux-musl
 
       # Test
-      - run: ./zig-out/bin/zigmod version
-      - run: ./zig-out/bin/zigmod zpm add apple_pie
-      - run: ./zig-out/bin/zigmod zpm tags
-      - run: ./zig-out/bin/zigmod aq add 1/vrischmann/sqlite
+      - run: zigmod version
+      - run: zigmod zpm add apple_pie
+      - run: zigmod zpm tags
+      - run: zigmod aq add 1/vrischmann/sqlite
 
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-basic
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-git-dep
