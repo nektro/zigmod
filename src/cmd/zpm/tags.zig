@@ -14,12 +14,14 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
     const out = std.io.getStdOut().writer();
 
     const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, "tags" });
-    const val = try zpm.server_fetch(url);
+    const doc = try zpm.server_fetch(url);
+    doc.acquire();
+    defer doc.release();
 
     const name_col_width = blk: {
         var w: usize = 4;
-        for (val.value.array.items) |tag| {
-            const len = tag.object.get("name").?.string.len;
+        for (doc.root.array()) |tag| {
+            const len = tag.object().getS("name").?.len;
             if (len > w) {
                 w = len;
             }
@@ -31,11 +33,11 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
     try print_c_n(out, ' ', name_col_width - 4);
     try out.writeAll("DESCRIPTION\n");
 
-    for (val.value.array.items) |tag| {
-        const name = tag.object.get("name").?.string;
+    for (doc.root.array()) |tag| {
+        const name = tag.object().getS("name").?;
         try out.writeAll(name);
         try print_c_n(out, ' ', name_col_width - name.len);
-        try out.writeAll(tag.object.get("description").?.string);
+        try out.writeAll(tag.object().getS("description").?);
         try out.writeAll("\n");
     }
 }

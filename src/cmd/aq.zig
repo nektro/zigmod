@@ -3,6 +3,7 @@ const string = []const u8;
 const gpa = std.heap.c_allocator;
 const zfetch = @import("zfetch");
 const extras = @import("extras");
+const json = @import("json");
 
 const u = @import("./../util/index.zig");
 
@@ -43,7 +44,7 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
     u.fail("unknown command \"{s}\" for \"zigmod aq\"", .{args[0]});
 }
 
-pub fn server_fetch(url: string) !std.json.Parsed(std.json.Value) {
+pub fn server_fetch(url: string) !json.Document {
     const req = try zfetch.Request.init(gpa, url, null);
     defer req.deinit();
 
@@ -53,13 +54,13 @@ pub fn server_fetch(url: string) !std.json.Parsed(std.json.Value) {
 
     try req.do(.GET, headers, null);
 
-    const r = req.reader();
-    const body_content = try r.readAllAlloc(gpa, std.math.maxInt(usize));
-    const val = try extras.parse_json(gpa, body_content);
+    const doc = try json.parse(gpa, "", req.reader(), .{ .support_trailing_commas = true, .maximum_depth = 100 });
+    doc.acquire();
+    defer doc.release();
 
-    if (val.value.object.get("message")) |msg| {
-        std.log.err("server: {s}", .{msg.string});
+    if (doc.root.object().getS("message")) |msg| {
+        std.log.err("server: {s}", .{msg});
         return error.AquilaBadResponse;
     }
-    return val;
+    return doc;
 }

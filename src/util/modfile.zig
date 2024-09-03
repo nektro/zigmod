@@ -90,7 +90,6 @@ pub const ModFile = struct {
                     var dtype: string = undefined;
                     var path: string = undefined;
                     var version: ?string = null;
-                    var name = item.mapping.get_string("name") orelse "";
                     var main = item.mapping.get_string("main") orelse "";
 
                     if (item.mapping.get("src")) |val| {
@@ -112,10 +111,6 @@ pub const ModFile = struct {
                     }
                     const dep_type = std.meta.stringToEnum(zigmod.Dep.Type, dtype).?;
                     if (dep_type == .local) {
-                        if (path.len > 0) {
-                            name = path;
-                            path = "";
-                        }
                         if (version.?.len > 0) {
                             main = version.?;
                             version = "";
@@ -129,7 +124,7 @@ pub const ModFile = struct {
                         .type = dep_type,
                         .path = path,
                         .id = id,
-                        .name = name,
+                        .name = item.mapping.get_string("name") orelse "",
                         .main = main,
                         .version = version.?,
                         .c_include_dirs = try item.mapping.get_string_array(alloc, "c_include_dirs"),
@@ -142,6 +137,7 @@ pub const ModFile = struct {
                         .keep = std.mem.eql(u8, "true", item.mapping.get_string("keep") orelse ""),
                         .for_build = for_build,
                     });
+                    // const d = &dep_list.getLast();
                 }
             }
         }

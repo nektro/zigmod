@@ -8,6 +8,8 @@ git https://github.com/nektro/zig-detect-license commit-3ff57d0681b7bd7f8ca9bd09
 git https://github.com/nektro/zig-extras commit-74f0ddb0a4dfa7921739b88cc381951a6b6e73ce
 git https://github.com/nektro/zig-git commit-103f4e419c35b88f802bb8234ece1c0a9aa40c03
 git https://github.com/nektro/zig-inquirer commit-cf43dd6c9f328073f7468b5341c69ed0bb185db3
+git https://github.com/nektro/zig-intrusive-parser commit-2336d8b767eb7378762e1ba63635ca44accbd2ca
+git https://github.com/nektro/zig-json commit-29587071de6dd3338e8eb76d4e0307af69a2d61a
 git https://github.com/nektro/zig-leven commit-e5481b297b6023d446d835156591ba5ce88c17be
 git https://github.com/nektro/zig-licenses commit-f46d9f774df929885eef66c733a1e2a46bf16aec
 git https://github.com/nektro/zig-licenses-text commit-b01e5a2dffcc564bddd8f514fe64bab9b5c52572

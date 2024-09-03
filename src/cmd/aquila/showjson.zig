@@ -12,7 +12,9 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
     const out = std.io.getStdOut().writer();
 
     const url = try std.mem.join(gpa, "/", &.{ aq.server_root, args[0] });
-    const val = try aq.server_fetch(url);
+    const doc = try aq.server_fetch(url);
+    doc.acquire();
+    defer doc.release();
 
-    try out.print("{}\n", .{val});
+    try out.print("{}\n", .{doc});
 }

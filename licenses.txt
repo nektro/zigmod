@@ -10,6 +10,7 @@ MIT:
 - git https://github.com/nektro/zig-extras
 - git https://github.com/nektro/zig-git
 - git https://github.com/nektro/zig-inquirer
+- git https://github.com/nektro/zig-json
 - git https://github.com/nektro/zig-leven
 - git https://github.com/nektro/zig-licenses
 - git https://github.com/nektro/zig-licenses-text
@@ -19,3 +20,7 @@ MIT:
 - git https://github.com/truemedian/hzzp
 - git https://github.com/ziglibs/known-folders
 - git https://github.com/yaml/libyaml
+
+MPL-2.0:
+= https://spdx.org/licenses/MPL-2.0
+- git https://github.com/nektro/zig-intrusive-parser
