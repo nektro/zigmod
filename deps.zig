@@ -54,7 +54,7 @@ pub fn fetch(exe: *std.Build.Step.Compile) *std.Build.Step {
           const root = if (@field(package_data, decl.name).store) |_| b.cache_root.path.? else ".";
           if (path.* != null) path.* = b.fmt("{s}/zigmod/deps{s}", .{ root, path.*.? });
     }
-    step.dependOn(&GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "c778640d3dc153e900fbe37e2816b5176af3c802").step);
+    step.dependOn(&GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "407a4c7b869ee3d10db520fdfae8b9faf9b2adb5").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "38a018ad3a19d5b4663a5364d2d31271f250846b").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/iguanaTLS", "4dc8850883b49e4a452871298788b06b1af9fe24").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zfetch", "863be236188e5f24d16554f9dcd7df96dd254a13").step);
@@ -174,9 +174,9 @@ fn checkMinZig(current: std.SemanticVersion, exe: *std.Build.Step.Compile) void 
 
 pub const package_data = struct {
     pub var _o6ogpor87xc2 = Package{
-        .store = "/git/github.com/marlersoft/zigwin32/c778640d3dc153e900fbe37e2816b5176af3c802",
+        .store = "/git/github.com/marlersoft/zigwin32/407a4c7b869ee3d10db520fdfae8b9faf9b2adb5",
         .name = "win32",
-        .entry = "/git/github.com/marlersoft/zigwin32/c778640d3dc153e900fbe37e2816b5176af3c802/win32.zig",
+        .entry = "/git/github.com/marlersoft/zigwin32/407a4c7b869ee3d10db520fdfae8b9faf9b2adb5/win32.zig",
     };
     pub var _u7sysdckdymi = Package{
         .store = "/git/github.com/nektro/arqv-ini/38a018ad3a19d5b4663a5364d2d31271f250846b",
