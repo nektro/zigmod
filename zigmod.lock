@@ -17,5 +17,5 @@ git https://github.com/nektro/zig-time commit-ba546bbf2e8438c9b2325f36f392c9d95b
 git https://github.com/nektro/zig-tracer commit-ad868b45cfd445aa4d3f53cf8dda4b62b73efb54
 git https://github.com/nektro/zig-yaml commit-0d17fb99cba338aedc1abac12d78d5e5f04f0b6b
 git https://github.com/truemedian/hzzp commit-a7f03a1e652abe8c89b376d090cec50acb0d2a1a
-git https://github.com/ziglibs/known-folders commit-0ad514dcfb7525e32ae349b9acc0a53976f3a9fa
+git https://github.com/ziglibs/known-folders commit-1cceeb70e77dec941a4178160ff6c8d05a74de6f
 git https://github.com/yaml/libyaml tag-0.2.5

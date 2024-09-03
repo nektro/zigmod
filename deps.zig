@@ -72,7 +72,7 @@ pub fn fetch(exe: *std.Build.Step.Compile) *std.Build.Step {
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-tracer", "ad868b45cfd445aa4d3f53cf8dda4b62b73efb54").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-yaml", "0d17fb99cba338aedc1abac12d78d5e5f04f0b6b").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/truemedian/hzzp", "a7f03a1e652abe8c89b376d090cec50acb0d2a1a").step);
-    step.dependOn(&GitExactStep.create(b, "https://github.com/ziglibs/known-folders", "0ad514dcfb7525e32ae349b9acc0a53976f3a9fa").step);
+    step.dependOn(&GitExactStep.create(b, "https://github.com/ziglibs/known-folders", "1cceeb70e77dec941a4178160ff6c8d05a74de6f").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/yaml/libyaml", "2c891fc7a770e8ba2fec34fc6b545c672beb37e6").step);
     return step;
 }
@@ -273,9 +273,9 @@ pub const package_data = struct {
         .deps = &[_]*Package{ &_9k24gimke1an, &_csbnipaad8n7 },
     };
     pub var _2ta738wrqbaq = Package{
-        .store = "/git/github.com/ziglibs/known-folders/0ad514dcfb7525e32ae349b9acc0a53976f3a9fa",
+        .store = "/git/github.com/ziglibs/known-folders/1cceeb70e77dec941a4178160ff6c8d05a74de6f",
         .name = "known-folders",
-        .entry = "/git/github.com/ziglibs/known-folders/0ad514dcfb7525e32ae349b9acc0a53976f3a9fa/known-folders.zig",
+        .entry = "/git/github.com/ziglibs/known-folders/1cceeb70e77dec941a4178160ff6c8d05a74de6f/known-folders.zig",
     };
     pub var _89ujp8gq842x = Package{
         .name = "zigmod",
