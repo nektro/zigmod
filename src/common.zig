@@ -202,7 +202,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             }
             const file_path = try std.fs.path.resolve(options.alloc, &.{ p, file_name });
             try d.type.pull(options.alloc, d.path, p);
-            try std.fs.deleteFileAbsolute(file_path);
+            try std.fs.cwd().deleteFile(file_path);
             return p;
         },
     }
