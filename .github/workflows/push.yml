@@ -25,6 +25,7 @@ jobs:
       - run: zig version
       - run: zig env
       - run: zig build -j1
+      - run: echo "$PWD/zig-out/bin" >> $GITHUB_PATH
 
       # Build All
       - run: ./build_release.sh x86_64-linux-musl
