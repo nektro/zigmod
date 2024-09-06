@@ -12,6 +12,10 @@ pub fn addAllTo(exe: *std.Build.Step.Compile) void {
         const module = pkg.module(exe);
         exe.root_module.addImport(pkg.import.?[0], module);
     }
+    for (package_data._root.system_libs) |libname| {
+        exe.linkSystemLibrary(libname);
+        exe.linkLibC();
+    }
 }
 
 var link_lib_c = false;
@@ -31,11 +35,8 @@ pub const Package = struct {
             return cached;
         }
         const b = exe.step.owner;
-        const result = b.createModule(.{});
-        const dummy_library = b.addStaticLibrary(.{
-            .name = "dummy",
+        const result = b.createModule(.{
             .target = exe.root_module.resolved_target orelse b.host,
-            .optimize = exe.root_module.optimize.?,
         });
         if (self.import) |capture| {
             result.root_source_file = capture[1];
@@ -54,25 +55,26 @@ pub const Package = struct {
         }
         for (self.c_include_dirs) |item| {
             result.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
-            dummy_library.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
+            exe.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
             link_lib_c = true;
         }
         for (self.c_source_files) |item| {
-            dummy_library.addCSourceFile(.{ .file = b.path(b.fmt("{s}/{s}", .{ self.directory, item })), .flags = self.c_source_flags });
+            exe.addCSourceFile(.{ .file = b.path(b.fmt("{s}/{s}", .{ self.directory, item })), .flags = self.c_source_flags });
+            link_lib_c = true;
         }
         for (self.system_libs) |item| {
-            dummy_library.linkSystemLibrary(item);
+            result.linkSystemLibrary(item, .{});
+            exe.linkSystemLibrary(item);
+            link_lib_c = true;
         }
         for (self.frameworks) |item| {
-            dummy_library.linkFramework(item);
-        }
-        if (self.c_source_files.len > 0 or self.system_libs.len > 0 or self.frameworks.len > 0) {
-            dummy_library.linkLibC();
-            exe.root_module.linkLibrary(dummy_library);
+            result.linkFramework(item, .{});
+            exe.linkFramework(item);
             link_lib_c = true;
         }
         if (link_lib_c) {
             result.link_libc = true;
+            exe.linkLibC();
         }
         self.module_memo = result;
         return result;
