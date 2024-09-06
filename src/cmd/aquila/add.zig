@@ -18,11 +18,13 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
 
 pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
     const url = try std.mem.join(gpa, "/", &.{ aq.server_root, pkg_id });
-    const val = try aq.server_fetch(url);
+    const doc = try aq.server_fetch(url);
+    doc.acquire();
+    defer doc.release();
 
     const pkg_url = try std.fmt.allocPrint(gpa, "https://{s}/{s}", .{
-        val.value.object.get("repo").?.object.get("domain").?.string,
-        val.value.object.get("package").?.object.get("remote_name").?.string,
+        doc.root.object().getO("repo").?.getS("domain").?,
+        doc.root.object().getO("package").?.getS("remote_name").?,
     });
 
     const m = try zigmod.ModFile.from_dir(gpa, dir);

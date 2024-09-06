@@ -15,7 +15,7 @@ pub const Dep = struct {
 
     type: Type,
     path: string,
-    id: string,
+    id: [48]u8,
     name: string,
     main: string,
     version: string,
@@ -28,7 +28,8 @@ pub const Dep = struct {
     deps: []zigmod.Dep,
     keep: bool = false,
     for_build: bool = false,
-    parent_id: string,
+
+    pub const EMPTY = (" " ** 48).*;
 
     pub const Type = @import("./dep_type.zig").DepType;
 

@@ -2,6 +2,7 @@ const std = @import("std");
 const string = []const u8;
 const gpa = std.heap.c_allocator;
 const extras = @import("extras");
+const git = @import("git");
 
 const u = @import("index.zig");
 
@@ -79,10 +80,8 @@ pub fn list_remove(alloc: std.mem.Allocator, input: []string, search: string) ![
     return list.toOwnedSlice();
 }
 
-pub fn last(in: []string) !string {
-    if (in.len == 0) {
-        return error.EmptyArray;
-    }
+pub fn last(in: []string) ?string {
+    if (in.len == 0) return null;
     return in[in.len - 1];
 }
 
@@ -132,9 +131,9 @@ pub fn validate_hash(alloc: std.mem.Allocator, input: string, file_path: string)
     const data = try file.reader().readAllAlloc(alloc, gb);
     const expected = hash.string;
     const actual = switch (hash.id) {
-        .blake3 => try do_hash(alloc, std.crypto.hash.Blake3, data),
-        .sha256 => try do_hash(alloc, std.crypto.hash.sha2.Sha256, data),
-        .sha512 => try do_hash(alloc, std.crypto.hash.sha2.Sha512, data),
+        .blake3 => &try do_hash(std.crypto.hash.Blake3, data),
+        .sha256 => &try do_hash(std.crypto.hash.sha2.Sha256, data),
+        .sha512 => &try do_hash(std.crypto.hash.sha2.Sha512, data),
     };
     const result = std.mem.startsWith(u8, actual, expected);
     if (!result) {
@@ -143,22 +142,16 @@ pub fn validate_hash(alloc: std.mem.Allocator, input: string, file_path: string)
     return result;
 }
 
-pub fn do_hash(alloc: std.mem.Allocator, comptime algo: type, data: string) !string {
-    var h = algo.init(.{});
-    var out: [algo.digest_length]u8 = undefined;
-    h.update(data);
-    h.final(&out);
-    const hex = try std.fmt.allocPrint(alloc, "{x}", .{std.fmt.fmtSliceHexLower(out[0..])});
-    return hex;
+pub fn do_hash(comptime algo: type, data: string) ![algo.digest_length * 2]u8 {
+    return extras.to_hex(extras.hashBytes(algo, data));
 }
 
 /// Returns the result of running `git rev-parse HEAD`
 pub fn git_rev_HEAD(alloc: std.mem.Allocator, dir: std.fs.Dir) !string {
-    const dirg = try dir.openDir(".git", .{});
-    const h = std.mem.trim(u8, try dirg.readFileAlloc(alloc, "HEAD", 50), "\n");
-    if (!std.mem.startsWith(u8, h, "ref:")) return h;
-    const r = std.mem.trim(u8, try dirg.readFileAlloc(alloc, h[5..], 50), "\n");
-    return r;
+    var dirg = try dir.openDir(".git", .{});
+    defer dirg.close();
+    const commitid = try git.getHEAD(alloc, dirg);
+    return if (commitid) |_| commitid.?.id else error.NotAGitRepo;
 }
 
 pub fn slice(comptime T: type, input: []const T, from: usize, to: usize) []const T {

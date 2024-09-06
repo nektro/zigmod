@@ -17,13 +17,15 @@ jobs:
       - run: top -b -n 1 | head -n5
 
       - name: Setup Zig
-        uses: goto-bus-stop/setup-zig@v2
+        uses: mlugg/setup-zig@v1
         with:
+          mirror: "http://mirrors.nektro.net/s3cgi"
           version: "0.12.0"
 
       - run: zig version
       - run: zig env
       - run: zig build -j1
+      - run: echo "$PWD/zig-out/bin" >> $GITHUB_PATH
 
       # Build All
       - run: ./build_release.sh x86_64-linux-musl
@@ -37,10 +39,18 @@ jobs:
       - run: ./build_release.sh mips64-linux-musl
 
       # Test
-      - run: ./zig-out/bin/zigmod version
-      - run: ./zig-out/bin/zigmod zpm add apple_pie
-      - run: ./zig-out/bin/zigmod zpm tags
-      - run: ./zig-out/bin/zigmod aq add 1/vrischmann/sqlite
+      - run: zigmod version
+      - run: zigmod zpm add apple_pie
+      - run: zigmod zpm tags
+      - run: zigmod aq add 1/vrischmann/sqlite
+
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-basic
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-git-dep
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-hg-dep
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-http-dep
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-systemlib-dep
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-local-dep
+      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-c-code
 
       # Github Release
       - run: ./changelog.sh

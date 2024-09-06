@@ -15,6 +15,8 @@ dependencies:
   - src: git https://github.com/nektro/arqv-ini
   - src: git https://github.com/nektro/zig-time
   - src: git https://github.com/nektro/zig-extras
+  - src: git https://github.com/nektro/zig-git
+  - src: git https://github.com/nektro/zig-json
 
 root_dependencies:
   - src: git https://github.com/marlersoft/zigwin32

@@ -63,6 +63,10 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        const module = pkg.module(exe);
         \\        exe.root_module.addImport(pkg.import.?[0], module);
         \\    }
+        \\    for (package_data._root.system_libs) |libname| {
+        \\        exe.linkSystemLibrary(libname);
+        \\        exe.linkLibC();
+        \\    }
         \\}
         \\
         \\var link_lib_c = false;
@@ -82,11 +86,8 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            return cached;
         \\        }
         \\        const b = exe.step.owner;
-        \\        const result = b.createModule(.{});
-        \\        const dummy_library = b.addStaticLibrary(.{
-        \\            .name = "dummy",
+        \\        const result = b.createModule(.{
         \\            .target = exe.root_module.resolved_target orelse b.host,
-        \\            .optimize = exe.root_module.optimize.?,
         \\        });
         \\        if (self.import) |capture| {
         \\            result.root_source_file = capture[1];
@@ -105,25 +106,26 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        }
         \\        for (self.c_include_dirs) |item| {
         \\            result.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
-        \\            dummy_library.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
+        \\            exe.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
         \\            link_lib_c = true;
         \\        }
         \\        for (self.c_source_files) |item| {
-        \\            dummy_library.addCSourceFile(.{ .file = b.path(b.fmt("{s}/{s}", .{ self.directory, item })), .flags = self.c_source_flags });
+        \\            exe.addCSourceFile(.{ .file = b.path(b.fmt("{s}/{s}", .{ self.directory, item })), .flags = self.c_source_flags });
+        \\            link_lib_c = true;
         \\        }
         \\        for (self.system_libs) |item| {
-        \\            dummy_library.linkSystemLibrary(item);
+        \\            result.linkSystemLibrary(item, .{});
+        \\            exe.linkSystemLibrary(item);
+        \\            link_lib_c = true;
         \\        }
         \\        for (self.frameworks) |item| {
-        \\            dummy_library.linkFramework(item);
-        \\        }
-        \\        if (self.c_source_files.len > 0 or self.system_libs.len > 0 or self.frameworks.len > 0) {
-        \\            dummy_library.linkLibC();
-        \\            exe.root_module.linkLibrary(dummy_library);
+        \\            result.linkFramework(item, .{});
+        \\            exe.linkFramework(item);
         \\            link_lib_c = true;
         \\        }
         \\        if (link_lib_c) {
         \\            result.link_libc = true;
+        \\            exe.linkLibC();
         \\        }
         \\        self.module_memo = result;
         \\        return result;
@@ -285,7 +287,7 @@ fn diff_printchange(comptime testt: string, comptime replacement: string, item: 
 fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module, alloc: std.mem.Allocator) !void {
     for (list) |mod| {
         if (mod.type == .system_lib or mod.type == .framework) continue;
-        if (std.mem.eql(u8, mod.id, "root")) {
+        if (std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
             try w.writeAll("    pub const _root = \"\";\n");
             continue;
         }
@@ -325,7 +327,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                     mod.short_id(),
                     mod.short_id(),
                 });
-                if (mod.main.len > 0 and !std.mem.eql(u8, mod.id, "root")) {
+                if (mod.main.len > 0 and !std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
                     try w.print(
                         \\        .import = .{{ "{s}", .{{ .cwd_relative = dirs._{s} ++ "/{s}" }} }},
                         \\
@@ -339,6 +341,8 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                     try w.writeAll("        .dependencies =");
                     try w.writeAll(" &.{");
                     for (mod.deps, 0..) |moddep, j| {
+                        if (moddep.type == .system_lib) continue;
+                        if (moddep.type == .framework) continue;
                         try w.print(" &_{s}", .{moddep.id[0..12]});
                         if (j != mod.deps.len - 1) try w.writeAll(",");
                     }

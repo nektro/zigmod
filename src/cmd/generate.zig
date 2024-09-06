@@ -284,7 +284,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
                     .hg => @panic("TODO"),
                     .http => @panic("TODO"),
                 }
-                if (mod.main.len > 0 and !std.mem.eql(u8, mod.id, "root")) {
+                if (mod.main.len > 0 and !std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
                     try w.print("        .name = \"{s}\",\n", .{mod.name});
                     try w.print("        .entry = \"/{}/{s}/{s}\",\n", .{ std.zig.fmtEscapes(fixed_path), try mod.pin(alloc, cachepath), mod.main });
 

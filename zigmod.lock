@@ -11,6 +11,7 @@ git https://github.com/nektro/zig-leven commit-e5481b297b6023d446d835156591ba5ce
 git https://github.com/nektro/zig-licenses commit-f46d9f774df929885eef66c733a1e2a46bf16aec
 git https://github.com/nektro/zig-licenses-text commit-b01e5a2dffcc564bddd8f514fe64bab9b5c52572
 git https://github.com/nektro/zig-time commit-ba546bbf2e8438c9b2325f36f392c9d95b432e8e
+git https://github.com/nektro/zig-tracer commit-ad868b45cfd445aa4d3f53cf8dda4b62b73efb54
 git https://github.com/nektro/zig-yaml commit-0d17fb99cba338aedc1abac12d78d5e5f04f0b6b
 git https://github.com/truemedian/hzzp commit-a7f03a1e652abe8c89b376d090cec50acb0d2a1a
 git https://github.com/ziglibs/known-folders commit-47076c6b11214a218e9244471d8762310820911a
