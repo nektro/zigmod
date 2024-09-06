@@ -102,6 +102,10 @@ pub const dirs = struct {
     pub const _c1xirp1ota5p = cache ++ "/git/github.com/nektro/zig-inquirer";
     pub const _u7sysdckdymi = cache ++ "/git/github.com/nektro/arqv-ini";
     pub const _iecwp4b3bsfm = cache ++ "/git/github.com/nektro/zig-time";
+    pub const _0k64oe2nuzvj = cache ++ "/git/github.com/nektro/zig-git";
+    pub const _ede2wygpe1iy = cache ++ "/git/github.com/nektro/zig-tracer";
+    pub const _ocmr9rtohgcc = cache ++ "/git/github.com/nektro/zig-json";
+    pub const _7l3oxw6nqqws = cache ++ "/git/github.com/nektro/zig-intrusive-parser";
     pub const _o6ogpor87xc2 = cache ++ "/git/github.com/marlersoft/zigwin32";
 };
 
@@ -183,10 +187,30 @@ pub const package_data = struct {
         .import = .{ "time", .{ .cwd_relative = dirs._iecwp4b3bsfm ++ "/time.zig" } },
         .dependencies = &.{ &_f7dubzb7cyqe },
     };
+    pub var _ede2wygpe1iy = Package{
+        .directory = dirs._ede2wygpe1iy,
+        .import = .{ "tracer", .{ .cwd_relative = dirs._ede2wygpe1iy ++ "/src/mod.zig" } },
+        .dependencies = &.{ &_f7dubzb7cyqe },
+    };
+    pub var _0k64oe2nuzvj = Package{
+        .directory = dirs._0k64oe2nuzvj,
+        .import = .{ "git", .{ .cwd_relative = dirs._0k64oe2nuzvj ++ "/git.zig" } },
+        .dependencies = &.{ &_iecwp4b3bsfm, &_f7dubzb7cyqe, &_ede2wygpe1iy },
+    };
+    pub var _7l3oxw6nqqws = Package{
+        .directory = dirs._7l3oxw6nqqws,
+        .import = .{ "intrusive-parser", .{ .cwd_relative = dirs._7l3oxw6nqqws ++ "/intrusive_parser.zig" } },
+        .dependencies = &.{ &_f7dubzb7cyqe },
+    };
+    pub var _ocmr9rtohgcc = Package{
+        .directory = dirs._ocmr9rtohgcc,
+        .import = .{ "json", .{ .cwd_relative = dirs._ocmr9rtohgcc ++ "/json.zig" } },
+        .dependencies = &.{ &_f7dubzb7cyqe, &_ede2wygpe1iy, &_7l3oxw6nqqws },
+    };
     pub var _89ujp8gq842x = Package{
         .directory = dirs._89ujp8gq842x,
         .import = .{ "zigmod", .{ .cwd_relative = dirs._89ujp8gq842x ++ "/src/lib.zig" } },
-        .dependencies = &.{ &_g982zq6e8wsv, &_s84v9o48ucb0, &_2ta738wrqbaq, &_0npcrzfdlrvk, &_ejw82j2ipa0e, &_2ovav391ivak, &_c1xirp1ota5p, &_u7sysdckdymi, &_iecwp4b3bsfm, &_f7dubzb7cyqe },
+        .dependencies = &.{ &_g982zq6e8wsv, &_s84v9o48ucb0, &_2ta738wrqbaq, &_0npcrzfdlrvk, &_ejw82j2ipa0e, &_2ovav391ivak, &_c1xirp1ota5p, &_u7sysdckdymi, &_iecwp4b3bsfm, &_f7dubzb7cyqe, &_0k64oe2nuzvj, &_ocmr9rtohgcc },
     };
     pub var _o6ogpor87xc2 = Package{
         .directory = dirs._o6ogpor87xc2,

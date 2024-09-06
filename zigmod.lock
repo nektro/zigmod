@@ -1,12 +1,15 @@
 2
-git https://github.com/marlersoft/zigwin32 commit-4a78e716ae6496f52d9ddaf4fda2c4bb692631cd
+git https://github.com/marlersoft/zigwin32 commit-407a4c7b869ee3d10db520fdfae8b9faf9b2adb5
 git https://github.com/nektro/arqv-ini commit-38a018ad3a19d5b4663a5364d2d31271f250846b
 git https://github.com/nektro/iguanaTLS commit-4dc8850883b49e4a452871298788b06b1af9fe24
 git https://github.com/nektro/zfetch commit-863be236188e5f24d16554f9dcd7df96dd254a13
 git https://github.com/nektro/zig-ansi commit-c3e439f86b0484e4428f38c4d8b07b7b5ae1634b
 git https://github.com/nektro/zig-detect-license commit-3ff57d0681b7bd7f8ca9bd092afa0b4bfe2f1afd
-git https://github.com/nektro/zig-extras commit-74f0ddb0a4dfa7921739b88cc381951a6b6e73ce
+git https://github.com/nektro/zig-extras commit-afd6e5e39651b8079d8d72bb59d6b6f9115ef94e
+git https://github.com/nektro/zig-git commit-103f4e419c35b88f802bb8234ece1c0a9aa40c03
 git https://github.com/nektro/zig-inquirer commit-cf43dd6c9f328073f7468b5341c69ed0bb185db3
+git https://github.com/nektro/zig-intrusive-parser commit-2336d8b767eb7378762e1ba63635ca44accbd2ca
+git https://github.com/nektro/zig-json commit-29587071de6dd3338e8eb76d4e0307af69a2d61a
 git https://github.com/nektro/zig-leven commit-e5481b297b6023d446d835156591ba5ce88c17be
 git https://github.com/nektro/zig-licenses commit-f46d9f774df929885eef66c733a1e2a46bf16aec
 git https://github.com/nektro/zig-licenses-text commit-b01e5a2dffcc564bddd8f514fe64bab9b5c52572
@@ -14,5 +17,5 @@ git https://github.com/nektro/zig-time commit-ba546bbf2e8438c9b2325f36f392c9d95b
 git https://github.com/nektro/zig-tracer commit-ad868b45cfd445aa4d3f53cf8dda4b62b73efb54
 git https://github.com/nektro/zig-yaml commit-0d17fb99cba338aedc1abac12d78d5e5f04f0b6b
 git https://github.com/truemedian/hzzp commit-a7f03a1e652abe8c89b376d090cec50acb0d2a1a
-git https://github.com/ziglibs/known-folders commit-47076c6b11214a218e9244471d8762310820911a
+git https://github.com/ziglibs/known-folders commit-1cceeb70e77dec941a4178160ff6c8d05a74de6f
 git https://github.com/yaml/libyaml tag-0.2.5
