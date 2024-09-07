@@ -40,7 +40,7 @@ pub const GitExactStep = struct {
             return result;
         }
 
-        fn make(step: *std.Build.Step, prog_node: *std.Progress.Node) !void {
+        fn make(step: *std.Build.Step, prog_node: std.Progress.Node) !void {
             _ = step;
             _ = prog_node;
         }
@@ -126,7 +126,7 @@ pub const Package = struct {
         });
         dummy_library.step.dependOn(fetch_step);
         if (self.entry) |capture| {
-            result.root_source_file = .{ .path = capture };
+            result.root_source_file = .{ .cwd_relative = capture };
         }
         for (self.deps) |item| {
             const module_dep = item.module(exe, fetch_step);
@@ -168,7 +168,7 @@ pub const Package = struct {
 };
 
 fn checkMinZig(current: std.SemanticVersion, exe: *std.Build.Step.Compile) void {
-    const min = std.SemanticVersion.parse("0.12.0") catch return;
+    const min = std.SemanticVersion.parse("0.13.0") catch return;
     if (current.order(min).compare(.lt)) @panic(exe.step.owner.fmt("Your Zig version v{} does not meet the minimum build requirement of v{}", .{current, min}));
 }
 

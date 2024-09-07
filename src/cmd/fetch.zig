@@ -329,7 +329,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
                 });
                 if (mod.main.len > 0 and !std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
                     try w.print(
-                        \\        .import = .{{ "{s}", .{{ .path = dirs._{s} ++ "/{s}" }} }},
+                        \\        .import = .{{ "{s}", .{{ .cwd_relative = dirs._{s} ++ "/{s}" }} }},
                         \\
                     , .{
                         mod.name,

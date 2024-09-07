@@ -1,3 +1,5 @@
-zig-*
+zig-cache
+.zig-cache
+zig-out
 .zigmod
 bin

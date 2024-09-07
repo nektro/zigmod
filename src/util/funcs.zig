@@ -53,8 +53,8 @@ pub fn file_list(alloc: std.mem.Allocator, dpath: string) ![]const string {
     return try extras.fileList(alloc, dir);
 }
 
-pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.ChildProcess.RunResult {
-    return std.ChildProcess.run(.{ .allocator = alloc, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
+pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.process.Child.RunResult {
+    return std.process.Child.run(.{ .allocator = alloc, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
         error.FileNotFound => {
             u.fail("\"{s}\" command not found", .{args[0]});
         },

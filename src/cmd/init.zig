@@ -147,7 +147,8 @@ pub fn execute(self_name: []const u8, args: [][]u8) !void {
             if (len > 0 and (try file.reader().readByte()) != '\n') {
                 try w.writeAll("\n");
             }
-            if (!exists) try w.writeAll("zig-*\n");
+            if (!exists) try w.writeAll(".zig-cache\n");
+            if (!exists) try w.writeAll("zig-out\n");
             try w.writeAll(".zigmod\n");
             try w.writeAll("deps.zig\n");
             try w.writeAll("files.zig\n");
