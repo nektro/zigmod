@@ -105,12 +105,12 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            }
         \\        }
         \\        for (self.c_include_dirs) |item| {
-        \\            result.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
-        \\            exe.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
+        \\            result.addIncludePath(.{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) });
+        \\            exe.addIncludePath(.{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) });
         \\            link_lib_c = true;
         \\        }
         \\        for (self.c_source_files) |item| {
-        \\            exe.addCSourceFile(.{ .file = b.path(b.fmt("{s}/{s}", .{ self.directory, item })), .flags = self.c_source_flags });
+        \\            exe.addCSourceFile(.{ .file = .{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) }, .flags = self.c_source_flags });
         \\            link_lib_c = true;
         \\        }
         \\        for (self.system_libs) |item| {
