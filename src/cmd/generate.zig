@@ -9,7 +9,7 @@ const common = @import("./../common.zig");
 //
 //
 
-pub fn execute(self_name: []const u8, args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     _ = self_name;
     _ = args;
 
@@ -83,9 +83,9 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            return result;
         \\        }
         \\
-        \\        fn make(step: *std.Build.Step, prog_node: std.Progress.Node) !void {
+        \\        fn make(step: *std.Build.Step, options: std.Build.Step.MakeOptions) !void {
         \\            _ = step;
-        \\            _ = prog_node;
+        \\            _ = options;
         \\        }
         \\};
         \\

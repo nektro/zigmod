@@ -15,7 +15,7 @@ const Map = std.StringArrayHashMap(*List);
 // Inspired by:
 // https://github.com/onur/cargo-license
 
-pub fn execute(self_name: []const u8, args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     _ = self_name;
     _ = args;
 

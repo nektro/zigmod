@@ -30,7 +30,7 @@ pub const Package = struct {
     links: []const string,
 };
 
-pub fn execute(self_name: []const u8, args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     if (args.len == 0) {
         std.debug.print("{s}\n", .{
             \\This is a subcommand for use with https://github.com/zigtools/zpm-server instances but has no default behavior on its own aside from showing you this nice help text.

@@ -40,9 +40,9 @@ pub const GitExactStep = struct {
             return result;
         }
 
-        fn make(step: *std.Build.Step, prog_node: std.Progress.Node) !void {
+        fn make(step: *std.Build.Step, options: std.Build.Step.MakeOptions) !void {
             _ = step;
-            _ = prog_node;
+            _ = options;
         }
 };
 
@@ -121,7 +121,7 @@ pub const Package = struct {
         const result = b.createModule(.{});
         const dummy_library = b.addStaticLibrary(.{
             .name = "dummy",
-            .target = exe.root_module.resolved_target orelse b.host,
+            .target = exe.root_module.resolved_target orelse b.graph.host,
             .optimize = exe.root_module.optimize.?,
         });
         dummy_library.step.dependOn(fetch_step);
