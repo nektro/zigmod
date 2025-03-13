@@ -1,6 +1,5 @@
 const std = @import("std");
 const string = []const u8;
-const builtin = @import("builtin");
 const deps = @import("./deps.zig");
 
 pub fn build(b: *std.Build) void {
