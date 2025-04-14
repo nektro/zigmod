@@ -36,11 +36,11 @@ pub fn try_index(comptime T: type, array: []T, n: usize, def: T) T {
     return array[n];
 }
 
-pub fn split(alloc: std.mem.Allocator, in: string, delim: string) ![]string {
+pub fn split(alloc: std.mem.Allocator, in: string, delim: u8) ![]string {
     var list = std.ArrayList(string).init(alloc);
     errdefer list.deinit();
 
-    var iter = std.mem.split(u8, in, delim);
+    var iter = std.mem.splitScalar(u8, in, delim);
     while (iter.next()) |str| {
         try list.append(str);
     }
@@ -99,7 +99,7 @@ pub fn random_string(comptime len: usize) [len]u8 {
     return buf;
 }
 
-pub fn parse_split(comptime T: type, comptime delim: string) type {
+pub fn parse_split(comptime T: type, comptime delim: u8) type {
     return struct {
         const Self = @This();
 
@@ -107,7 +107,7 @@ pub fn parse_split(comptime T: type, comptime delim: string) type {
         string: string,
 
         pub fn do(input: string) !Self {
-            var iter = std.mem.split(u8, input, delim);
+            var iter = std.mem.splitScalar(u8, input, delim);
             const start = iter.next() orelse return error.IterEmpty;
             const id = std.meta.stringToEnum(T, start) orelse return error.NoMemberFound;
             return Self{
@@ -125,7 +125,7 @@ pub const HashFn = enum {
 };
 
 pub fn validate_hash(alloc: std.mem.Allocator, input: string, file_path: string) !bool {
-    const hash = parse_split(HashFn, "-").do(input) catch return false;
+    const hash = parse_split(HashFn, '-').do(input) catch return false;
     const file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
     const data = try file.reader().readAllAlloc(alloc, gb);
@@ -169,7 +169,7 @@ pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: string) !
         return error.NoBuildZig;
     }
     const dpath = try std.fs.realpathAlloc(alloc, try std.fs.path.join(alloc, &.{ dir, "build.zig" }));
-    const splitP = try split(alloc, dpath, std.fs.path.sep_str);
+    const splitP = try split(alloc, dpath, std.fs.path.sep);
     var name = splitP[splitP.len - 2];
     name = extras.trimPrefix(name, "zig-");
     assert(name.len > 0, "package name must not be an empty string", .{});

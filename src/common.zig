@@ -127,10 +127,10 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
         },
         .git => {
             if (d.version.len > 0) {
-                const vers = u.parse_split(zigmod.Dep.Type.Version.Git, "-").do(d.version) catch |e| switch (e) {
+                const vers = u.parse_split(zigmod.Dep.Type.Version.Git, '-').do(d.version) catch |e| switch (e) {
                     error.IterEmpty => unreachable,
                     error.NoMemberFound => {
-                        const vtype = d.version[0..std.mem.indexOf(u8, d.version, "-").?];
+                        const vtype = d.version[0..std.mem.indexOfScalar(u8, d.version, '-').?];
                         u.fail("fetch: git: version type '{s}' is invalid.", .{vtype});
                     },
                 };
@@ -179,7 +179,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             if (try extras.doesFolderExist(null, pv)) {
                 return pv;
             }
-            const file_name = u.last(try u.split(options.alloc, d.path, "/")).?;
+            const file_name = u.last(try u.split(options.alloc, d.path, '/')).?;
             if (d.version.len > 0) {
                 if (try extras.doesFolderExist(null, pv)) {
                     return pv;
@@ -338,7 +338,7 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
         }
         switch (v) {
             1 => {
-                var iter = std.mem.split(u8, line, " ");
+                var iter = std.mem.splitScalar(u8, line, ' ');
                 try list.append([4]string{
                     iter.next().?,
                     iter.next().?,
@@ -347,7 +347,7 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
                 });
             },
             2 => {
-                var iter = std.mem.split(u8, line, " ");
+                var iter = std.mem.splitScalar(u8, line, ' ');
                 const asdep = zigmod.Dep{
                     .type = std.meta.stringToEnum(zigmod.Dep.Type, iter.next().?).?,
                     .path = iter.next().?,

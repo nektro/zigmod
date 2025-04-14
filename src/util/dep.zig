@@ -71,7 +71,7 @@ pub const Dep = struct {
         }
         return switch (self.type) {
             .git => blk: {
-                const vers = try u.parse_split(zigmod.Dep.Type.Version.Git, "-").do(self.version);
+                const vers = try u.parse_split(zigmod.Dep.Type.Version.Git, '-').do(self.version);
                 if (vers.id.frozen()) break :blk self.version;
                 break :blk try self.type.exact_version(alloc, dpath);
             },
