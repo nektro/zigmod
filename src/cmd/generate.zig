@@ -133,6 +133,8 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        const module = pkg.module(exe, fetch_step);
         \\        exe.root_module.addImport(pkg.name, module);
         \\    }
+        \\    // clear module memo cache so addAllTo can be called more than once in the same build.zig
+        \\    inline for (comptime std.meta.declarations(package_data)) |decl| @field(package_data, decl.name).module_memo = null;
         \\}
         \\
         \\var link_lib_c = false;

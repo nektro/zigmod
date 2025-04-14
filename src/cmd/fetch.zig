@@ -67,6 +67,8 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        exe.linkSystemLibrary(libname);
         \\        exe.linkLibC();
         \\    }
+        \\    // clear module memo cache so addAllTo can be called more than once in the same build.zig
+        \\    inline for (comptime std.meta.declarations(package_data)) |decl| @field(package_data, decl.name).module_memo = null;
         \\}
         \\
         \\var link_lib_c = false;
