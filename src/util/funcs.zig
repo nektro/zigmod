@@ -222,5 +222,5 @@ pub fn find_cachepath() !string {
     if (std.mem.indexOf(u8, haystack, needle)) |index| {
         return haystack[0 .. index + needle.len];
     }
-    return try std.fs.path.join(gpa, &.{ ".zigmod", "deps" });
+    return try std.fs.path.join(gpa, &.{ haystack, ".zigmod", "deps" });
 }
