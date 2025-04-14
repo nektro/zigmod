@@ -93,7 +93,7 @@ pub const ModFile = struct {
                     var main = item.mapping.get_string("main") orelse "";
 
                     if (item.mapping.get("src")) |val| {
-                        var src_iter = std.mem.tokenize(u8, val.string, " ");
+                        var src_iter = std.mem.tokenizeScalar(u8, val.string, ' ');
                         dtype = src_iter.next().?;
                         path = src_iter.next().?;
                         if (src_iter.next()) |dver| {
@@ -130,8 +130,8 @@ pub const ModFile = struct {
                         .c_include_dirs = try item.mapping.get_string_array(alloc, "c_include_dirs"),
                         .c_source_flags = try item.mapping.get_string_array(alloc, "c_source_flags"),
                         .c_source_files = try item.mapping.get_string_array(alloc, "c_source_files"),
-                        .only_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("only_os") orelse "", ","), ""),
-                        .except_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("except_os") orelse "", ","), ""),
+                        .only_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("only_os") orelse "", ','), ""),
+                        .except_os = try u.list_remove(alloc, try u.split(alloc, item.mapping.get_string("except_os") orelse "", ','), ""),
                         .yaml = item.mapping,
                         .deps = try dep_list_by_name(alloc, item.mapping, &.{"dependencies"}, for_build),
                         .keep = std.mem.eql(u8, "true", item.mapping.get_string("keep") orelse ""),
