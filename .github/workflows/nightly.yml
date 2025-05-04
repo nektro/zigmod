@@ -47,3 +47,9 @@ jobs:
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-systemlib-dep
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-local-dep
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-c-code
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DonIsaac/zlint-action@v0
