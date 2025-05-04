@@ -2,7 +2,7 @@ const std = @import("std");
 const gpa = std.heap.c_allocator;
 const builtin = @import("builtin");
 
-const u = @import("./../util/index.zig");
+const u = @import("./../util/funcs.zig");
 
 //
 //

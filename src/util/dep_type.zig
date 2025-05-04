@@ -1,7 +1,7 @@
 const std = @import("std");
 const string = []const u8;
 
-const u = @import("./index.zig");
+const u = @import("./funcs.zig");
 
 //
 //

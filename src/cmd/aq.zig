@@ -5,7 +5,7 @@ const zfetch = @import("zfetch");
 const extras = @import("extras");
 const json = @import("json");
 
-const u = @import("./../util/index.zig");
+const u = @import("./../util/funcs.zig");
 
 //
 //
