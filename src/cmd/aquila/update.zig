@@ -5,7 +5,7 @@ const knownfolders = @import("known-folders");
 const extras = @import("extras");
 
 const zigmod = @import("../../lib.zig");
-const u = @import("./../../util/index.zig");
+const u = @import("./../../util/funcs.zig");
 const common = @import("./../../common.zig");
 
 pub fn execute(self_name: []const u8, args: [][]u8) !void {

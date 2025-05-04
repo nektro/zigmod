@@ -8,7 +8,7 @@ const ini = @import("ini");
 const time = @import("time");
 const extras = @import("extras");
 
-const u = @import("./../util/index.zig");
+const u = @import("./../util/funcs.zig");
 
 //
 //

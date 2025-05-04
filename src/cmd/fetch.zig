@@ -4,7 +4,7 @@ const ansi = @import("ansi");
 const extras = @import("extras");
 
 const zigmod = @import("../lib.zig");
-const u = @import("./../util/index.zig");
+const u = @import("./../util/funcs.zig");
 const common = @import("./../common.zig");
 const license = @import("./license.zig");
 

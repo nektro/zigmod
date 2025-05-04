@@ -5,7 +5,7 @@ const yaml = @import("yaml");
 const extras = @import("extras");
 
 const zigmod = @import("../lib.zig");
-const u = @import("index.zig");
+const u = @import("funcs.zig");
 
 //
 //

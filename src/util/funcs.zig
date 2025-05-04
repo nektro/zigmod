@@ -4,8 +4,6 @@ const gpa = std.heap.c_allocator;
 const extras = @import("extras");
 const git = @import("git");
 
-const u = @import("index.zig");
-
 //
 //
 
@@ -56,7 +54,7 @@ pub fn file_list(alloc: std.mem.Allocator, dpath: string) ![]const string {
 pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.process.Child.RunResult {
     return std.process.Child.run(.{ .allocator = alloc, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
         error.FileNotFound => {
-            u.fail("\"{s}\" command not found", .{args[0]});
+            fail("\"{s}\" command not found", .{args[0]});
         },
         else => |ee| return ee,
     };

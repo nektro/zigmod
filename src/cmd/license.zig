@@ -6,7 +6,7 @@ const licenses = @import("licenses");
 const extras = @import("extras");
 
 const zigmod = @import("../lib.zig");
-const u = @import("./../util/index.zig");
+const u = @import("./../util/funcs.zig");
 const common = @import("./../common.zig");
 
 const List = std.ArrayList(zigmod.Module);
