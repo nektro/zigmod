@@ -17,6 +17,7 @@ pub fn build(b: *std.Build) void {
     });
     const tag = b.option(string, "tag", "") orelse "dev";
     const strip = b.option(bool, "strip", "Build without debug info.") orelse false;
+    const disable_llvm = b.option(bool, "disable_llvm", "use the non-llvm zig codegen") orelse false;
 
     const exe_options = b.addOptions();
     exe.root_module.addImport("build_options", exe_options.createModule());
@@ -24,6 +25,8 @@ pub fn build(b: *std.Build) void {
 
     deps.addAllTo(exe);
     exe.root_module.strip = strip;
+    exe.use_llvm = !disable_llvm;
+    exe.use_lld = !disable_llvm;
     b.installArtifact(exe);
 
     const run_cmd = b.addRunArtifact(exe);
@@ -34,4 +37,9 @@ pub fn build(b: *std.Build) void {
 
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run_cmd.step);
+
+    //
+
+    const test_step = b.step("test", "Stub for ziginfra");
+    test_step.dependOn(&exe.step);
 }
