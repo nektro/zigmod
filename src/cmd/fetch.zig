@@ -11,7 +11,7 @@ const license = @import("./license.zig");
 //
 //
 
-pub fn execute(self_name: []const u8, args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     _ = self_name;
 
     const gpa = std.heap.c_allocator;
@@ -89,7 +89,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        }
         \\        const b = exe.step.owner;
         \\        const result = b.createModule(.{
-        \\            .target = exe.root_module.resolved_target orelse b.host,
+        \\            .target = exe.root_module.resolved_target,
         \\        });
         \\        if (self.import) |capture| {
         \\            result.root_source_file = capture[1];

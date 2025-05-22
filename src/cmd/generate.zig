@@ -9,7 +9,7 @@ const common = @import("./../common.zig");
 //
 //
 
-pub fn execute(self_name: []const u8, args: [][]u8) !void {
+pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     _ = self_name;
     _ = args;
 
@@ -67,7 +67,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            var urlpath = url;
         \\            urlpath = trimPrefix(u8, urlpath, "https://");
         \\            urlpath = trimPrefix(u8, urlpath, "git://");
-        \\            const repopath = b.fmt("{s}/zigmod/deps/git/{s}/{s}", .{ b.cache_root.path.?, urlpath, commit });
+        \\            const repopath = b.fmt("{s}/zigmod/deps/git/{s}/{s}", .{ b.graph.global_cache_root.path.?, urlpath, commit });
         \\            flip(std.fs.cwd().access(repopath, .{})) catch return result;
         \\
         \\            var clonestep = std.Build.Step.Run.create(b, "clone");
@@ -83,9 +83,9 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            return result;
         \\        }
         \\
-        \\        fn make(step: *std.Build.Step, prog_node: std.Progress.Node) !void {
+        \\        fn make(step: *std.Build.Step, options: std.Build.Step.MakeOptions) !void {
         \\            _ = step;
-        \\            _ = prog_node;
+        \\            _ = options;
         \\        }
         \\};
         \\
@@ -159,7 +159,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        const result = b.createModule(.{});
         \\        const dummy_library = b.addStaticLibrary(.{
         \\            .name = "dummy",
-        \\            .target = exe.root_module.resolved_target orelse b.host,
+        \\            .target = exe.root_module.resolved_target orelse b.graph.host,
         \\            .optimize = exe.root_module.optimize.?,
         \\        });
         \\        dummy_library.step.dependOn(fetch_step);
