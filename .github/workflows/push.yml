@@ -20,7 +20,7 @@ jobs:
         uses: mlugg/setup-zig@v1
         with:
           mirror: "http://mirrors.nektro.net/s3cgi"
-          version: "0.13.0"
+          version: "0.14.0"
 
       - run: zig version
       - run: zig env

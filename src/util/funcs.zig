@@ -27,7 +27,7 @@ pub fn fail(comptime fmt: string, args: anytype) noreturn {
     unreachable;
 }
 
-pub fn try_index(comptime T: type, array: []T, n: usize, def: T) T {
+pub fn try_index(comptime T: type, array: []const T, n: usize, def: T) T {
     if (array.len <= n) {
         return def;
     }
@@ -87,7 +87,7 @@ const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 pub fn random_string(comptime len: usize) [len]u8 {
     const now: u64 = @intCast(std.time.nanoTimestamp());
-    var rand = std.rand.DefaultPrng.init(now);
+    var rand = std.Random.DefaultPrng.init(now);
     var r = rand.random();
     var buf: [len]u8 = undefined;
     var i: usize = 0;

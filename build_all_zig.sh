@@ -3,8 +3,6 @@
 set -e
 
 zig build
-zigmod license > licenses.txt
-zigmod sum
 
 targets="
 x86_64-linux-musl

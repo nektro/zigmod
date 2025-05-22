@@ -4,6 +4,8 @@ const builtin = @import("builtin");
 const deps = @import("./deps.zig");
 
 pub fn build(b: *std.Build) void {
+    b.reference_trace = 256;
+
     const target = b.standardTargetOptions(.{});
     const mode = b.option(std.builtin.Mode, "mode", "") orelse .Debug;
     const use_full_name = b.option(bool, "use-full-name", "") orelse false;
@@ -18,6 +20,7 @@ pub fn build(b: *std.Build) void {
     const tag = b.option(string, "tag", "") orelse "dev";
     const strip = b.option(bool, "strip", "Build without debug info.") orelse false;
     const disable_llvm = b.option(bool, "disable_llvm", "use the non-llvm zig codegen") orelse false;
+    _ = &disable_llvm; // macos can't mix the flags rn because it needs llvm but also can't use lld
 
     const exe_options = b.addOptions();
     exe.root_module.addImport("build_options", exe_options.createModule());
@@ -25,8 +28,8 @@ pub fn build(b: *std.Build) void {
 
     deps.addAllTo(exe);
     exe.root_module.strip = strip;
-    exe.use_llvm = !disable_llvm;
-    exe.use_lld = !disable_llvm;
+    // exe.use_llvm = !disable_llvm;
+    // exe.use_lld = !disable_llvm;
     b.installArtifact(exe);
 
     const run_cmd = b.addRunArtifact(exe);
