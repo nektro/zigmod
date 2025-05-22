@@ -36,7 +36,6 @@ jobs:
       - run: ./build_release.sh aarch64-windows-gnu
       - run: ./build_release.sh riscv64-linux-musl
       - run: ./build_release.sh powerpc64le-linux-musl
-      - run: ./build_release.sh mips64-linux-musl
 
       # Test
       - run: zigmod version
