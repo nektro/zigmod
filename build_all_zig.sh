@@ -15,6 +15,7 @@ riscv64-linux-musl
 powerpc64le-linux-musl
 mips64-linux-muslabi64
 s390x-linux-musl
+loongarch64-linux-musl
 "
 
 for item in $targets
