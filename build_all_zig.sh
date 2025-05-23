@@ -13,8 +13,8 @@ aarch64-macos-none
 aarch64-windows-gnu
 riscv64-linux-musl
 powerpc64le-linux-musl
+mips64-linux-muslabi64
 "
-# mips64-linux-musl # https://github.com/ziglang/zig/issues/23965
 
 for item in $targets
 do
