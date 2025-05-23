@@ -37,6 +37,7 @@ jobs:
       - run: ./build_release.sh riscv64-linux-musl
       - run: ./build_release.sh powerpc64le-linux-musl
       - run: ./build_release.sh mips64-linux-muslabi64
+      - run: ./build_release.sh s390x-linux-musl
 
       # Test
       - run: zigmod version

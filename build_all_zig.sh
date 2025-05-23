@@ -14,6 +14,7 @@ aarch64-windows-gnu
 riscv64-linux-musl
 powerpc64le-linux-musl
 mips64-linux-muslabi64
+s390x-linux-musl
 "
 
 for item in $targets
