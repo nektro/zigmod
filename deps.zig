@@ -26,7 +26,7 @@ pub const GitExactStep = struct {
             var urlpath = url;
             urlpath = trimPrefix(u8, urlpath, "https://");
             urlpath = trimPrefix(u8, urlpath, "git://");
-            const repopath = b.fmt("{s}/zigmod/deps/git/{s}/{s}", .{ b.graph.global_cache_root.path.?, urlpath, commit });
+            const repopath = b.fmt("{s}/zigmod/deps/git/{s}/{s}", .{ b.cache_root.path.?, urlpath, commit });
             flip(std.fs.cwd().access(repopath, .{})) catch return result;
 
             var clonestep = std.Build.Step.Run.create(b, "clone");
