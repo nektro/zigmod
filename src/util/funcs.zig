@@ -3,6 +3,7 @@ const string = []const u8;
 const gpa = std.heap.c_allocator;
 const extras = @import("extras");
 const git = @import("git");
+const ansi = @import("ansi");
 
 //
 //
@@ -12,12 +13,9 @@ pub const kb = b * 1024;
 pub const mb = kb * 1024;
 pub const gb = mb * 1024;
 
-const ansi_red = "\x1B[31m";
-const ansi_reset = "\x1B[39m";
-
 pub fn assert(ok: bool, comptime fmt: string, args: anytype) void {
     if (!ok) {
-        std.debug.print(ansi_red ++ fmt ++ ansi_reset ++ "\n", args);
+        std.debug.print(ansi.color.Fg(.Red, fmt) ++ "\n", args);
         std.process.exit(1);
     }
 }
