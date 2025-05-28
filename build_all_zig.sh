@@ -13,7 +13,7 @@ aarch64-macos-none
 aarch64-windows-gnu
 riscv64-linux-musl
 powerpc64le-linux-musl
-mips64-linux-muslabi64
+mips64el-linux-muslabi64
 s390x-linux-musl
 loongarch64-linux-musl
 "
