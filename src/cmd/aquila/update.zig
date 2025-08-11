@@ -25,7 +25,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     u.assert(args.len == 0, "zigmod aq update accepts no parameters", .{});
 
     // get modfile and dep
-    const m = try zigmod.ModFile.from_dir(gpa, homedir);
+    const m = try zigmod.ModFile.from_dir(gpa, homedir, homepath);
     for (m.rootdeps) |dep| {
         //
         const cache = try knownfolders.getPath(gpa, .cache);

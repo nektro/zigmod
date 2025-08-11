@@ -1,6 +1,9 @@
 const std = @import("std");
 const string = []const u8;
 const yaml = @import("yaml");
+const extras = @import("extras");
+const root = @import("root");
+const build_options = root.build_options;
 
 const zigmod = @import("../lib.zig");
 const u = @import("funcs.zig");
@@ -29,29 +32,29 @@ pub const ModFile = struct {
     builddeps: []zigmod.Dep,
     min_zig_version: ?std.SemanticVersion,
 
-    pub fn openFile(dir: std.fs.Dir, ops: std.fs.File.OpenFlags) !std.fs.File {
-        return dir.openFile("zig.mod", ops) catch |err| switch (err) {
-            error.FileNotFound => dir.openFile("zigmod.yml", ops) catch |err2| switch (err2) {
+    pub fn openFile(dir: std.fs.Dir, ops: std.fs.File.OpenFlags) !struct { string, std.fs.File } {
+        return .{ "zig.mod", dir.openFile("zig.mod", ops) catch |err| switch (err) {
+            error.FileNotFound => return .{ "zigmod.yml", dir.openFile("zigmod.yml", ops) catch |err2| switch (err2) {
                 error.FileNotFound => return error.ManifestNotFound,
                 else => |e2| return e2,
-            },
+            } },
             else => |e| return e,
-        };
+        } };
     }
 
     pub fn init(alloc: std.mem.Allocator) !Self {
-        return try from_dir(alloc, std.fs.cwd());
+        return try from_dir(alloc, std.fs.cwd(), ".");
     }
 
-    pub fn from_dir(alloc: std.mem.Allocator, dir: std.fs.Dir) !Self {
-        const file = try openFile(dir, .{});
+    pub fn from_dir(alloc: std.mem.Allocator, dir: std.fs.Dir, dir_path: string) !Self {
+        const file_path, const file = try openFile(dir, .{});
         defer file.close();
         const input = try file.reader().readAllAlloc(alloc, mb);
         const doc = try yaml.parse(alloc, input);
-        return from_mapping(alloc, doc.mapping);
+        return from_mapping(alloc, doc.mapping, dir_path, file_path);
     }
 
-    pub fn from_mapping(alloc: std.mem.Allocator, mapping: yaml.Mapping) !Self {
+    pub fn from_mapping(alloc: std.mem.Allocator, mapping: yaml.Mapping, dir_path: string, file_path: string) !Self {
         var id = zigmod.Dep.EMPTY;
         std.mem.copyForwards(u8, &id, mapping.get_string("id") orelse &u.random_string(48));
 
@@ -60,6 +63,16 @@ pub const ModFile = struct {
 
         if (std.mem.indexOf(u8, name, "/")) |_| {
             u.fail("name may not contain any '/'", .{});
+        }
+
+        if (mapping.get_string("min_zigmod_version")) |min_zigmod_version_raw| {
+            const meets = zigmod.meetsMinimumVersion(min_zigmod_version_raw);
+            if (meets == null) {
+                u.fail("invalid min_zigmod_version: {s}", .{min_zigmod_version_raw});
+            }
+            if (meets.? == false) {
+                u.fail("Your Zigmod version {s} does not meet the minimum of {s} required by {s}{s}{s}", .{ build_options.version, min_zigmod_version_raw, dir_path, std.fs.path.sep_str, file_path });
+            }
         }
 
         return Self{

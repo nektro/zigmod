@@ -12,11 +12,11 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     _ = self_name;
 
     const pkg_id = args[0];
-    _ = try do(std.fs.cwd(), pkg_id);
+    _ = try do(std.fs.cwd(), ".", pkg_id);
     std.log.info("Successfully added package {s}", .{pkg_id});
 }
 
-pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
+pub fn do(dir: std.fs.Dir, dir_path: string, pkg_id: string) !string {
     const url = try std.mem.join(gpa, "/", &.{ aq.server_root, pkg_id });
     const doc = try aq.server_fetch(url);
     doc.acquire();
@@ -27,7 +27,7 @@ pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
         doc.root.object().getO("package").?.getS("remote_name").?,
     });
 
-    const m = try zigmod.ModFile.from_dir(gpa, dir);
+    const m = try zigmod.ModFile.from_dir(gpa, dir, dir_path);
     for (m.rootdeps) |d| {
         if (std.mem.eql(u8, d.path, pkg_url)) {
             return pkg_url;
@@ -39,7 +39,7 @@ pub fn do(dir: std.fs.Dir, pkg_id: string) !string {
         }
     }
 
-    var file = try zigmod.ModFile.openFile(dir, .{ .mode = .read_write });
+    _, var file = try zigmod.ModFile.openFile(dir, .{ .mode = .read_write });
     defer file.close();
     try file.seekTo(try file.getEndPos());
 

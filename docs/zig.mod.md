@@ -58,6 +58,11 @@ Similar to `dependencies` but will only get added to the project if the current 
 - Type: `string`
 Parsed as a `std.SemanticVersion`, this attribute refers to the minimum compatible Zig version for this package/application and will cause `zig build` to panic if violated.
 
+### `min_zigmod_version`
+- Type: `string`
+This attribute refers to the minimum compatible Zigmod version for this package/application and will cause `zigmod fetch`, `zigmod ci`, and others to exit with an error.
+While rare, this is most useful to provide a nice error message to the user when your `zigmod.yml` uses a new feature that may not be available in previous versions of Zigmod.
+
 ----
 
 ### Dep Object

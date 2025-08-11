@@ -25,13 +25,13 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
 
     // add to ~/zigmod.yml for later
     const aqadd = @import("./add.zig");
-    const pkgurl = aqadd.do(homedir, args[0]) catch |err| switch (err) {
+    const pkgurl = aqadd.do(homedir, homepath, args[0]) catch |err| switch (err) {
         error.AquilaBadResponse => return,
         else => |ee| return ee,
     };
 
     // get modfile and dep
-    const m = try zigmod.ModFile.from_dir(gpa, homedir);
+    const m = try zigmod.ModFile.from_dir(gpa, homedir, homepath);
     var dep: zigmod.Dep = undefined;
     for (m.rootdeps) |d| {
         if (std.mem.eql(u8, d.path, pkgurl)) {

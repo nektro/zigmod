@@ -57,7 +57,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         break :blk @intFromEnum(_req.status) == 200;
     };
 
-    const file = try zigmod.ModFile.openFile(std.fs.cwd(), .{ .mode = .read_write });
+    _, const file = try zigmod.ModFile.openFile(std.fs.cwd(), .{ .mode = .read_write });
     defer file.close();
     try file.seekTo(try file.getEndPos());
 
