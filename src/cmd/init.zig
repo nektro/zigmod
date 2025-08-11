@@ -180,6 +180,8 @@ pub fn writeExeManifest(w: std.fs.File.Writer, id: string, name: string, license
     try w.print("name: {s}\n", .{name});
     if (license) |_| try w.print("license: {s}\n", .{license.?});
     if (description) |_| try w.print("description: {s}\n", .{description.?});
+    try w.print("min_zig_version: 0.14.0\n", .{});
+    try w.print("min_zigmod_version: r96\n", .{});
     try w.writeAll("root_dependencies:\n");
 }
 
@@ -189,6 +191,8 @@ pub fn writeLibManifest(w: std.fs.File.Writer, id: string, name: string, entry: 
     try w.print("main: {s}\n", .{entry});
     try w.print("license: {s}\n", .{license});
     try w.print("description: {s}\n", .{description});
+    try w.print("min_zig_version: 0.14.0\n", .{});
+    try w.print("min_zigmod_version: r96\n", .{});
     try w.writeAll("dependencies:\n");
 }
 
