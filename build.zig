@@ -17,14 +17,14 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = mode,
     });
-    const tag = b.option(string, "tag", "") orelse "dev";
+    const tag = b.option(string, "tag", "");
     const strip = b.option(bool, "strip", "Build without debug info.") orelse false;
     const disable_llvm = b.option(bool, "disable_llvm", "use the non-llvm zig codegen") orelse false;
     _ = &disable_llvm; // macos can't mix the flags rn because it needs llvm but also can't use lld
 
     const exe_options = b.addOptions();
     exe.root_module.addImport("build_options", exe_options.createModule());
-    exe_options.addOption(string, "version", tag);
+    exe_options.addOption(string, "version", tag orelse std.mem.trimRight(u8, b.run(&.{ "git", "describe", "--tags" }), "\n"));
 
     deps.addAllTo(exe);
     exe.root_module.strip = strip;
