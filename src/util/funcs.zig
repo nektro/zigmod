@@ -157,16 +157,11 @@ pub fn slice(comptime T: type, input: []const T, from: usize, to: usize) []const
 }
 
 pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: string) !string {
-    if (override.len > 0) {
-        return override;
-    }
+    if (override.len > 0) return override;
     const dirO = if (dir.len == 0) std.fs.cwd() else try std.fs.cwd().openDir(dir, .{});
-    if (!(try extras.doesFileExist(dirO, "build.zig"))) {
-        return error.NoBuildZig;
-    }
-    const dpath = try std.fs.realpathAlloc(alloc, try std.fs.path.join(alloc, &.{ dir, "build.zig" }));
+    const dpath = try dirO.realpathAlloc(gpa, ".");
     const splitP = try split(alloc, dpath, std.fs.path.sep);
-    var name = splitP[splitP.len - 2];
+    var name = splitP[splitP.len - 1];
     name = extras.trimPrefix(name, "zig-");
     assert(name.len > 0, "package name must not be an empty string", .{});
     return name;
