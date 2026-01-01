@@ -9,6 +9,10 @@ dependencies:
   - src: git https://github.com/nektro/zig-yaml
   - src: git https://github.com/nektro/zig-ansi
   - src: git https://github.com/ziglibs/known-folders
+    id: 2ta738wrqbaqzl3iwzoo8nj35k9ynwz5p5iyz80ryrpp4ttf
+    name: known-folders
+    main: known-folders.zig
+    license: MIT
   - src: git https://github.com/nektro/zig-licenses
   - src: git https://github.com/nektro/zfetch
   - src: git https://github.com/nektro/zig-detect-license
