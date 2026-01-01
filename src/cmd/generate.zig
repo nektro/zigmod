@@ -11,17 +11,18 @@ const common = @import("./../common.zig");
 
 pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     _ = self_name;
-    _ = args;
 
     //
     const gpa = std.heap.c_allocator;
     const cachepath = try u.find_cachepath();
     const dir = std.fs.cwd();
+    const should_lock = args.len >= 1 and std.mem.eql(u8, args[0], "--lock");
 
     var options = common.CollectOptions{
         .log = false,
         .update = false,
         .alloc = gpa,
+        .lock = if (should_lock) try common.parse_lockfile(gpa, dir) else null,
     };
     const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
@@ -30,10 +31,10 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
 
     std.mem.sort(zigmod.Module, list.items, {}, zigmod.Module.lessThan);
 
-    try create_depszig(gpa, cachepath, dir, top_module, list.items);
+    try create_depszig(gpa, cachepath, dir, top_module, list.items, &options);
 }
 
-pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.Dir, top_module: zigmod.Module, list: []const zigmod.Module) !void {
+pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.Dir, top_module: zigmod.Module, list: []const zigmod.Module, options: *common.CollectOptions) !void {
     const f = try dir.createFile("deps.zig", .{});
     defer f.close();
 
@@ -104,7 +105,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
             .local => {},
             .system_lib => {},
             .framework => {},
-            .git => try w.print("    step.dependOn(&GitExactStep.create(b, \"{s}\", \"{s}\").step);\n", .{ module.dep.?.path, try module.pin(alloc, cachepath) }),
+            .git => try w.print("    step.dependOn(&GitExactStep.create(b, \"{s}\", \"{s}\").step);\n", .{ module.dep.?.path, try module.pin(alloc, cachepath, options) }),
             .hg => @panic("TODO"),
             .http => @panic("TODO"),
         }
@@ -226,7 +227,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         }
         try duped.append(mod);
     }
-    try print_pkg_data_to(w, alloc, cachepath, &duped, &done);
+    try print_pkg_data_to(w, alloc, cachepath, &duped, &done, options);
     try w.writeAll("};\n\n");
 
     try w.writeAll("pub const packages = ");
@@ -267,7 +268,7 @@ fn print_deps(w: std.fs.File.Writer, m: zigmod.Module) !void {
     try w.writeAll("}");
 }
 
-fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath: string, notdone: *std.ArrayList(zigmod.Module), done: *std.ArrayList(zigmod.Module)) !void {
+fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath: string, notdone: *std.ArrayList(zigmod.Module), done: *std.ArrayList(zigmod.Module), options: *common.CollectOptions) !void {
     var len: usize = notdone.items.len;
     while (notdone.items.len > 0) {
         for (notdone.items, 0..) |mod, i| {
@@ -282,13 +283,13 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
                 switch (mod.type) {
                     .system_lib, .framework => {},
                     .local => {},
-                    .git => try w.print("        .store = \"/{}/{s}\",\n", .{ std.zig.fmtEscapes(fixed_path), try mod.pin(alloc, cachepath) }),
+                    .git => try w.print("        .store = \"/{}/{s}\",\n", .{ std.zig.fmtEscapes(fixed_path), try mod.pin(alloc, cachepath, options) }),
                     .hg => @panic("TODO"),
                     .http => @panic("TODO"),
                 }
                 if (mod.main.len > 0 and !std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
                     try w.print("        .name = \"{s}\",\n", .{mod.name});
-                    try w.print("        .entry = \"/{}/{s}/{s}\",\n", .{ std.zig.fmtEscapes(fixed_path), try mod.pin(alloc, cachepath), mod.main });
+                    try w.print("        .entry = \"/{}/{s}/{s}\",\n", .{ std.zig.fmtEscapes(fixed_path), try mod.pin(alloc, cachepath, options), mod.main });
 
                     if (mod.deps.len != 0) {
                         try w.writeAll("        .deps = &[_]*Package{");

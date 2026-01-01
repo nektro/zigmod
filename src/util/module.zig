@@ -163,7 +163,7 @@ pub const Module = struct {
         return false;
     }
 
-    pub fn pin(self: Module, alloc: std.mem.Allocator, cachepath: string) !string {
+    pub fn pin(self: Module, alloc: std.mem.Allocator, cachepath: string, options: *common.CollectOptions) !string {
         return switch (self.type) {
             .local => "",
             .system_lib => "",
@@ -175,7 +175,15 @@ pub const Module = struct {
                 defer mdir.close();
                 return switch (sub) {
                     .local, .system_lib, .framework => unreachable,
-                    .git => try u.git_rev_HEAD(alloc, mdir),
+                    .git => {
+                        if (options.lock == null) return try u.git_rev_HEAD(alloc, mdir);
+                        for (options.lock.?) |item| {
+                            if (!std.mem.eql(u8, item[1], "git")) continue;
+                            if (!std.mem.eql(u8, item[2], self.dep.?.path)) continue;
+                            return item[3][std.mem.indexOfScalar(u8, item[3], '-').? + 1 ..];
+                        }
+                        @panic("unreachable");
+                    },
                     .hg => @panic("TODO"),
                     .http => @panic("TODO"),
                 };
