@@ -9,6 +9,8 @@ const time = @import("time");
 const extras = @import("extras");
 
 const u = @import("./../util/funcs.zig");
+const common = @import("./../common.zig");
+const zigmod = @import("./../lib.zig");
 
 //
 //
@@ -287,6 +289,26 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
                 },
             );
         }
+    }
+
+    // write a deps.zig
+    {
+        const alloc = gpa;
+        const cachepath = try u.find_cachepath();
+        const dir = std.fs.cwd();
+
+        var options = common.CollectOptions{
+            .log = true,
+            .update = false,
+            .alloc = alloc,
+        };
+        const top_module = try common.collect_deps_deep(cachepath, dir, &options);
+
+        var list = std.ArrayList(zigmod.Module).init(alloc);
+        try common.collect_pkgs(top_module, &list);
+
+        const fetch = @import("./fetch.zig");
+        try fetch.create_depszig(alloc, cachepath, dir, top_module, &list);
     }
 }
 
