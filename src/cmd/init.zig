@@ -268,6 +268,26 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
             }
         }
     }
+
+    // ask about test.zig
+    if (!try extras.doesFileExist(null, "test.zig")) {
+        const do = try inquirer.forConfirm(stdout, stdin, "It looks like there's no test.zig. Do you want Zigmod to generate it for you?", gpa);
+        if (do) {
+            const file = try cwd.createFile("test.zig", .{});
+            defer file.close();
+            const w = file.writer();
+            try w.print(
+                \\const std = @import("std");
+                \\const {s} = @import("{s}");
+                \\
+            ,
+                .{
+                    flatname,
+                    name,
+                },
+            );
+        }
+    }
 }
 
 pub fn writeExeManifest(w: std.fs.File.Writer, id: string, name: string, license: ?string, description: ?string) !void {
