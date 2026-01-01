@@ -47,7 +47,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     std.debug.print("\n", .{});
     switch (ptype) {
         .exe => try writeExeManifest(stdout, id, name, license, description),
-        .lib => try writeLibManifest(stdout, id, name, entry.?, license, description),
+        .lib => try writeLibManifest(stdout, id, name, license, description, entry.?),
     }
 
     std.debug.print("\n", .{});
@@ -62,7 +62,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
             const w = file.writer();
             switch (ptype) {
                 .exe => try writeExeManifest(w, id, name, license, description),
-                .lib => try writeLibManifest(w, id, name, entry.?, license, description),
+                .lib => try writeLibManifest(w, id, name, license, description, entry.?),
             }
             std.debug.print("\n", .{});
             std.debug.print("Successfully initialized new package {s}!\n", .{name});
@@ -180,7 +180,7 @@ pub fn writeExeManifest(w: std.fs.File.Writer, id: string, name: string, license
     try w.writeAll("root_dependencies:\n");
 }
 
-pub fn writeLibManifest(w: std.fs.File.Writer, id: string, name: string, entry: string, license: string, description: string) !void {
+pub fn writeLibManifest(w: std.fs.File.Writer, id: string, name: string, license: string, description: string, entry: string) !void {
     try w.print("id: {s}\n", .{id});
     try w.print("name: {s}\n", .{name});
     try w.print("main: {s}\n", .{entry});
