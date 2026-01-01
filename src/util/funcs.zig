@@ -179,6 +179,12 @@ pub fn detct_mainfile(alloc: std.mem.Allocator, override: string, dir: ?std.fs.D
     if (try extras.doesFileExist(dir, namedotzig)) {
         return namedotzig;
     }
+    if (try extras.doesFileExist(dir, "lib.zig")) {
+        return "lib.zig";
+    }
+    if (try extras.doesFileExist(dir, "main.zig")) {
+        return "main.zig";
+    }
     if (try extras.doesFileExist(dir, try std.fs.path.join(alloc, &.{ "src", "lib.zig" }))) {
         return "src/lib.zig";
     }
