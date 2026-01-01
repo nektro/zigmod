@@ -234,6 +234,40 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
             }
         }
     }
+
+    // ask about main.zig / mod.zig
+    if (!try extras.doesFileExist(null, entry orelse "main.zig")) {
+        const do = try inquirer.forConfirm(stdout, stdin, "It looks like your entry point doesn't exist. Do you want Zigmod to generate it for you?", gpa);
+        if (do) {
+            const file = try cwd.createFile(entry orelse "main.zig", .{});
+            defer file.close();
+            const w = file.writer();
+            switch (ptype) {
+                .exe => {
+                    try w.print(
+                        \\const std = @import("std");
+                        \\const {s} = @import("{s}");
+                        \\
+                        \\pub fn main() void {{
+                        \\    //
+                        \\}}
+                        \\
+                    ,
+                        .{
+                            flatname,
+                            name,
+                        },
+                    );
+                },
+                .lib => {
+                    try w.writeAll(
+                        \\const std = @import("std");
+                        \\
+                    );
+                },
+            }
+        }
+    }
 }
 
 pub fn writeExeManifest(w: std.fs.File.Writer, id: string, name: string, license: ?string, description: ?string) !void {
