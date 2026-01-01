@@ -171,6 +171,69 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
             try w.writeAll("zigmod.* text eol=lf\n");
         }
     }
+
+    // ask about build.zig
+    if (!try extras.doesFileExist(null, "build.zig")) {
+        const do = try inquirer.forConfirm(stdout, stdin, "It looks like there's no build.zig. Do you want Zigmod to generate one for you?", gpa);
+        if (do) {
+            const file = try cwd.createFile("build.zig", .{});
+            defer file.close();
+            const w = file.writer();
+            switch (ptype) {
+                .exe => {
+                    try w.writeAll(
+                        \\const std = @import("std");
+                        \\const deps = @import("./deps.zig");
+                        \\
+                        \\pub fn build(b: *std.Build) void {
+                        \\    const target = b.standardTargetOptions(.{});
+                        \\    const mode = b.option(std.builtin.Mode, "mode", "") orelse .Debug;
+                        \\
+                        \\    const exe = b.addExecutable(.{
+                        \\        .root_source_file = b.path("main.zig"),
+                        \\        .target = target,
+                        \\        .optimize = mode,
+                        \\    });
+                        \\    deps.addAllTo(tests);
+                        \\    b.installArtifact(exe);
+                        \\
+                        \\    const run_step = b.step("run", "Run the app");
+                        \\    const run_cmd = b.addRunArtifact(exe);
+                        \\    run_cmd.step.dependOn(b.getInstallStep());
+                        \\    if (b.args) |args| run_cmd.addArgs(args);
+                        \\    run_step.dependOn(&run_cmd.step);
+                        \\}
+                        \\
+                    );
+                },
+                .lib => {
+                    try w.writeAll(
+                        \\const std = @import("std");
+                        \\const deps = @import("./deps.zig");
+                        \\
+                        \\pub fn build(b: *std.Build) void {
+                        \\    const target = b.standardTargetOptions(.{});
+                        \\    const mode = b.option(std.builtin.Mode, "mode", "") orelse .Debug;
+                        \\
+                        \\    const tests = b.addTest(.{
+                        \\        .root_source_file = b.path("test.zig"),
+                        \\        .target = target,
+                        \\        .optimize = mode,
+                        \\    });
+                        \\    deps.addAllTo(tests);
+                        \\
+                        \\    const test_step = b.step("test", "Run all library tests");
+                        \\    const tests_run = b.addRunArtifact(tests);
+                        \\    tests_run.setCwd(b.path("."));
+                        \\    tests_run.has_side_effects = true;
+                        \\    test_step.dependOn(&tests_run.step);
+                        \\}
+                        \\
+                    );
+                },
+            }
+        }
+    }
 }
 
 pub fn writeExeManifest(w: std.fs.File.Writer, id: string, name: string, license: ?string, description: ?string) !void {
