@@ -31,8 +31,11 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
 
     const name = try inquirer.forString(stdout, stdin, "package name:", gpa, try u.detect_pkgname(gpa, u.try_index(string, args, 0, ""), ""));
 
+    const flatname = try gpa.dupe(u8, name);
+    _ = std.mem.replaceScalar(u8, flatname, '-', '_');
+
     const entry = if (ptype == .lib) try inquirer.forString(stdout, stdin, "package entry point:", gpa, u.detct_mainfile(gpa, u.try_index(string, args, 1, ""), null, name) catch |err| switch (err) {
-        error.CantFindMain => null,
+        error.CantFindMain => try std.mem.concat(gpa, u8, &.{ flatname, ".zig" }),
         else => |ee| return ee,
     }) else null;
 
