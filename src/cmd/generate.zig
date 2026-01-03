@@ -16,7 +16,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     const gpa = std.heap.c_allocator;
     const cachepath = try u.find_cachepath();
     const dir = std.fs.cwd();
-    const should_lock = args.len >= 1 and std.mem.eql(u8, args[0], "--lock");
+    const should_lock = args.len >= 1 and std.mem.eql(u8, args[0], "--locked");
 
     var options = common.CollectOptions{
         .log = false,
