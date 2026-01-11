@@ -81,6 +81,7 @@ The available `type`s are:
 - `git`
 - `hg`
 - `http`
+- `pijul`
 
 For the full details on `Dep` types, you can check out the source where the enum is defined: https://github.com/nektro/zigmod/blob/master/src/util/dep_type.zig.
 
@@ -107,6 +108,8 @@ Version types available to each Dep type:
     - `blake3`
     - `sha256`
     - `sha512`
+- `pijul`
+    - `channel`
 
 #### Dep `only_os`
 - Type: `comma-split string[]`
