@@ -119,9 +119,6 @@ Alternatively, if you want to download updates exactly as defined by the lockfil
 ## Adding a dependency
 The core of expandability, it is possible to add dependencies to your project. How exactly, depends on where you're sourcing the information from.
 
-- Aquila
-     - One place packages can be sourced from is https://aquila.red/. In order to add them to your project, you will obtain its ID in the form `1/truemedian/hzzp` and then run `zigmod aq add <package>`.
-
 - ZPM
      - https://zig.pm/ is another supported package index. You may add packages from ZPM with `zigmod zpm add <package>`.
 
@@ -179,20 +176,6 @@ Then push your local changes with `git push fork master` and create your pull re
 This will allow your Github Action task to use the various Zigmod commands. `zigmod ci` is recommended for this use case as it is similar to `zigmod fetch` but will fetch the versions only listed in your `zigmod.lock`.
 
 ---
-## Publishing your project on Aquila
-https://github.com/nektro/aquila is a package index software and CI system designed to work in conjunction with Zigmod.
-
-> Note: I, @nektro, host a public instance at https://aquila.red/ available for anyone to use. However Aquila can be self hosted and the only difference in the following instructions will be the domain name.
-
-Navigating to https://aquila.red/ will show you the homepage with recent packages and most starred ones.
-
-Clicking the "Login" button will bring you to https://aquila.red/dashboard which will show you a list of your currently imported packages. The login screen will prompt you to authorize with an identity provider and ask you for webhook permissions. This is so that aquila can listen for new updates and automatically test them for the CI.
-
-The main nav will contain a link to https://aquila.red/import. Listed will be all of your not-imported Zig projects. Clicking "Select" will not immediately navigate the page in most browsers as the server will attempt to clone and verify your repository. Please be patient while it loads.
-
-Once it brings you to the package page it will now be available for discovery and be automatically included for testing.
-
----
 ## Auditing your project's licenses
 This can come in handy for users and organizations alike. The `zigmod license` command will show you a list of the licenses involved in a project (deeply) and present them nicely grouping similar licenses together and providing a link to the license test for any projects that use a valid SPDX license identifier.
 
@@ -211,4 +194,3 @@ Given the project https://github.com/kristoff-it/bork, at the time of writing th
 ## Installing online programs to your local machine
 Adding `~/.zigmod/bin` to your `$PATH` enables you to install Zig-written command line utilities to your machine with Zigmod.
 
-> Ref: See [`zigmod aq install`](commands/aq_install.md) reference for more info.

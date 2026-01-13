@@ -39,8 +39,6 @@ Check out our [docs](docs/) or the website: https://nektro.github.io/zigmod/.
 
 There is now also a tutorial-style getting started guide that goes over various use cases that Zigmod provides and caters to. It is [available here](docs/tutorial.md).
 
-A package index for Zigmod packages is also available at https://aquila.red/.
-
 ## Contact
 
 - hello@nektro.net
