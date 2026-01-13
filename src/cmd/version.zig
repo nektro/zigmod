@@ -12,8 +12,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     _ = args;
 
     const root = @import("root");
-    const build_options = if (@hasDecl(root, "build_options")) root.build_options else struct {};
-    const version = build_options.version;
+    const version = root.build_options.version;
 
     var gitversion = u.git_rev_HEAD(gpa, std.fs.cwd()) catch "";
     gitversion = if (gitversion.len > 0) gitversion[0..9] else gitversion;
