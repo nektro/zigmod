@@ -68,23 +68,24 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        exe.linkLibC();
         \\    }
         \\    // clear module memo cache so addAllTo can be called more than once in the same build.zig
-        \\    inline for (comptime std.meta.declarations(package_data)) |decl| @field(package_data, decl.name).module_memo = null;
+        \\    module_memo.clearAndFree(exe.step.owner.allocator);
         \\}
         \\
         \\var link_lib_c = false;
+        \\var module_memo: std.StringArrayHashMapUnmanaged(*std.Build.Module) = .empty;
         \\pub const Package = struct {
+        \\    id: string,
         \\    directory: string,
         \\    import: ?struct { string, std.Build.LazyPath } = null,
-        \\    dependencies: []const *Package,
+        \\    dependencies: []const *const Package,
         \\    c_include_dirs: []const string = &.{},
         \\    c_source_files: []const string = &.{},
         \\    c_source_flags: []const string = &.{},
         \\    system_libs: []const string = &.{},
         \\    frameworks: []const string = &.{},
-        \\    module_memo: ?*std.Build.Module = null,
         \\
-        \\    pub fn module(self: *Package, exe: *std.Build.Step.Compile) *std.Build.Module {
-        \\        if (self.module_memo) |cached| {
+        \\    pub fn module(self: *const Package, exe: *std.Build.Step.Compile) *std.Build.Module {
+        \\        if (module_memo.get(self.id)) |cached| {
         \\            return cached;
         \\        }
         \\        const b = exe.step.owner;
@@ -129,7 +130,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            result.link_libc = true;
         \\            exe.linkLibC();
         \\        }
-        \\        self.module_memo = result;
+        \\        module_memo.putNoClobber(b.allocator, self.id, result) catch @panic("OOM");
         \\        return result;
         \\    }
         \\};
@@ -303,7 +304,7 @@ fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module, alloc: std.mem
 }
 
 fn print_deps(w: std.fs.File.Writer, m: zigmod.Module) !void {
-    try w.writeAll("&[_]*Package{\n");
+    try w.writeAll("&[_]*const Package{\n");
     for (m.deps) |d| {
         if (d.main.len == 0) {
             continue;
@@ -322,10 +323,12 @@ fn print_pkg_data_to(w: std.fs.File.Writer, notdone: *std.ArrayList(zigmod.Modul
         for (notdone.items, 0..) |mod, i| {
             if (contains_all(mod.deps, done.items)) {
                 try w.print(
-                    \\    pub var _{s} = Package{{
+                    \\    pub const _{s} = Package{{
+                    \\        .id = "{s}",
                     \\        .directory = dirs._{s},
                     \\
                 , .{
+                    mod.short_id(),
                     mod.short_id(),
                     mod.short_id(),
                 });
