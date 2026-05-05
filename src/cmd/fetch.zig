@@ -54,6 +54,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     try w.writeAll("const string = []const u8;\n");
     try w.writeAll("\n");
     try w.print("pub const cache = \"{}\";\n", .{std.zig.fmtEscapes(cachepath)});
+    try w.writeAll("pub var skip_libc = false;\n");
     try w.writeAll("\n");
     try w.writeAll(
         \\pub fn addAllTo(exe: *std.Build.Step.Compile) void {
@@ -92,6 +93,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        const result = b.createModule(.{
         \\            .target = exe.root_module.resolved_target,
         \\        });
+        \\        const target = result.resolved_target.?.result;
         \\        if (self.import) |capture| {
         \\            result.root_source_file = capture[1];
         \\        }
@@ -117,6 +119,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            link_lib_c = true;
         \\        }
         \\        for (self.system_libs) |item| {
+        \\            if (skip_libc and std.zig.target.isLibCLibName(target, item)) continue;
         \\            result.linkSystemLibrary(item, .{});
         \\            exe.linkSystemLibrary(item);
         \\            link_lib_c = true;
@@ -126,7 +129,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            exe.linkFramework(item);
         \\            link_lib_c = true;
         \\        }
-        \\        if (link_lib_c) {
+        \\        if (link_lib_c and !skip_libc) {
         \\            result.link_libc = true;
         \\            exe.linkLibC();
         \\        }
