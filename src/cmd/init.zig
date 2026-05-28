@@ -193,11 +193,15 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
                         \\    const mode = b.option(std.builtin.Mode, "mode", "") orelse .Debug;
                         \\
                         \\    const exe = b.addExecutable(.{
+                        \\
+                    );
+                    try w.print("        .name = \"{s}\",\n", .{name});
+                    try w.writeAll(
                         \\        .root_source_file = b.path("main.zig"),
                         \\        .target = target,
                         \\        .optimize = mode,
                         \\    });
-                        \\    deps.addAllTo(tests);
+                        \\    deps.addAllTo(exe);
                         \\    b.installArtifact(exe);
                         \\
                         \\    const run_step = b.step("run", "Run the app");
