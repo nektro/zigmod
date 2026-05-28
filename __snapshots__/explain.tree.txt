@@ -1,0 +1,35 @@
+root
+	zigmod
+		yaml
+			
+			extras
+		ansi
+		known-folders
+		licenses
+		zfetch
+			hzzp
+			iguanaTLS
+		detect-license
+			licenses-text
+			leven
+		inquirer
+			ansi
+		ini
+		time
+			extras
+		extras
+		git
+			time
+				extras
+			extras
+			tracer
+				extras
+		json
+			extras
+			tracer
+				extras
+			intrusive-parser
+				extras
+	win32
+	extras
+	ansi
