@@ -8,6 +8,10 @@ const win32 = @import("win32");
 //
 //
 
+pub const std_options: std.Options = .{
+    .log_level = std.log.Level.debug,
+};
+
 pub fn main() !void {
     const gpa = std.heap.c_allocator;
 

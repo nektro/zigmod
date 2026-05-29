@@ -14,6 +14,7 @@ pub const commands = struct {
     pub const license = @import("./cmd/license.zig");
     pub const generate = @import("./cmd/generate.zig");
     pub const explain = @import("./cmd/explain.zig");
+    pub const install = @import("./cmd/install.zig");
 };
 
 pub fn init() !void {
