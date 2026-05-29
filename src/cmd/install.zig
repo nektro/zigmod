@@ -14,7 +14,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     if (args.len < 2) u.fail("usage: zigmod install [git|hg|http] [url]", .{});
 
     const homepath = try knownfolders.getPath(gpa, .home) orelse u.fail("failed to read HOME", .{});
-    const cache = try knownfolders.getPath(gpa, .cache);
+    const cache = try knownfolders.getPath(gpa, .cache) orelse u.fail("failed to read XDG_CACHE_HOME", .{});
     const datapath = try knownfolders.getPath(gpa, .data) orelse u.fail("failed to read XDG_DATA_HOME", .{});
 
     const RemoteType = enum {
@@ -47,7 +47,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         .for_build = false,
     };
     const clean_path = try dep.clean_path(gpa);
-    const cachepath = try std.fs.path.join(gpa, &.{ cache.?, "zigmod", "deps" });
+    const cachepath = try std.fs.path.join(gpa, &.{ cache, "zigmod", "deps" });
     const modpath = try std.fs.path.join(gpa, &.{ cachepath, clean_path });
     std.log.debug("modpath: {s}", .{modpath});
 
