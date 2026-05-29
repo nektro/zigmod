@@ -182,7 +182,7 @@ pub const Module = struct {
                                     const cpath = extras.trimPrefixEnsure(self.clean_path, "v/") orelse return err;
                                     var iter = std.mem.splitScalar(u8, cpath, '/');
                                     while (iter.next()) |segment| {
-                                        if (iter.peek() == null) return segment;
+                                        if (iter.peek() == null) return extras.trimPrefixEnsure(segment, "commit-") orelse return err;
                                     }
                                     unreachable;
                                 },

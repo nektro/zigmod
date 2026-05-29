@@ -13,6 +13,7 @@ dependencies:
     name: known-folders
     main: known-folders.zig
     license: MIT
+    version: commit-aa24df42183ad415d10bc0a33e6238c437fc0f59
   - src: git https://github.com/nektro/zig-licenses
   - src: git https://github.com/nektro/zfetch
   - src: git https://github.com/nektro/zig-detect-license
@@ -22,6 +23,8 @@ dependencies:
   - src: git https://github.com/nektro/zig-extras
   - src: git https://github.com/nektro/zig-git
   - src: git https://github.com/nektro/zig-json
+  - src: git https://github.com/nektro/zig-nio
+  - src: git https://github.com/nektro/zig-nfs
 
 root_dependencies:
   - src: git https://github.com/marlersoft/zigwin32

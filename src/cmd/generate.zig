@@ -157,13 +157,17 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\        }
         \\        const b = exe.step.owner;
         \\
-        \\        const result = b.createModule(.{});
+        \\        const result = b.createModule(.{
+        \\            .target = exe.root_module.resolved_target,
+        \\        });
+        \\        const target = result.resolved_target.?.result;
         \\        const dummy_library = b.addStaticLibrary(.{
-        \\            .name = "dummy",
+        \\            .name = b.fmt("dummy-{s}", .{self.name}),
         \\            .target = exe.root_module.resolved_target orelse b.graph.host,
         \\            .optimize = exe.root_module.optimize.?,
         \\        });
         \\        dummy_library.step.dependOn(fetch_step);
+        \\        var links: u32 = 0;
         \\        if (self.entry) |capture| {
         \\            result.root_source_file = .{ .cwd_relative = capture };
         \\        }
@@ -183,17 +187,22 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\            result.addIncludePath(.{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) });
         \\            dummy_library.addIncludePath(.{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) });
         \\            link_lib_c = true;
+        \\            links += 1;
         \\        }
         \\        for (self.c_source_files) |item| {
         \\            dummy_library.addCSourceFile(.{ .file = .{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) }, .flags = self.c_source_flags });
+        \\            links += 1;
         \\        }
         \\        for (self.system_libs) |item| {
+        \\            if (std.zig.target.isLibCLibName(target, item)) continue;
         \\            dummy_library.linkSystemLibrary(item);
+        \\            links += 1;
         \\        }
         \\        for (self.frameworks) |item| {
         \\            dummy_library.linkFramework(item);
+        \\            links += 1;
         \\        }
-        \\        if (self.c_source_files.len > 0 or self.system_libs.len > 0 or self.frameworks.len > 0) {
+        \\        if (links > 0) {
         \\            dummy_library.linkLibC();
         \\            exe.root_module.linkLibrary(dummy_library);
         \\            link_lib_c = true;

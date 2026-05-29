@@ -4,6 +4,7 @@ const gpa = std.heap.c_allocator;
 const zfetch = @import("zfetch");
 const extras = @import("extras");
 const json = @import("json");
+const nio = @import("nio");
 
 const u = @import("./../util/funcs.zig");
 
@@ -60,7 +61,7 @@ pub fn server_fetch(url: string) !json.Document {
     const req = try zfetch.Request.init(gpa, url, null);
     defer req.deinit();
     try req.do(.GET, null, null);
-    return json.parse(gpa, "", req.reader(), .{ .support_trailing_commas = true, .maximum_depth = 100 });
+    return json.parse(gpa, "", nio.AnyReadable.fromStd(&req.reader()), .{ .support_trailing_commas = true, .maximum_depth = 100 });
 }
 
 pub fn server_fetchArray(url: string) ![]const Package {

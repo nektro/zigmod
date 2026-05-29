@@ -4,6 +4,7 @@ const gpa = std.heap.c_allocator;
 const extras = @import("extras");
 const git = @import("git");
 const ansi = @import("ansi");
+const nfs = @import("nfs");
 
 //
 //
@@ -144,7 +145,8 @@ pub fn do_hash(comptime algo: type, data: string) ![algo.digest_length * 2]u8 {
 
 /// Returns the result of running `git rev-parse HEAD`
 pub fn git_rev_HEAD(alloc: std.mem.Allocator, dir: std.fs.Dir) !string {
-    var dirg = try dir.openDir(".git", .{});
+    const ndir: nfs.Dir = .{ .fd = @enumFromInt(dir.fd) };
+    var dirg = try ndir.openDir(".git", .{});
     defer dirg.close();
     const commitid = try git.getHEAD(alloc, dirg);
     return if (commitid) |_| commitid.?.id else error.NotAGitRepo;
