@@ -176,7 +176,19 @@ pub const Module = struct {
                 return switch (sub) {
                     .local, .system_lib, .framework => unreachable,
                     .git => {
-                        if (options.lock == null) return try u.git_rev_HEAD(alloc, mdir);
+                        if (options.lock == null) {
+                            return u.git_rev_HEAD(alloc, mdir) catch |err| switch (err) {
+                                error.ENOENT, error.NotAGitRepo => {
+                                    const cpath = extras.trimPrefixEnsure(self.clean_path, "v/") orelse return err;
+                                    var iter = std.mem.splitScalar(u8, cpath, '/');
+                                    while (iter.next()) |segment| {
+                                        if (iter.peek() == null) return segment;
+                                    }
+                                    unreachable;
+                                },
+                                else => |e| e,
+                            };
+                        }
                         for (options.lock.?) |item| {
                             if (!std.mem.eql(u8, item[1], "git")) continue;
                             if (!std.mem.eql(u8, item[2], self.dep.?.path)) continue;
