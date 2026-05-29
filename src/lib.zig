@@ -33,7 +33,7 @@ pub const version: u16 = blk: {
     var version_s = build_options.version;
     version_s = extras.trimPrefixEnsure(version_s, "r").?;
     version_s = version_s[0 .. std.mem.indexOfScalar(u8, version_s, '-') orelse version_s.len];
-    var version_i = std.fmt.parseInt(u16, version_s, 10) catch unreachable;
+    var version_i = extras.parseDigits(u16, version_s, 10) catch unreachable;
     if (std.mem.indexOfScalar(u8, version_s, '-')) |_| version_i += 1;
     break :blk version_i;
 };
@@ -42,6 +42,6 @@ pub fn meetsMinimumVersion(min_zigmod_version_raw: []const u8) ?bool {
     var min_zigmod_version_s = min_zigmod_version_raw;
     min_zigmod_version_s = extras.trimPrefixEnsure(min_zigmod_version_s, "r") orelse return null;
     min_zigmod_version_s = min_zigmod_version_s[0 .. std.mem.indexOfScalar(u8, min_zigmod_version_s, '-') orelse min_zigmod_version_s.len];
-    const min_zigmod_version = std.fmt.parseInt(u16, min_zigmod_version_s, 10) catch return null;
+    const min_zigmod_version = extras.parseDigits(u16, min_zigmod_version_s, 10) catch return null;
     return min_zigmod_version <= version;
 }
