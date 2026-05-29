@@ -294,6 +294,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
                     if (mod.deps.len != 0) {
                         try w.writeAll("        .deps = &[_]*Package{");
                         for (mod.deps, 0..) |moddep, j| {
+                            if (moddep.type == .system_lib or moddep.type == .framework) continue;
                             try w.print(" &_{s}", .{moddep.id[0..12]});
                             if (j != mod.deps.len - 1) try w.writeAll(",");
                         }
