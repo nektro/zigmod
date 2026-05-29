@@ -29,8 +29,10 @@ jobs:
 
       # Build All
       - run: ./build_release.sh x86_64-linux-musl
+      - run: ./build_release.sh x86_64-macos-none
 
       - run: ./build_release.sh aarch64-linux-musl
+      - run: ./build_release.sh aarch64-macos-none
 
       - run: ./build_release.sh riscv64-linux-musl
 

@@ -6,8 +6,10 @@ zig build
 
 targets="
 x86_64-linux-musl
+x86_64-macos-none
 
 aarch64-linux-musl
+aarch64-macos-none
 
 riscv64-linux-musl
 
