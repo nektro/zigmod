@@ -4,9 +4,9 @@ git https://github.com/nektro/arqv-ini commit-ab427a4de4f875eaa39ee56a29114fc020
 git https://github.com/nektro/iguanaTLS commit-3450aaf3ca47986540e2b0258c2affc45af64ea2
 git https://github.com/nektro/zfetch commit-40d141bf7db81f05a83cce5f2edc4b14e41a5c34
 git https://github.com/nektro/zig-ansi commit-5f89211a749aef6bf518889c0467ceb24825c055
-git https://github.com/nektro/zig-detect-license commit-8d553ba6283f778965678ee73b17ae1e2019440d
+git https://github.com/nektro/zig-detect-license commit-9285c96497ec5debae97a859e69976148a66aa7a
 git https://github.com/nektro/zig-extras commit-c2c581aa6a38438dd9ed8da0f59019691c5dd45d
-git https://github.com/nektro/zig-git commit-70d5ded3d5699c452cb3f4298ee2822cfc0f814e
+git https://github.com/nektro/zig-git commit-acb6691534e00ded166cccc272e17efbf613a2ab
 git https://github.com/nektro/zig-inquirer commit-4cddefa42744d61067567b0b36b5d2bb376e5ae3
 git https://github.com/nektro/zig-intrusive-parser commit-eec3155dc8188b8440cb6097cc436f49511f01cd
 git https://github.com/nektro/zig-json commit-80e943ac8734b91da3560c8f45bbe702d833ac11
