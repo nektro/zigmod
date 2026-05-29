@@ -4,6 +4,7 @@ const builtin = @import("builtin");
 pub const build_options = @import("build_options");
 const zigmod = @import("zigmod");
 const win32 = @import("win32");
+const nio = @import("nio");
 
 //
 //
@@ -56,7 +57,7 @@ pub fn main() !void {
     }
 
     var sub_cmd_args = std.ArrayList(string).init(gpa);
-    try sub_cmd_args.append(try std.fmt.allocPrint(gpa, "zigmod-{s}", .{args[0]}));
+    try sub_cmd_args.append(try nio.fmt.allocPrint(gpa, "zigmod-{s}", .{args[0]}));
     for (args[1..]) |item| {
         try sub_cmd_args.append(item);
     }

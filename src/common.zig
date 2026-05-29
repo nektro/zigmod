@@ -3,6 +3,7 @@ const string = []const u8;
 const builtin = @import("builtin");
 const ansi = @import("ansi");
 const extras = @import("extras");
+const nio = @import("nio");
 
 const zigmod = @import("./lib.zig");
 const u = @import("./util/funcs.zig");
@@ -302,7 +303,7 @@ pub fn gen_files_package(alloc: std.mem.Allocator, cachepath: string, mdir: std.
                 continue;
             }
             const path = try alloc.dupe(u8, p.path);
-            try map.put(path, try std.fmt.allocPrint(alloc, "{s}/{s}", .{ dir_path, path }));
+            try map.put(path, try nio.fmt.allocPrint(alloc, "{s}/{s}", .{ dir_path, path }));
         }
     }
 

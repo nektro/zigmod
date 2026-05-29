@@ -35,3 +35,4 @@ root_dependencies:
     license: MIT
   - src: git https://github.com/nektro/zig-extras
   - src: git https://github.com/nektro/zig-ansi
+  - src: git https://github.com/nektro/zig-nio

@@ -8,6 +8,7 @@ const knownfolders = @import("known-folders");
 const ini = @import("ini");
 const time = @import("time");
 const extras = @import("extras");
+const nio = @import("nio");
 
 const u = @import("./../util/funcs.zig");
 const common = @import("./../common.zig");
@@ -85,7 +86,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
                     "year:",
                     string,
                     "{s}",
-                    try std.fmt.allocPrint(gpa, "{d}", .{time.DateTime.now().years}),
+                    try nio.fmt.allocPrint(gpa, "{d}", .{time.DateTime.now().years}),
                 ));
                 realtext = try std.mem.replaceOwned(u8, gpa, realtext, "<copyright holders>", try inquirer.forString(
                     stdout,

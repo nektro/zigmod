@@ -1,5 +1,6 @@
 const std = @import("std");
 const string = []const u8;
+const nio = @import("nio");
 
 const u = @import("./funcs.zig");
 
@@ -68,7 +69,7 @@ pub const DepType = enum {
             .local => "",
             .system_lib => "",
             .framework => "",
-            .git => try std.fmt.allocPrint(alloc, "commit-{s}", .{(try u.git_rev_HEAD(alloc, mdir))}),
+            .git => try nio.fmt.allocPrint(alloc, "commit-{s}", .{(try u.git_rev_HEAD(alloc, mdir))}),
             .hg => "",
             .http => "",
         };

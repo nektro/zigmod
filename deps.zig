@@ -338,6 +338,7 @@ pub const packages = [_]*Package{
     &package_data._o6ogpor87xc2,
     &package_data._f7dubzb7cyqe,
     &package_data._s84v9o48ucb0,
+    &package_data._kscsl0145t7x,
 };
 
 pub const pkgs = struct {
@@ -345,6 +346,7 @@ pub const pkgs = struct {
     pub const win32 = &package_data._o6ogpor87xc2;
     pub const extras = &package_data._f7dubzb7cyqe;
     pub const ansi = &package_data._s84v9o48ucb0;
+    pub const nio = &package_data._kscsl0145t7x;
 };
 
 pub const imports = struct {

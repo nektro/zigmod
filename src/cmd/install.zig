@@ -3,6 +3,7 @@ const string = []const u8;
 const gpa = std.heap.c_allocator;
 const knownfolders = @import("known-folders");
 const extras = @import("extras");
+const nio = @import("nio");
 
 const zigmod = @import("./../lib.zig");
 const u = @import("./../util/funcs.zig");
@@ -62,8 +63,8 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     try ci.do(gpa, cachepath, moddir);
 
     const modfile = try zigmod.ModFile.from_dir(gpa, moddir, modpath);
-    const zigversion_sv = modfile.min_zig_version orelse u.fail("zigmod manifest requires min_zig_version field", .{});
-    const zigversion = try std.fmt.allocPrint(gpa, "{}", .{zigversion_sv});
+    _ = modfile.min_zig_version orelse u.fail("zigmod manifest requires min_zig_version field", .{});
+    const zigversion = try nio.fmt.allocPrint(gpa, "{s}", .{modfile.yaml.get_string("min_zig_version").?});
     const zigpath = try std.fs.path.join(gpa, &.{ datapath, "zig", zigversion, "zig" });
 
     // zig build

@@ -3,6 +3,7 @@ const string = []const u8;
 const builtin = @import("builtin");
 const yaml = @import("yaml");
 const extras = @import("extras");
+const nio = @import("nio");
 
 const zigmod = @import("../lib.zig");
 const u = @import("funcs.zig");
@@ -95,7 +96,7 @@ pub const Module = struct {
         }
         var out: [32]u8 = undefined;
         h.final(&out);
-        const hex = try std.fmt.allocPrint(alloc, "blake3-{x}", .{std.fmt.fmtSliceHexLower(out[0..])});
+        const hex = try nio.fmt.allocPrint(alloc, "blake3-{s}", .{&extras.to_hex(out)});
         return hex;
     }
 
