@@ -48,6 +48,11 @@ jobs:
 
       # Test
       - run: zigmod version
+      - run: zigmod ci
+      - run: git diff <(cat __snapshots__/explain.tree.txt) <(zigmod explain --locked --format tree)
+      - run: git diff <(cat __snapshots__/explain.mermaid.txt) <(zigmod explain --locked --format mermaid)
+      - run: git diff <(cat __snapshots__/explain.dot.txt) <(zigmod explain --locked --format dot)
+
       - run: zigmod zpm add apple_pie
       - run: zigmod zpm tags
 
@@ -58,10 +63,6 @@ jobs:
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-systemlib-dep
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-local-dep
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-c-code
-
-      - run: git diff <(cat __snapshots__/explain.tree.txt) <(zigmod explain --locked --format tree)
-      - run: git diff <(cat __snapshots__/explain.mermaid.txt) <(zigmod explain --locked --format mermaid)
-      - run: git diff <(cat __snapshots__/explain.dot.txt) <(zigmod explain --locked --format dot)
 
       # Github Release
       - run: ./changelog.sh
