@@ -68,7 +68,7 @@ pub fn server_fetch(url: string) !json.Document {
     try req.send();
     try req.finish();
     try req.wait();
-    if (req.response.status == .ok) u.fail("expected: 200 from '{s}' got: {s}", .{ url, @tagName(req.response.status) });
+    if (req.response.status != .ok) u.fail("expected: 200 from '{s}' got: {s}", .{ url, @tagName(req.response.status) });
     return json.parse(gpa, "", nio.AnyReadable.fromStd(&req.reader()), .{ .support_trailing_commas = true, .maximum_depth = 100 });
 }
 
