@@ -1,6 +1,5 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
-const zfetch = @import("zfetch");
 const extras = @import("extras");
 const nfs = @import("nfs");
 
@@ -43,19 +42,33 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         }
     }
 
+    var buf: [4096]u8 = @splat(0);
+    var client: std.http.Client = .{ .allocator = gpa };
+    defer client.deinit();
+
     const has_zigdotmod = blk: {
         const _url = try std.mem.join(gpa, "/", &.{ found.git, "blob", "HEAD", "zig.mod" });
-        const _req = try zfetch.Request.init(gpa, _url, null);
+        var _req = try client.open(.GET, try std.Uri.parse(_url), .{
+            .server_header_buffer = &buf,
+            .redirect_behavior = .not_allowed,
+        });
         defer _req.deinit();
-        try _req.do(.GET, null, null);
-        break :blk @intFromEnum(_req.status) == 200;
+        try _req.send();
+        try _req.finish();
+        try _req.wait();
+        break :blk _req.response.status == .ok;
     };
     const has_zigmodyml = blk: {
         const _url = try std.mem.join(gpa, "/", &.{ found.git, "blob", "HEAD", "zigmod.yml" });
-        const _req = try zfetch.Request.init(gpa, _url, null);
+        var _req = try client.open(.GET, try std.Uri.parse(_url), .{
+            .server_header_buffer = &buf,
+            .redirect_behavior = .not_allowed,
+        });
         defer _req.deinit();
-        try _req.do(.GET, null, null);
-        break :blk @intFromEnum(_req.status) == 200;
+        try _req.send();
+        try _req.finish();
+        try _req.wait();
+        break :blk _req.response.status == .ok;
     };
 
     _, const file = try zigmod.ModFile.openFile(nfs.cwd(), .{ .mode = .read_write });

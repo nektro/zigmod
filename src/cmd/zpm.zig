@@ -1,7 +1,6 @@
 const std = @import("std");
 const string = []const u8;
 const gpa = std.heap.c_allocator;
-const zfetch = @import("zfetch");
 const extras = @import("extras");
 const json = @import("json");
 const nio = @import("nio");
@@ -58,9 +57,19 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
 }
 
 pub fn server_fetch(url: string) !json.Document {
-    const req = try zfetch.Request.init(gpa, url, null);
+    var buf: [4096]u8 = @splat(0);
+    var client: std.http.Client = .{ .allocator = gpa };
+    defer client.deinit();
+
+    var req = try client.open(.GET, try std.Uri.parse(url), .{
+        .server_header_buffer = &buf,
+        .redirect_behavior = .not_allowed,
+    });
     defer req.deinit();
-    try req.do(.GET, null, null);
+    try req.send();
+    try req.finish();
+    try req.wait();
+    if (req.response.status == .ok) return error.HttpExpected200;
     return json.parse(gpa, "", nio.AnyReadable.fromStd(&req.reader()), .{ .support_trailing_commas = true, .maximum_depth = 100 });
 }
 

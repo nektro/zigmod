@@ -15,7 +15,6 @@ dependencies:
     license: MIT
     version: commit-aa24df42183ad415d10bc0a33e6238c437fc0f59
   - src: git https://github.com/nektro/zig-licenses
-  - src: git https://github.com/nektro/zfetch
   - src: git https://github.com/nektro/zig-detect-license
   - src: git https://github.com/nektro/zig-inquirer
   - src: git https://github.com/nektro/arqv-ini

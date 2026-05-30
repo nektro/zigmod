@@ -1,5 +1,4 @@
 const std = @import("std");
-const zfetch = @import("zfetch");
 const extras = @import("extras");
 const root = @import("root");
 const build_options = root.build_options;
@@ -18,11 +17,11 @@ pub const commands = struct {
 };
 
 pub fn init() !void {
-    try zfetch.init();
+    //
 }
 
 pub fn deinit() void {
-    zfetch.deinit();
+    //
 }
 
 pub const Dep = @import("./util/dep.zig").Dep;

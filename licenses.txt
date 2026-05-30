@@ -3,8 +3,6 @@ MIT:
 - This
 - git https://github.com/marlersoft/zigwin32
 - git https://github.com/nektro/arqv-ini
-- git https://github.com/nektro/iguanaTLS
-- git https://github.com/nektro/zfetch
 - git https://github.com/nektro/zig-ansi
 - git https://github.com/nektro/zig-detect-license
 - git https://github.com/nektro/zig-extras
@@ -18,7 +16,6 @@ MIT:
 - git https://github.com/nektro/zig-time
 - git https://github.com/nektro/zig-tracer
 - git https://github.com/nektro/zig-yaml
-- git https://github.com/truemedian/hzzp
 - git https://github.com/yaml/libyaml
 - git https://github.com/ziglibs/known-folders
 
