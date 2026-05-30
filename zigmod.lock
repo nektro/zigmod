@@ -3,7 +3,7 @@ git https://github.com/marlersoft/zigwin32 commit-ec98bb4d9eea532320a8551720a9e3
 git https://github.com/nektro/arqv-ini commit-ab427a4de4f875eaa39ee56a29114fc020431546
 git https://github.com/nektro/zig-ansi commit-5f89211a749aef6bf518889c0467ceb24825c055
 git https://github.com/nektro/zig-detect-license commit-a1a066da88dab50873a56f0349dc12dc76542077
-git https://github.com/nektro/zig-extras commit-b3457b31a1d1ea2c19c5d0b007c903d3e80add40
+git https://github.com/nektro/zig-extras commit-0cf756c80a4bc1b0459bc81bf8071891f12c3738
 git https://github.com/nektro/zig-git commit-2b3f83cd341764f979969603e4f77e62f353b6a3
 git https://github.com/nektro/zig-inquirer commit-4cddefa42744d61067567b0b36b5d2bb376e5ae3
 git https://github.com/nektro/zig-intrusive-parser commit-a31b480914d15f3d13cdfb586aac950c73beebdd
@@ -11,13 +11,13 @@ git https://github.com/nektro/zig-json commit-428aa8a29e370fdb2e6739d5676b1de415
 git https://github.com/nektro/zig-leven commit-618eddde4ffbc6d34100e4bc6aa654d41161537a
 git https://github.com/nektro/zig-licenses commit-16cef5e32b3f8bbcf1064c599615290a720b6547
 git https://github.com/nektro/zig-licenses-text commit-ba0f00dfb23d28c301e4b54d0a278def2c38dc7b
-git https://github.com/nektro/zig-nfs commit-c855473c8bd15dd24a4e8b6911b7e006062004ba
+git https://github.com/nektro/zig-nfs commit-c61b820567505899198bb425c2b7c459a1f3cce2
 git https://github.com/nektro/zig-nio commit-c1da2e8a31858880eb3e4cfcf12de0a865617623
-git https://github.com/nektro/zig-sys-darwin commit-3265d1f06418eb0360d753c12116310a14b97bde
+git https://github.com/nektro/zig-sys-darwin commit-c8ef1a85dfb5e1891454650f88d56bfaa0834304
 git https://github.com/nektro/zig-sys-linux commit-f0b155d3627f8c19868be1b2f15d71cda908b575
 git https://github.com/nektro/zig-time commit-0f4db4c980146e4a3fc86a9a9070452a25ff9317
 git https://github.com/nektro/zig-tracer commit-3a5fdea4ffd387a53ac2a42fb503557cdbe20696
-git https://github.com/nektro/zig-yaml commit-00e899bec815bc2b49c6e5a72a7cfeeda673e133
+git https://github.com/nektro/zig-yaml commit-1dbb8eec4059e6b49e9a590300355f8090c681c7
 git https://github.com/madler/zlib tag-v1.3.2
 git https://github.com/yaml/libyaml tag-0.2.5
 git https://github.com/ziglibs/known-folders commit-aa24df42183ad415d10bc0a33e6238c437fc0f59

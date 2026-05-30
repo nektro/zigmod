@@ -58,7 +58,7 @@ pub fn fetch(exe: *std.Build.Step.Compile) *std.Build.Step {
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "ab427a4de4f875eaa39ee56a29114fc020431546").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-ansi", "5f89211a749aef6bf518889c0467ceb24825c055").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-detect-license", "a1a066da88dab50873a56f0349dc12dc76542077").step);
-    step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-extras", "b3457b31a1d1ea2c19c5d0b007c903d3e80add40").step);
+    step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-extras", "0cf756c80a4bc1b0459bc81bf8071891f12c3738").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-git", "2b3f83cd341764f979969603e4f77e62f353b6a3").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-inquirer", "4cddefa42744d61067567b0b36b5d2bb376e5ae3").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-intrusive-parser", "a31b480914d15f3d13cdfb586aac950c73beebdd").step);
@@ -66,13 +66,13 @@ pub fn fetch(exe: *std.Build.Step.Compile) *std.Build.Step {
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-leven", "618eddde4ffbc6d34100e4bc6aa654d41161537a").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-licenses", "16cef5e32b3f8bbcf1064c599615290a720b6547").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-licenses-text", "ba0f00dfb23d28c301e4b54d0a278def2c38dc7b").step);
-    step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-nfs", "c855473c8bd15dd24a4e8b6911b7e006062004ba").step);
+    step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-nfs", "c61b820567505899198bb425c2b7c459a1f3cce2").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-nio", "c1da2e8a31858880eb3e4cfcf12de0a865617623").step);
-    step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-sys-darwin", "3265d1f06418eb0360d753c12116310a14b97bde").step);
+    step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-sys-darwin", "c8ef1a85dfb5e1891454650f88d56bfaa0834304").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-sys-linux", "f0b155d3627f8c19868be1b2f15d71cda908b575").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-time", "0f4db4c980146e4a3fc86a9a9070452a25ff9317").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-tracer", "3a5fdea4ffd387a53ac2a42fb503557cdbe20696").step);
-    step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-yaml", "00e899bec815bc2b49c6e5a72a7cfeeda673e133").step);
+    step.dependOn(&GitExactStep.create(b, "https://github.com/nektro/zig-yaml", "1dbb8eec4059e6b49e9a590300355f8090c681c7").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/madler/zlib", "da607da739fa6047df13e66a2af6b8bec7c2a498").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/yaml/libyaml", "2c891fc7a770e8ba2fec34fc6b545c672beb37e6").step);
     step.dependOn(&GitExactStep.create(b, "https://github.com/ziglibs/known-folders", "aa24df42183ad415d10bc0a33e6238c437fc0f59").step);
@@ -202,9 +202,9 @@ pub const package_data = struct {
         .entry = "/git/github.com/nektro/zig-ansi/5f89211a749aef6bf518889c0467ceb24825c055/src/lib.zig",
     };
     pub var _f7dubzb7cyqe = Package{
-        .store = "/git/github.com/nektro/zig-extras/b3457b31a1d1ea2c19c5d0b007c903d3e80add40",
+        .store = "/git/github.com/nektro/zig-extras/0cf756c80a4bc1b0459bc81bf8071891f12c3738",
         .name = "extras",
-        .entry = "/git/github.com/nektro/zig-extras/b3457b31a1d1ea2c19c5d0b007c903d3e80add40/src/lib.zig",
+        .entry = "/git/github.com/nektro/zig-extras/0cf756c80a4bc1b0459bc81bf8071891f12c3738/src/lib.zig",
     };
     pub var _c1xirp1ota5p = Package{
         .store = "/git/github.com/nektro/zig-inquirer/4cddefa42744d61067567b0b36b5d2bb376e5ae3",
@@ -223,9 +223,9 @@ pub const package_data = struct {
         .entry = "/git/github.com/nektro/zig-licenses/16cef5e32b3f8bbcf1064c599615290a720b6547/src/lib.zig",
     };
     pub var _73bukkeci2u6 = Package{
-        .store = "/git/github.com/nektro/zig-sys-darwin/3265d1f06418eb0360d753c12116310a14b97bde",
+        .store = "/git/github.com/nektro/zig-sys-darwin/c8ef1a85dfb5e1891454650f88d56bfaa0834304",
         .name = "sys-darwin",
-        .entry = "/git/github.com/nektro/zig-sys-darwin/3265d1f06418eb0360d753c12116310a14b97bde/sys_darwin.zig",
+        .entry = "/git/github.com/nektro/zig-sys-darwin/c8ef1a85dfb5e1891454650f88d56bfaa0834304/sys_darwin.zig",
     };
     pub var _h7tv7ayhffak = Package{
         .store = "/git/github.com/nektro/zig-sys-linux/f0b155d3627f8c19868be1b2f15d71cda908b575",
@@ -253,9 +253,9 @@ pub const package_data = struct {
         .deps = &[_]*Package{ &_f7dubzb7cyqe, &_h7tv7ayhffak, &_73bukkeci2u6 },
     };
     pub var _vph9l0hxpeze = Package{
-        .store = "/git/github.com/nektro/zig-nfs/c855473c8bd15dd24a4e8b6911b7e006062004ba",
+        .store = "/git/github.com/nektro/zig-nfs/c61b820567505899198bb425c2b7c459a1f3cce2",
         .name = "nfs",
-        .entry = "/git/github.com/nektro/zig-nfs/c855473c8bd15dd24a4e8b6911b7e006062004ba/nfs.zig",
+        .entry = "/git/github.com/nektro/zig-nfs/c61b820567505899198bb425c2b7c459a1f3cce2/nfs.zig",
         .deps = &[_]*Package{ &_h7tv7ayhffak, &_kscsl0145t7x, &_iecwp4b3bsfm, &_73bukkeci2u6 },
     };
     pub var _ede2wygpe1iy = Package{
@@ -289,9 +289,9 @@ pub const package_data = struct {
         .deps = &[_]*Package{ &_pt88y5d80m25, &_96h80ezrvj7i },
     };
     pub var _g982zq6e8wsv = Package{
-        .store = "/git/github.com/nektro/zig-yaml/00e899bec815bc2b49c6e5a72a7cfeeda673e133",
+        .store = "/git/github.com/nektro/zig-yaml/1dbb8eec4059e6b49e9a590300355f8090c681c7",
         .name = "yaml",
-        .entry = "/git/github.com/nektro/zig-yaml/00e899bec815bc2b49c6e5a72a7cfeeda673e133/yaml.zig",
+        .entry = "/git/github.com/nektro/zig-yaml/1dbb8eec4059e6b49e9a590300355f8090c681c7/yaml.zig",
         .deps = &[_]*Package{ &_8mdbh0zuneb0 },
     };
     pub var _0e2d06bb494b = Package{

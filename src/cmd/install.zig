@@ -53,7 +53,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     const modpath = try std.fs.path.joinZ(gpa, &.{ cachepath, clean_path });
     std.log.debug("modpath: {s}", .{modpath});
 
-    if (!try extras.doesFolderExist(null, modpath)) {
+    if (!try nfs.cwd().existsDir(modpath)) {
         try dep.type.pull(gpa, dep.path, modpath);
     } else {
         try dep.type.update(gpa, modpath, "");

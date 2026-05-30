@@ -104,7 +104,7 @@ pub const ModFile = struct {
                 for (dep_seq.sequence) |item| {
                     var dtype: string = undefined;
                     var path: [:0]const u8 = undefined;
-                    var version: ?string = null;
+                    var version: ?[:0]const u8 = null;
                     var main = item.mapping.get_string("main") orelse "";
 
                     if (item.mapping.get("src")) |val| {
@@ -112,7 +112,7 @@ pub const ModFile = struct {
                         dtype = src_iter.next().?;
                         path = try gpa.dupeZ(u8, src_iter.next().?);
                         if (src_iter.next()) |dver| {
-                            version = dver;
+                            version = try gpa.dupeZ(u8, dver);
                         }
                     } else {
                         dtype = item.mapping.get("type").?.string;

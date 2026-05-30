@@ -17,7 +17,7 @@ pub const Dep = struct {
     path: [:0]const u8,
     id: [48]u8,
     name: string,
-    main: string,
+    main: [:0]const u8,
     version: string,
     c_include_dirs: []const string = &.{},
     c_source_flags: []const string = &.{},

@@ -206,7 +206,7 @@ const DiffChange = struct {
 fn diff_lockfile(alloc: std.mem.Allocator) !void {
     const max = std.math.maxInt(usize);
 
-    if (try extras.doesFolderExist(null, ".git")) {
+    if (try nfs.cwd().existsDir(".git")) {
         const result = try u.run_cmd_raw(alloc, null, &.{ "git", "diff", "zigmod.lock" });
         var stdout = std.io.fixedBufferStream(result.stdout);
         const r = stdout.reader();

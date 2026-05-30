@@ -39,7 +39,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     const flatname = try gpa.dupe(u8, name);
     _ = std.mem.replaceScalar(u8, flatname, '-', '_');
 
-    const entry_bare = if (ptype == .lib) try inquirer.forString(stdout, stdin, "package entry point:", gpa, u.detct_mainfile(gpa, u.try_index(string, args, 1, ""), .cwd(), name) catch |err| switch (err) {
+    const entry_bare = if (ptype == .lib) try inquirer.forString(stdout, stdin, "package entry point:", gpa, u.detct_mainfile(gpa, u.try_index([:0]const u8, args, 1, ""), .cwd(), name) catch |err| switch (err) {
         error.CantFindMain => try std.mem.concat(gpa, u8, &.{ flatname, ".zig" }),
         else => |ee| return ee,
     }) else null;
@@ -138,10 +138,10 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     }
 
     // ask about .gitignore
-    if (try extras.doesFolderExist(null, ".git")) {
+    if (try nfs.cwd().existsDir(".git")) {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitignore?", gpa);
         if (do) {
-            const exists = try extras.doesFileExist(null, ".gitignore");
+            const exists = try nfs.cwd().exists(".gitignore");
             const file: nfs.File = try (if (exists) cwd.openFile(".gitignore", .{ .mode = .read_write }) else cwd.createFile(".gitignore", .{}));
             defer file.close();
             const len = try file.getEndPos();
@@ -160,10 +160,10 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     }
 
     // ask about .gitattributes
-    if (try extras.doesFolderExist(null, ".git")) {
+    if (try nfs.cwd().existsDir(".git")) {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitattributes?", gpa);
         if (do) {
-            const exists = try extras.doesFileExist(null, ".gitattributes");
+            const exists = try nfs.cwd().exists(".gitattributes");
             const file: nfs.File = try (if (exists) cwd.openFile(".gitattributes", .{ .mode = .read_write }) else cwd.createFile(".gitattributes", .{}));
             defer file.close();
             const len = try file.getEndPos();
@@ -179,7 +179,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     }
 
     // ask about build.zig
-    if (!try extras.doesFileExist(null, "build.zig")) {
+    if (!try nfs.cwd().exists("build.zig")) {
         const do = try inquirer.forConfirm(stdout, stdin, "It looks like there's no build.zig. Do you want Zigmod to generate one for you?", gpa);
         if (do) {
             const file = try cwd.createFile("build.zig", .{});
@@ -246,7 +246,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     }
 
     // ask about main.zig / mod.zig
-    if (!try extras.doesFileExist(null, entry orelse "main.zig")) {
+    if (!try nfs.cwd().exists(entry orelse "main.zig")) {
         const do = try inquirer.forConfirm(stdout, stdin, "It looks like your entry point doesn't exist. Do you want Zigmod to generate it for you?", gpa);
         if (do) {
             const file = try cwd.createFile(entry orelse "main.zig", .{});
@@ -280,7 +280,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     }
 
     // ask about test.zig
-    if (!try extras.doesFileExist(null, "test.zig")) {
+    if (!try nfs.cwd().exists("test.zig")) {
         const do = try inquirer.forConfirm(stdout, stdin, "It looks like there's no test.zig. Do you want Zigmod to generate it for you?", gpa);
         if (do) {
             const file = try cwd.createFile("test.zig", .{});
@@ -342,10 +342,11 @@ pub fn writeLibManifest(w: nfs.File, id: string, name: string, license: string, 
 }
 
 fn guessCopyrightName() !?string {
-    const home = (try knownfolders.open(gpa, .home, .{})).?;
-    if (!(try extras.doesFileExist(home, ".gitconfig"))) return null;
+    const homepath = (try knownfolders.getPath(gpa, .home)).?;
+    const home = try nfs.cwd().openDirC(homepath, .{});
+    if (!(try home.exists(".gitconfig"))) return null;
     const file = try home.openFile(".gitconfig", .{});
-    const content = try file.reader().readAllAlloc(gpa, 1024 * 1024);
+    const content = try file.readAllAlloc(gpa, 1024 * 1024);
     var iniO = try ini.parseIntoMap(content, gpa);
     return iniO.map.get("user.name");
 }

@@ -138,7 +138,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                         u.fail("fetch: git: version type '{s}' is invalid.", .{vtype});
                     },
                 };
-                if (try extras.doesFolderExist(null, pv)) {
+                if (try nfs.cwd().existsDir(pv)) {
                     if (vers.id == .branch) {
                         if (options.update) {
                             try d.type.update(options.alloc, pv, d.path);
@@ -160,7 +160,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 try setTreeReadOnly(pvd, options.alloc);
                 return pv;
             }
-            if (!try extras.doesFolderExist(null, p)) {
+            if (!try nfs.cwd().existsDir(p)) {
                 try d.type.pull(options.alloc, d.path, p);
             } else {
                 if (options.update) {
@@ -170,7 +170,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             return p;
         },
         .hg => {
-            if (!try extras.doesFolderExist(null, p)) {
+            if (!try nfs.cwd().existsDir(p)) {
                 try d.type.pull(options.alloc, d.path, p);
             } else {
                 if (options.update) {
@@ -180,12 +180,12 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             return p;
         },
         .http => {
-            if (try extras.doesFolderExist(null, pv)) {
+            if (try nfs.cwd().existsDir(pv)) {
                 return pv;
             }
             const file_name = u.last(try u.split(options.alloc, d.path, '/')).?;
             if (d.version.len > 0) {
-                if (try extras.doesFolderExist(null, pv)) {
+                if (try nfs.cwd().existsDir(pv)) {
                     return pv;
                 }
                 const file_path = try std.fs.path.joinZ(options.alloc, &.{ pv, file_name });
@@ -201,7 +201,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 u.fail("{s} does not match hash {s}", .{ d.path, d.version });
                 return p;
             }
-            if (try extras.doesFolderExist(null, p)) {
+            if (try nfs.cwd().existsDir(p)) {
                 try nfs.cwd().deleteTree(p);
             }
             const file_path_s = try std.fs.path.resolve(options.alloc, &.{ p, file_name });
@@ -263,7 +263,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: [:0]const u8, options: *Co
                     }
                     const moddirO = try nfs.cwd().openDir(modpath, .{});
                     const tryname = try u.detect_pkgname(options.alloc, d.name, modpath);
-                    const trymain: ?string = u.detct_mainfile(options.alloc, d.main, moddirO, tryname) catch |err| switch (err) {
+                    const trymain = u.detct_mainfile(options.alloc, d.main, moddirO, tryname) catch |err| switch (err) {
                         error.CantFindMain => null,
                         else => |ee| return ee,
                     };
@@ -335,7 +335,7 @@ pub fn gen_files_package(alloc: std.mem.Allocator, cachepath: string, mdir: nfs.
 pub fn parse_lockfile(alloc: std.mem.Allocator, dir: nfs.Dir) ![]const [4]string {
     var list = std.ArrayList([4]string).init(alloc);
     const max = std.math.maxInt(usize);
-    if (!try extras.doesFileExist(dir.to_std(), "zigmod.lock")) return &[_][4]string{};
+    if (!try dir.exists("zigmod.lock")) return &[_][4]string{};
     var f = try dir.openFile("zigmod.lock", .{});
     defer f.close();
     var r = nio.BufferedReader(4096, nfs.File).init(f);

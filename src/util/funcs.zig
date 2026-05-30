@@ -44,10 +44,19 @@ pub fn split(alloc: std.mem.Allocator, in: string, delim: u8) ![]string {
     return list.toOwnedSlice();
 }
 
-pub fn file_list(alloc: std.mem.Allocator, dpath: [:0]const u8) ![]const string {
+pub fn file_list(alloc: std.mem.Allocator, dpath: [:0]const u8) ![][:0]u8 {
     var dir = try nfs.cwd().openDir(dpath, .{});
     defer dir.close();
-    return try extras.fileList(alloc, dir.to_std());
+    var list = std.ArrayList([:0]u8).init(alloc);
+    errdefer list.deinit();
+    errdefer for (list.items) |x| alloc.free(x);
+    var walker = try dir.walk(alloc);
+    defer walker.deinit();
+    while (try walker.next()) |entry| {
+        if (entry.type != .REG) continue;
+        try list.append(try alloc.dupeZ(u8, entry.path));
+    }
+    return list.toOwnedSlice();
 }
 
 pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.process.Child.RunResult {
@@ -168,28 +177,28 @@ pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: [:0]const
     return name;
 }
 
-pub fn detct_mainfile(alloc: std.mem.Allocator, override: string, dir: nfs.Dir, name: string) !string {
+pub fn detct_mainfile(alloc: std.mem.Allocator, override: [:0]const u8, dir: nfs.Dir, name: string) ![:0]const u8 {
     if (override.len > 0) {
-        if (try extras.doesFileExist(dir.to_std(), override)) {
+        if (try dir.exists(override)) {
             if (std.mem.endsWith(u8, override, ".zig")) {
                 return override;
             }
         }
     }
-    const namedotzig = try std.mem.concat(alloc, u8, &.{ name, ".zig" });
-    if (try extras.doesFileExist(dir.to_std(), namedotzig)) {
+    const namedotzig = try std.mem.concatWithSentinel(alloc, u8, &.{ name, ".zig" }, 0);
+    if (try dir.exists(namedotzig)) {
         return namedotzig;
     }
-    if (try extras.doesFileExist(dir.to_std(), "lib.zig")) {
+    if (try dir.exists("lib.zig")) {
         return "lib.zig";
     }
-    if (try extras.doesFileExist(dir.to_std(), "main.zig")) {
+    if (try dir.exists("main.zig")) {
         return "main.zig";
     }
-    if (try extras.doesFileExist(dir.to_std(), try std.fs.path.join(alloc, &.{ "src", "lib.zig" }))) {
+    if (try dir.exists(try std.fs.path.joinZ(alloc, &.{ "src", "lib.zig" }))) {
         return "src/lib.zig";
     }
-    if (try extras.doesFileExist(dir.to_std(), try std.fs.path.join(alloc, &.{ "src", "main.zig" }))) {
+    if (try dir.exists(try std.fs.path.joinZ(alloc, &.{ "src", "main.zig" }))) {
         return "src/main.zig";
     }
     return error.CantFindMain;
