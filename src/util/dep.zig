@@ -14,7 +14,7 @@ pub const Dep = struct {
     const Self = @This();
 
     type: Type,
-    path: string,
+    path: [:0]const u8,
     id: [48]u8,
     name: string,
     main: string,
@@ -33,17 +33,17 @@ pub const Dep = struct {
 
     pub const Type = @import("./dep_type.zig").DepType;
 
-    pub fn clean_path(self: Dep, alloc: std.mem.Allocator) !string {
+    pub fn clean_path(self: Dep, alloc: std.mem.Allocator) ![:0]const u8 {
         if (self.type == .local) {
             return self.path;
         }
-        var p = self.path;
+        var p: string = self.path;
         p = extras.trimPrefix(p, "http://");
         p = extras.trimPrefix(p, "https://");
         p = extras.trimPrefix(p, "git://");
         p = extras.trimSuffix(p, ".git");
-        p = try std.mem.join(alloc, "/", &.{ @tagName(self.type), p });
-        return p;
+        const np = try std.mem.joinZ(alloc, "/", &.{ @tagName(self.type), p });
+        return np;
     }
 
     pub fn clean_path_v(self: Dep, alloc: std.mem.Allocator) !string {
@@ -65,7 +65,7 @@ pub const Dep = struct {
         return true;
     }
 
-    pub fn exact_version(self: Dep, alloc: std.mem.Allocator, dpath: string) !string {
+    pub fn exact_version(self: Dep, alloc: std.mem.Allocator, dpath: [:0]const u8) !string {
         if (self.version.len == 0) {
             return try self.type.exact_version(alloc, dpath);
         }

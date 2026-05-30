@@ -4,9 +4,12 @@ const builtin = @import("builtin");
 const ansi = @import("ansi");
 const extras = @import("extras");
 const nio = @import("nio");
+const nfs = @import("nfs");
 
 const zigmod = @import("./lib.zig");
 const u = @import("./util/funcs.zig");
+
+const gpa = std.heap.c_allocator;
 
 //
 //
@@ -24,8 +27,8 @@ pub const CollectOptions = struct {
     }
 };
 
-pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectOptions) !zigmod.Module {
-    try std.fs.cwd().makePath(cachepath);
+pub fn collect_deps_deep(cachepath: [:0]const u8, mdir: nfs.Dir, options: *CollectOptions) !zigmod.Module {
+    try nfs.cwd().makePath(cachepath);
 
     const m = try zigmod.ModFile.from_dir(options.alloc, mdir, ".");
     try options.init();
@@ -58,8 +61,8 @@ pub fn collect_deps_deep(cachepath: string, mdir: std.fs.Dir, options: *CollectO
     };
 }
 
-pub fn collect_deps(cachepath: string, mdir: std.fs.Dir, mdir_path: string, dtype: zigmod.Dep.Type, options: *CollectOptions) anyerror!zigmod.Module {
-    try std.fs.cwd().makePath(cachepath);
+pub fn collect_deps(cachepath: [:0]const u8, mdir: nfs.Dir, mdir_path: string, dtype: zigmod.Dep.Type, options: *CollectOptions) anyerror!zigmod.Module {
+    try nfs.cwd().makePath(cachepath);
 
     const m = try zigmod.ModFile.from_dir(options.alloc, mdir, mdir_path);
     var moduledeps = std.ArrayList(zigmod.Module).init(options.alloc);
@@ -98,9 +101,9 @@ pub fn collect_pkgs(mod: zigmod.Module, list: *std.ArrayList(zigmod.Module)) any
     }
 }
 
-pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !string {
-    const p = try std.fs.path.join(options.alloc, &.{ cachepath, try d.clean_path(options.alloc) });
-    const pv = try std.fs.path.join(options.alloc, &.{ cachepath, try d.clean_path_v(options.alloc) });
+pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) ![:0]const u8 {
+    const p = try std.fs.path.joinZ(options.alloc, &.{ cachepath, try d.clean_path(options.alloc) });
+    const pv = try std.fs.path.joinZ(options.alloc, &.{ cachepath, try d.clean_path_v(options.alloc) });
 
     const nocache = d.type.isLocal();
     if (!nocache and extras.containsString(options.already_fetched.items, p)) return p;
@@ -118,7 +121,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
     switch (d.type) {
         .local => {
             if (!std.mem.endsWith(u8, d.main, ".zig")) {
-                return d.main;
+                return gpa.dupeZ(u8, d.main);
             }
             return d.path;
         },
@@ -148,11 +151,11 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                     u.fail("fetch: git: {s}: {s} {s} does not exist", .{ d.path, @tagName(vers.id), vers.string });
                 }
                 if (builtin.os.tag != .windows and vers.id == .commit) {
-                    var pvd = try std.fs.cwd().openDir(pv, .{});
+                    var pvd = try nfs.cwd().openDir(pv, .{});
                     defer pvd.close();
                     try pvd.deleteTree(".git");
                 }
-                var pvd = try std.fs.cwd().openDir(pv, .{ .iterate = true });
+                var pvd = try nfs.cwd().openDir(pv, .{});
                 defer pvd.close();
                 try setTreeReadOnly(pvd, options.alloc);
                 return pv;
@@ -185,36 +188,38 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
                 if (try extras.doesFolderExist(null, pv)) {
                     return pv;
                 }
-                const file_path = try std.fs.path.join(options.alloc, &.{ pv, file_name });
+                const file_path = try std.fs.path.joinZ(options.alloc, &.{ pv, file_name });
                 try d.type.pull(options.alloc, d.path, pv);
                 if (try u.validate_hash(options.alloc, d.version, file_path)) {
-                    try std.fs.cwd().deleteFile(file_path);
-                    var pvd = try std.fs.cwd().openDir(pv, .{ .iterate = true });
+                    try nfs.cwd().deleteFile(file_path);
+                    var pvd = try nfs.cwd().openDir(pv, .{});
                     defer pvd.close();
                     try setTreeReadOnly(pvd, options.alloc);
                     return pv;
                 }
-                try std.fs.cwd().deleteTree(pv);
+                try nfs.cwd().deleteTree(pv);
                 u.fail("{s} does not match hash {s}", .{ d.path, d.version });
                 return p;
             }
             if (try extras.doesFolderExist(null, p)) {
-                try std.fs.cwd().deleteTree(p);
+                try nfs.cwd().deleteTree(p);
             }
-            const file_path = try std.fs.path.resolve(options.alloc, &.{ p, file_name });
+            const file_path_s = try std.fs.path.resolve(options.alloc, &.{ p, file_name });
+            defer gpa.free(file_path_s);
+            const file_path = try gpa.dupeZ(u8, file_path_s);
             try d.type.pull(options.alloc, d.path, p);
-            try std.fs.cwd().deleteFile(file_path);
+            try nfs.cwd().deleteFile(file_path);
             return p;
         },
     }
 }
 
-pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectOptions) anyerror!?zigmod.Module {
+pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: [:0]const u8, options: *CollectOptions) anyerror!?zigmod.Module {
     if (options.lock) |lock| {
         for (lock) |item| {
             if (std.mem.eql(u8, item[0], try d.clean_path(options.alloc))) {
                 d.type = std.meta.stringToEnum(zigmod.Dep.Type, item[1]).?;
-                d.path = item[2];
+                d.path = try gpa.dupeZ(u8, item[2]);
                 d.version = item[3];
                 break;
             }
@@ -222,7 +227,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
     }
     if (!d.is_for_this()) return null;
     const modpath = try get_modpath(cachepath, d.*, options);
-    const moddir = if (modpath.len == 0) try std.fs.cwd().openDir(cachepath, .{}) else try std.fs.cwd().openDir(modpath, .{});
+    const moddir = if (modpath.len == 0) try nfs.cwd().openDir(cachepath, .{}) else try nfs.cwd().openDir(modpath, .{});
 
     const nocache = d.type.isLocal();
     if (!nocache) try options.already_fetched.append(modpath);
@@ -249,11 +254,14 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                 error.ManifestNotFound => {
                     if (d.main.len > 0 or d.c_include_dirs.len > 0 or d.c_source_files.len > 0 or d.keep) {
                         var mod_from = try zigmod.Module.from(options.alloc, d.*, cachepath, options);
-                        if (d.type != .local) mod_from.clean_path = extras.trimPrefix(modpath, cachepath)[1..];
+                        if (d.type != .local) {
+                            const new_clean_path = extras.trimPrefix(modpath, cachepath)[1..];
+                            mod_from.clean_path = new_clean_path.ptr[0..new_clean_path.len :0];
+                        }
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
-                    const moddirO = try std.fs.cwd().openDir(modpath, .{});
+                    const moddirO = try nfs.cwd().openDir(modpath, .{});
                     const tryname = try u.detect_pkgname(options.alloc, d.name, modpath);
                     const trymain: ?string = u.detct_mainfile(options.alloc, d.main, moddirO, tryname) catch |err| switch (err) {
                         error.CantFindMain => null,
@@ -263,7 +271,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
                         d.*.name = tryname;
                         d.*.main = trymain.?;
                         var mod_from = try zigmod.Module.from(options.alloc, d.*, cachepath, options);
-                        if (d.type != .local) mod_from.clean_path = extras.trimPrefix(modpath, cachepath)[1..];
+                        if (d.type != .local) mod_from.clean_path = extras.trimPrefix(modpath, cachepath)[1..][0.. :0];
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
@@ -274,7 +282,10 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
             dd.dep = d.*;
             dd.for_build = d.for_build;
             const save = dd;
-            if (d.type != .local) dd.clean_path = extras.trimPrefix(modpath, cachepath)[1..];
+            if (d.type != .local) {
+                const new_clean_path = extras.trimPrefix(modpath, cachepath)[1..];
+                dd.clean_path = new_clean_path.ptr[0..new_clean_path.len :0];
+            }
             if (std.mem.eql(u8, &dd.id, &zigmod.Dep.EMPTY)) dd.id = u.random_string(48);
             if (d.name.len > 0) dd.name = d.name;
             if (d.main.len > 0) dd.main = d.main;
@@ -290,16 +301,16 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: string, options: *CollectO
     }
 }
 
-pub fn gen_files_package(alloc: std.mem.Allocator, cachepath: string, mdir: std.fs.Dir, dirs: []const string) !void {
+pub fn gen_files_package(alloc: std.mem.Allocator, cachepath: string, mdir: nfs.Dir, dirs: []const string) !void {
     var map = std.StringHashMap(string).init(alloc);
     defer map.deinit();
 
     for (dirs) |dir_path| {
-        const dir = try mdir.openDir(dir_path, .{ .iterate = true });
+        const dir = try mdir.openDirC(dir_path, .{});
         var walker = try dir.walk(alloc);
         defer walker.deinit();
         while (try walker.next()) |p| {
-            if (p.kind == .directory) {
+            if (p.type == .DIR) {
                 continue;
             }
             const path = try alloc.dupe(u8, p.path);
@@ -315,21 +326,19 @@ pub fn gen_files_package(alloc: std.mem.Allocator, cachepath: string, mdir: std.
     const destdir = mdir;
     const rff = try destdir.createFile(fname, .{});
     defer rff.close();
-    const w = rff.writer();
     var iter = map.iterator();
     while (iter.next()) |item| {
-        try w.print("pub const @\"/{}\" = @embedFile(\"{}\");\n", .{ std.zig.fmtEscapes(item.key_ptr.*), std.zig.fmtEscapes(item.value_ptr.*) });
+        try rff.print("pub const @\"/{}\" = @embedFile(\"{}\");\n", .{ u.altStringEscape(item.key_ptr.*), u.altStringEscape(item.value_ptr.*) });
     }
 }
 
-pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]string {
+pub fn parse_lockfile(alloc: std.mem.Allocator, dir: nfs.Dir) ![]const [4]string {
     var list = std.ArrayList([4]string).init(alloc);
     const max = std.math.maxInt(usize);
-    if (!try extras.doesFileExist(dir, "zigmod.lock")) return &[_][4]string{};
+    if (!try extras.doesFileExist(dir.to_std(), "zigmod.lock")) return &[_][4]string{};
     var f = try dir.openFile("zigmod.lock", .{});
     defer f.close();
-    var br = std.io.bufferedReader(f.reader());
-    const r = br.reader();
+    var r = nio.BufferedReader(4096, nfs.File).init(f);
     var i: usize = 0;
     var v: usize = 1;
     while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line| : (i += 1) {
@@ -351,7 +360,7 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
                 var iter = std.mem.splitScalar(u8, line, ' ');
                 const asdep = zigmod.Dep{
                     .type = std.meta.stringToEnum(zigmod.Dep.Type, iter.next().?).?,
-                    .path = iter.next().?,
+                    .path = try gpa.dupeZ(u8, iter.next().?),
                     .version = iter.next().?,
                     .id = zigmod.Dep.EMPTY,
                     .name = "",
@@ -374,17 +383,17 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: std.fs.Dir) ![]const [4]str
     return list.toOwnedSlice();
 }
 
-fn setTreeReadOnly(dir: std.fs.Dir, alloc: std.mem.Allocator) !void {
+fn setTreeReadOnly(dir: nfs.Dir, alloc: std.mem.Allocator) !void {
     var walker = try dir.walk(alloc);
     defer walker.deinit();
 
     while (try walker.next()) |entry| {
-        if (entry.kind != .file) continue;
+        if (entry.type != .REG) continue;
         var file = try dir.openFile(entry.path, .{});
         defer file.close();
-        var metadata = try file.metadata();
-        var perms = metadata.permissions();
-        perms.setReadOnly(true);
-        try file.setPermissions(perms);
+        const stat = try file.stat();
+        var mode = stat.mode;
+        mode |= ~@as(nfs.File.Mode, 0o222);
+        try file.chmod(mode);
     }
 }

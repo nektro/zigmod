@@ -4,6 +4,7 @@ const yaml = @import("yaml");
 const extras = @import("extras");
 const root = @import("root");
 const build_options = root.build_options;
+const nfs = @import("nfs");
 
 const zigmod = @import("../lib.zig");
 const u = @import("funcs.zig");
@@ -11,6 +12,7 @@ const u = @import("funcs.zig");
 //
 //
 
+const gpa = std.heap.c_allocator;
 const b = 1;
 const kb = b * 1024;
 const mb = kb * 1024;
@@ -32,10 +34,10 @@ pub const ModFile = struct {
     builddeps: []zigmod.Dep,
     min_zig_version: ?std.SemanticVersion,
 
-    pub fn openFile(dir: std.fs.Dir, ops: std.fs.File.OpenFlags) !struct { string, std.fs.File } {
+    pub fn openFile(dir: nfs.Dir, ops: nfs.Dir.OpenFileFlags) !struct { string, nfs.File } {
         return .{ "zig.mod", dir.openFile("zig.mod", ops) catch |err| switch (err) {
-            error.FileNotFound => return .{ "zigmod.yml", dir.openFile("zigmod.yml", ops) catch |err2| switch (err2) {
-                error.FileNotFound => return error.ManifestNotFound,
+            error.ENOENT => return .{ "zigmod.yml", dir.openFile("zigmod.yml", ops) catch |err2| switch (err2) {
+                error.ENOENT => return error.ManifestNotFound,
                 else => |e2| return e2,
             } },
             else => |e| return e,
@@ -43,13 +45,13 @@ pub const ModFile = struct {
     }
 
     pub fn init(alloc: std.mem.Allocator) !Self {
-        return try from_dir(alloc, std.fs.cwd(), ".");
+        return try from_dir(alloc, nfs.cwd(), ".");
     }
 
-    pub fn from_dir(alloc: std.mem.Allocator, dir: std.fs.Dir, dir_path: string) !Self {
+    pub fn from_dir(alloc: std.mem.Allocator, dir: nfs.Dir, dir_path: string) !Self {
         const file_path, const file = try openFile(dir, .{});
         defer file.close();
-        const input = try file.reader().readAllAlloc(alloc, mb);
+        const input = try file.readAllAlloc(alloc, mb);
         const doc = try yaml.parse(alloc, input);
         return from_mapping(alloc, doc.mapping, dir_path, file_path);
     }
@@ -101,14 +103,14 @@ pub const ModFile = struct {
                 if (dep_seq != .sequence) continue;
                 for (dep_seq.sequence) |item| {
                     var dtype: string = undefined;
-                    var path: string = undefined;
+                    var path: [:0]const u8 = undefined;
                     var version: ?string = null;
                     var main = item.mapping.get_string("main") orelse "";
 
                     if (item.mapping.get("src")) |val| {
                         var src_iter = std.mem.tokenizeScalar(u8, val.string, ' ');
                         dtype = src_iter.next().?;
-                        path = src_iter.next().?;
+                        path = try gpa.dupeZ(u8, src_iter.next().?);
                         if (src_iter.next()) |dver| {
                             version = dver;
                         }

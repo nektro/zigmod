@@ -1,6 +1,7 @@
 const std = @import("std");
 const string = []const u8;
 const extras = @import("extras");
+const nfs = @import("nfs");
 
 const zigmod = @import("../lib.zig");
 const u = @import("./../util/funcs.zig");
@@ -15,7 +16,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     //
     const gpa = std.heap.c_allocator;
     const cachepath = try u.find_cachepath();
-    const dir = std.fs.cwd();
+    const dir = nfs.cwd();
     const should_lock = args.len >= 1 and std.mem.eql(u8, args[0], "--locked");
 
     var options = common.CollectOptions{
@@ -34,11 +35,11 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     try create_depszig(gpa, cachepath, dir, top_module, list.items, &options);
 }
 
-pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.Dir, top_module: zigmod.Module, list: []const zigmod.Module, options: *common.CollectOptions) !void {
+pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nfs.Dir, top_module: zigmod.Module, list: []const zigmod.Module, options: *common.CollectOptions) !void {
     const f = try dir.createFile("deps.zig", .{});
     defer f.close();
 
-    const w = f.writer();
+    const w = f;
     try w.writeAll("// zig fmt: off\n");
     try w.writeAll("const std = @import(\"std\");\n");
     try w.writeAll("const builtin = @import(\"builtin\");\n");
@@ -225,7 +226,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
         \\}}
         \\
         \\
-    , .{top_module.minZigVersion()});
+    , .{if (top_module.minZigVersion()) |sv| u.altSemanticVersion(sv) else null});
 
     try w.writeAll("pub const package_data = struct {\n");
     var duped = std.ArrayList(zigmod.Module).init(alloc);
@@ -252,18 +253,18 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.D
     try w.writeAll("};\n");
 }
 
-fn print_dirs(w: std.fs.File.Writer, list: []const zigmod.Module) !void {
+fn print_dirs(w: nfs.File, list: []const zigmod.Module) !void {
     for (list) |mod| {
         if (mod.type == .system_lib or mod.type == .framework) continue;
         if (std.mem.eql(u8, mod.id, "root")) {
             try w.writeAll("    pub const _root = \"\";\n");
             continue;
         }
-        try w.print("    pub const _{s} = cache ++ \"/{}\";\n", .{ mod.short_id(), std.zig.fmtEscapes(mod.clean_path) });
+        try w.print("    pub const _{s} = cache ++ \"/{}\";\n", .{ mod.short_id(), u.altStringEscape(mod.clean_path) });
     }
 }
 
-fn print_deps(w: std.fs.File.Writer, m: zigmod.Module) !void {
+fn print_deps(w: nfs.File, m: zigmod.Module) !void {
     try w.writeAll("[_]*Package{\n");
     for (m.deps) |d| {
         if (d.main.len == 0) {
@@ -277,7 +278,7 @@ fn print_deps(w: std.fs.File.Writer, m: zigmod.Module) !void {
     try w.writeAll("}");
 }
 
-fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath: string, notdone: *std.ArrayList(zigmod.Module), done: *std.ArrayList(zigmod.Module), options: *common.CollectOptions) !void {
+fn print_pkg_data_to(w: nfs.File, alloc: std.mem.Allocator, cachepath: [:0]const u8, notdone: *std.ArrayList(zigmod.Module), done: *std.ArrayList(zigmod.Module), options: *common.CollectOptions) !void {
     var len: usize = notdone.items.len;
     while (notdone.items.len > 0) {
         for (notdone.items, 0..) |mod, i| {
@@ -292,13 +293,13 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
                 switch (mod.type) {
                     .system_lib, .framework => {},
                     .local => {},
-                    .git => try w.print("        .store = \"/{}/{s}\",\n", .{ std.zig.fmtEscapes(fixed_path), try mod.pin(alloc, cachepath, options) }),
+                    .git => try w.print("        .store = \"/{}/{s}\",\n", .{ u.altStringEscape(fixed_path), try mod.pin(alloc, cachepath, options) }),
                     .hg => @panic("TODO"),
                     .http => @panic("TODO"),
                 }
                 if (mod.main.len > 0 and !std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
                     try w.print("        .name = \"{s}\",\n", .{mod.name});
-                    try w.print("        .entry = \"/{}/{s}/{s}\",\n", .{ std.zig.fmtEscapes(fixed_path), try mod.pin(alloc, cachepath, options), mod.main });
+                    try w.print("        .entry = \"/{}/{s}/{s}\",\n", .{ u.altStringEscape(fixed_path), try mod.pin(alloc, cachepath, options), mod.main });
 
                     if (mod.deps.len != 0) {
                         try w.writeAll("        .deps = &[_]*Package{");
@@ -313,7 +314,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
                 if (mod.c_include_dirs.len > 0) {
                     try w.writeAll("        .c_include_dirs = &.{");
                     for (mod.c_include_dirs, 0..) |item, j| {
-                        try w.print(" \"{}\"", .{std.zig.fmtEscapes(item)});
+                        try w.print(" \"{}\"", .{u.altStringEscape(item)});
                         if (j != mod.c_include_dirs.len - 1) try w.writeAll(",");
                     }
                     try w.writeAll(" },\n");
@@ -321,7 +322,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
                 if (mod.c_source_files.len > 0) {
                     try w.writeAll("        .c_source_files = &.{");
                     for (mod.c_source_files, 0..) |item, j| {
-                        try w.print(" \"{}\"", .{std.zig.fmtEscapes(item)});
+                        try w.print(" \"{}\"", .{u.altStringEscape(item)});
                         if (j != mod.c_source_files.len - 1) try w.writeAll(",");
                     }
                     try w.writeAll(" },\n");
@@ -329,7 +330,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
                 if (mod.c_source_flags.len > 0) {
                     try w.writeAll("        .c_source_flags = &.{");
                     for (mod.c_source_flags, 0..) |item, j| {
-                        try w.print(" \"{}\"", .{std.zig.fmtEscapes(item)});
+                        try w.print(" \"{}\"", .{u.altStringEscape(item)});
                         if (j != mod.c_source_flags.len - 1) try w.writeAll(",");
                     }
                     try w.writeAll(" },\n");
@@ -338,7 +339,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
                     try w.writeAll("        .system_libs = &.{");
                     for (mod.deps, 0..) |item, j| {
                         if (!(item.type == .system_lib)) continue;
-                        try w.print(" \"{}\"", .{std.zig.fmtEscapes(item.name)});
+                        try w.print(" \"{}\"", .{u.altStringEscape(item.name)});
                         if (j != mod.deps.len - 1) try w.writeAll(",");
                     }
                     try w.writeAll(" },\n");
@@ -347,7 +348,7 @@ fn print_pkg_data_to(w: std.fs.File.Writer, alloc: std.mem.Allocator, cachepath:
                     try w.writeAll("        .frameworks = &.{");
                     for (mod.deps, 0..) |item, j| {
                         if (!(item.type == .system_lib)) continue;
-                        try w.print(" \"{}\"", .{std.zig.fmtEscapes(item.name)});
+                        try w.print(" \"{}\"", .{u.altStringEscape(item.name)});
                         if (j != mod.deps.len - 1) try w.writeAll(",");
                     }
                     try w.writeAll(" },\n");
@@ -376,7 +377,7 @@ fn contains_all(needles: []zigmod.Module, haystack: []const zigmod.Module) bool 
     return true;
 }
 
-fn print_pkgs(alloc: std.mem.Allocator, w: std.fs.File.Writer, m: zigmod.Module) !void {
+fn print_pkgs(alloc: std.mem.Allocator, w: nfs.File, m: zigmod.Module) !void {
     try w.writeAll("struct {\n");
     for (m.deps) |d| {
         if (d.main.len == 0) {
@@ -391,7 +392,7 @@ fn print_pkgs(alloc: std.mem.Allocator, w: std.fs.File.Writer, m: zigmod.Module)
     try w.writeAll("}");
 }
 
-fn print_imports(alloc: std.mem.Allocator, w: std.fs.File.Writer, m: zigmod.Module, path: string) !void {
+fn print_imports(alloc: std.mem.Allocator, w: nfs.File, m: zigmod.Module, path: string) !void {
     for (m.deps) |d| {
         if (d.main.len == 0) {
             continue;
@@ -400,7 +401,7 @@ fn print_imports(alloc: std.mem.Allocator, w: std.fs.File.Writer, m: zigmod.Modu
             continue;
         }
         const ident = try zig_name_from_pkg_name(alloc, d.name);
-        try w.print("    pub const {s} = @import(\"{}/{}/{s}\");\n", .{ ident, std.zig.fmtEscapes(path), std.zig.fmtEscapes(d.clean_path), d.main });
+        try w.print("    pub const {s} = @import(\"{}/{}/{s}\");\n", .{ ident, u.altStringEscape(path), u.altStringEscape(d.clean_path), d.main });
     }
 }
 

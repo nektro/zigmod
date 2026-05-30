@@ -4,6 +4,7 @@ const string = []const u8;
 const style = @import("ansi").style;
 const licenses = @import("licenses");
 const extras = @import("extras");
+const nfs = @import("nfs");
 
 const zigmod = @import("../lib.zig");
 const u = @import("./../util/funcs.zig");
@@ -20,7 +21,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     _ = args;
 
     const cachepath = try u.find_cachepath();
-    const dir = std.fs.cwd();
+    const dir = nfs.cwd();
 
     var options = common.CollectOptions{
         .log = false,
@@ -28,10 +29,10 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         .alloc = gpa,
     };
 
-    try do(cachepath, dir, &options, std.io.getStdOut());
+    try do(cachepath, dir, &options, .stdout());
 }
 
-pub fn do(cachepath: string, dir: std.fs.Dir, options: *common.CollectOptions, outfile: std.fs.File) !void {
+pub fn do(cachepath: [:0]const u8, dir: nfs.Dir, options: *common.CollectOptions, outfile: nfs.File) !void {
     const top_module = try common.collect_deps_deep(cachepath, dir, options);
 
     var master_list = List.init(gpa);
@@ -71,8 +72,8 @@ pub fn do(cachepath: string, dir: std.fs.Dir, options: *common.CollectOptions, o
         try tracking_list.append(item);
     }
 
-    const istty = outfile.isTty();
-    const writer = outfile.writer();
+    const istty = outfile.isatty();
+    const writer = outfile;
     const Bold = if (!istty) "" else style.Bold;
     const Faint = if (!istty) "" else style.Faint;
     const ResetIntensity = if (!istty) "" else style.ResetIntensity;

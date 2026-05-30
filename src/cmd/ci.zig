@@ -1,5 +1,6 @@
 const std = @import("std");
 const string = []const u8;
+const nfs = @import("nfs");
 
 const zigmod = @import("../lib.zig");
 const u = @import("./../util/funcs.zig");
@@ -14,11 +15,11 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
 
     const gpa = std.heap.c_allocator;
     const cachepath = try u.find_cachepath();
-    const dir = std.fs.cwd();
+    const dir = nfs.cwd();
     try do(gpa, cachepath, dir);
 }
 
-pub fn do(alloc: std.mem.Allocator, cachepath: string, dir: std.fs.Dir) !void {
+pub fn do(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nfs.Dir) !void {
     var options = common.CollectOptions{
         .log = true,
         .update = false,

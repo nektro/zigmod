@@ -2,6 +2,7 @@ const std = @import("std");
 const gpa = std.heap.c_allocator;
 const zfetch = @import("zfetch");
 const extras = @import("extras");
+const nfs = @import("nfs");
 
 const zigmod = @import("../../lib.zig");
 const u = @import("./../../util/funcs.zig");
@@ -57,11 +58,11 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         break :blk @intFromEnum(_req.status) == 200;
     };
 
-    _, const file = try zigmod.ModFile.openFile(std.fs.cwd(), .{ .mode = .read_write });
+    _, const file = try zigmod.ModFile.openFile(nfs.cwd(), .{ .mode = .read_write });
     defer file.close();
     try file.seekTo(try file.getEndPos());
 
-    const file_w = file.writer();
+    const file_w = file;
     try file_w.writeAll("\n");
     try file_w.print("  - src: git {s}\n", .{extras.trimSuffix(found.git, ".git")});
     if (!(has_zigdotmod or has_zigmodyml)) {

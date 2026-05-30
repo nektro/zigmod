@@ -4,6 +4,7 @@ const gpa = std.heap.c_allocator;
 const knownfolders = @import("known-folders");
 const extras = @import("extras");
 const nio = @import("nio");
+const nfs = @import("nfs");
 
 const zigmod = @import("./../lib.zig");
 const u = @import("./../util/funcs.zig");
@@ -48,8 +49,8 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         .for_build = false,
     };
     const clean_path = try dep.clean_path(gpa);
-    const cachepath = try std.fs.path.join(gpa, &.{ cache, "zigmod", "deps" });
-    const modpath = try std.fs.path.join(gpa, &.{ cachepath, clean_path });
+    const cachepath = try std.fs.path.joinZ(gpa, &.{ cache, "zigmod", "deps" });
+    const modpath = try std.fs.path.joinZ(gpa, &.{ cachepath, clean_path });
     std.log.debug("modpath: {s}", .{modpath});
 
     if (!try extras.doesFolderExist(null, modpath)) {
@@ -58,14 +59,14 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         try dep.type.update(gpa, modpath, "");
     }
 
-    const moddir = try std.fs.cwd().openDir(modpath, .{});
+    const moddir = try nfs.cwd().openDir(modpath, .{});
     const ci = @import("./ci.zig");
     try ci.do(gpa, cachepath, moddir);
 
     const modfile = try zigmod.ModFile.from_dir(gpa, moddir, modpath);
-    _ = modfile.min_zig_version orelse u.fail("zigmod manifest requires min_zig_version field", .{});
-    const zigversion = try nio.fmt.allocPrint(gpa, "{s}", .{modfile.yaml.get_string("min_zig_version").?});
-    const zigpath = try std.fs.path.join(gpa, &.{ datapath, "zig", zigversion, "zig" });
+    const zigversion_sv = modfile.min_zig_version orelse u.fail("zigmod manifest requires min_zig_version field", .{});
+    const zigversion = try nio.fmt.allocPrint(gpa, "{s}", .{u.altSemanticVersion(zigversion_sv)});
+    const zigpath = try std.fs.path.joinZ(gpa, &.{ datapath, "zig", zigversion, "zig" });
 
     // zig build
     const argv: []const string = &.{

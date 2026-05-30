@@ -4,6 +4,7 @@ const builtin = @import("builtin");
 const yaml = @import("yaml");
 const extras = @import("extras");
 const nio = @import("nio");
+const nfs = @import("nfs");
 
 const zigmod = @import("../lib.zig");
 const u = @import("funcs.zig");
@@ -24,14 +25,14 @@ pub const Module = struct {
     except_os: []const string = &.{},
     yaml: ?yaml.Mapping,
     deps: []Module,
-    clean_path: string,
+    clean_path: [:0]const u8,
     dep: ?zigmod.Dep,
     for_build: bool = false,
     min_zig_version: ?std.SemanticVersion,
 
     pub const ROOT: [48]u8 = ("root" ++ (" " ** 44)).*;
 
-    pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, cachepath: string, options: *common.CollectOptions) !Module {
+    pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, cachepath: [:0]const u8, options: *common.CollectOptions) !Module {
         var moddeps = std.ArrayList(Module).init(alloc);
         errdefer moddeps.deinit();
 
@@ -68,7 +69,7 @@ pub const Module = struct {
     }
 
     pub fn get_hash(self: Module, alloc: std.mem.Allocator, cdpath: string) !string {
-        const file_list_1 = try u.file_list(alloc, try std.mem.concat(alloc, u8, &.{ cdpath, "/", self.clean_path }));
+        const file_list_1 = try u.file_list(alloc, try std.mem.concatWithSentinel(alloc, u8, &.{ cdpath, "/", self.clean_path }, 0));
 
         var file_list_2 = std.ArrayList(string).init(alloc);
         errdefer file_list_2.deinit();
@@ -88,10 +89,10 @@ pub const Module = struct {
 
         var h = std.crypto.hash.Blake3.init(.{});
         for (file_list_2.items) |item| {
-            const abs_path = try std.fs.path.join(alloc, &.{ cdpath, self.clean_path, item });
-            const file = try std.fs.cwd().openFile(abs_path, .{});
+            const abs_path = try std.fs.path.joinZ(alloc, &.{ cdpath, self.clean_path, item });
+            const file = try nfs.cwd().openFile(abs_path, .{});
             defer file.close();
-            const input = try file.reader().readAllAlloc(alloc, u.mb * 100);
+            const input = try file.readAllAlloc(alloc, u.mb * 100);
             h.update(input);
         }
         var out: [32]u8 = undefined;
@@ -164,13 +165,13 @@ pub const Module = struct {
         return false;
     }
 
-    pub fn pin(self: Module, alloc: std.mem.Allocator, cachepath: string, options: *common.CollectOptions) !string {
+    pub fn pin(self: Module, alloc: std.mem.Allocator, cachepath: [:0]const u8, options: *common.CollectOptions) !string {
         return switch (self.type) {
             .local => "",
             .system_lib => "",
             .framework => "",
             else => |sub| {
-                var cdir = try std.fs.cwd().openDir(cachepath, .{});
+                var cdir = try nfs.cwd().openDir(cachepath, .{});
                 defer cdir.close();
                 var mdir = try cdir.openDir(self.clean_path, .{});
                 defer mdir.close();

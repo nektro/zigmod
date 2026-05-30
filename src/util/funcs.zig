@@ -44,10 +44,10 @@ pub fn split(alloc: std.mem.Allocator, in: string, delim: u8) ![]string {
     return list.toOwnedSlice();
 }
 
-pub fn file_list(alloc: std.mem.Allocator, dpath: string) ![]const string {
-    var dir = try std.fs.cwd().openDir(dpath, .{ .iterate = true });
+pub fn file_list(alloc: std.mem.Allocator, dpath: [:0]const u8) ![]const string {
+    var dir = try nfs.cwd().openDir(dpath, .{});
     defer dir.close();
-    return try extras.fileList(alloc, dir);
+    return try extras.fileList(alloc, dir.to_std());
 }
 
 pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.process.Child.RunResult {
@@ -121,11 +121,11 @@ pub const HashFn = enum {
     sha512,
 };
 
-pub fn validate_hash(alloc: std.mem.Allocator, input: string, file_path: string) !bool {
+pub fn validate_hash(alloc: std.mem.Allocator, input: string, file_path: [:0]const u8) !bool {
     const hash = parse_split(HashFn, '-').do(input) catch return false;
-    const file = try std.fs.cwd().openFile(file_path, .{});
+    const file = try nfs.cwd().openFile(file_path, .{});
     defer file.close();
-    const data = try file.reader().readAllAlloc(alloc, gb);
+    const data = try file.readAllAlloc(alloc, gb);
     const expected = hash.string;
     const actual = switch (hash.id) {
         .blake3 => &try do_hash(std.crypto.hash.Blake3, data),
@@ -144,9 +144,8 @@ pub fn do_hash(comptime algo: type, data: string) ![algo.digest_length * 2]u8 {
 }
 
 /// Returns the result of running `git rev-parse HEAD`
-pub fn git_rev_HEAD(alloc: std.mem.Allocator, dir: std.fs.Dir) !string {
-    const ndir: nfs.Dir = .{ .fd = @enumFromInt(dir.fd) };
-    var dirg = try ndir.openDir(".git", .{});
+pub fn git_rev_HEAD(alloc: std.mem.Allocator, dir: nfs.Dir) !string {
+    var dirg = try dir.openDir(".git", .{});
     defer dirg.close();
     const commitid = try git.getHEAD(alloc, dirg);
     return if (commitid) |_| commitid.?.id else error.NotAGitRepo;
@@ -158,9 +157,9 @@ pub fn slice(comptime T: type, input: []const T, from: usize, to: usize) []const
     return input[f..t];
 }
 
-pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: string) !string {
+pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: [:0]const u8) !string {
     if (override.len > 0) return override;
-    const dirO = if (dir.len == 0) std.fs.cwd() else try std.fs.cwd().openDir(dir, .{});
+    const dirO = if (dir.len == 0) nfs.cwd() else try nfs.cwd().openDir(dir, .{});
     const dpath = try dirO.realpathAlloc(gpa, ".");
     const splitP = try split(alloc, dpath, std.fs.path.sep);
     var name = splitP[splitP.len - 1];
@@ -169,28 +168,28 @@ pub fn detect_pkgname(alloc: std.mem.Allocator, override: string, dir: string) !
     return name;
 }
 
-pub fn detct_mainfile(alloc: std.mem.Allocator, override: string, dir: ?std.fs.Dir, name: string) !string {
+pub fn detct_mainfile(alloc: std.mem.Allocator, override: string, dir: nfs.Dir, name: string) !string {
     if (override.len > 0) {
-        if (try extras.doesFileExist(dir, override)) {
+        if (try extras.doesFileExist(dir.to_std(), override)) {
             if (std.mem.endsWith(u8, override, ".zig")) {
                 return override;
             }
         }
     }
     const namedotzig = try std.mem.concat(alloc, u8, &.{ name, ".zig" });
-    if (try extras.doesFileExist(dir, namedotzig)) {
+    if (try extras.doesFileExist(dir.to_std(), namedotzig)) {
         return namedotzig;
     }
-    if (try extras.doesFileExist(dir, "lib.zig")) {
+    if (try extras.doesFileExist(dir.to_std(), "lib.zig")) {
         return "lib.zig";
     }
-    if (try extras.doesFileExist(dir, "main.zig")) {
+    if (try extras.doesFileExist(dir.to_std(), "main.zig")) {
         return "main.zig";
     }
-    if (try extras.doesFileExist(dir, try std.fs.path.join(alloc, &.{ "src", "lib.zig" }))) {
+    if (try extras.doesFileExist(dir.to_std(), try std.fs.path.join(alloc, &.{ "src", "lib.zig" }))) {
         return "src/lib.zig";
     }
-    if (try extras.doesFileExist(dir, try std.fs.path.join(alloc, &.{ "src", "main.zig" }))) {
+    if (try extras.doesFileExist(dir.to_std(), try std.fs.path.join(alloc, &.{ "src", "main.zig" }))) {
         return "src/main.zig";
     }
     return error.CantFindMain;
@@ -214,12 +213,48 @@ pub fn indexOfAfter(haystack: string, needle: u8, after: usize) ?usize {
     return null;
 }
 
-pub fn find_cachepath() !string {
-    const haystack = try std.fs.cwd().realpathAlloc(gpa, ".");
+pub fn find_cachepath() ![:0]const u8 {
+    const haystack = try nfs.cwd().realpathAlloc(gpa, ".");
     const needle = "/.zigmod/deps";
 
     if (std.mem.indexOf(u8, haystack, needle)) |index| {
-        return haystack[0 .. index + needle.len];
+        return gpa.dupeZ(u8, haystack[0 .. index + needle.len]);
     }
-    return try std.fs.path.join(gpa, &.{ haystack, ".zigmod", "deps" });
+    return try std.fs.path.joinZ(gpa, &.{ haystack, ".zigmod", "deps" });
 }
+
+pub fn altStringEscape(data: []const u8) StringEscape {
+    return .{ .data = data };
+}
+const StringEscape = struct {
+    data: []const u8,
+
+    pub fn nprint(self: StringEscape, writer: anytype) !void {
+        for (self.data) |c| switch (c) {
+            '\n' => try writer.writeAll("\\n"),
+            '\r' => try writer.writeAll("\\r"),
+            '\t' => try writer.writeAll("\\t"),
+            '\\' => try writer.writeAll("\\\\"),
+            '"' => try writer.writeAll("\\\""),
+            '\'' => try writer.writeAll(&.{'\''}),
+            ' ', '!', '#'...'&', '('...'[', ']'...'~' => try writer.writeAll(&.{c}),
+            else => {
+                try writer.print("\\x{x:0>2}", .{c});
+                // try writer.printInt(c, 16, .lower, .{ .width = 2, .fill = '0' });
+            },
+        };
+    }
+};
+
+pub fn altSemanticVersion(data: std.SemanticVersion) SemanticVersion {
+    return .{ .data = data };
+}
+const SemanticVersion = struct {
+    data: std.SemanticVersion,
+
+    pub fn nprint(self: SemanticVersion, writer: anytype) !void {
+        try writer.print("{d}.{d}.{d}", .{ self.data.major, self.data.minor, self.data.patch });
+        if (self.data.pre) |pre| try writer.print("-{s}", .{pre});
+        if (self.data.build) |build| try writer.print("+{s}", .{build});
+    }
+};

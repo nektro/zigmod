@@ -1,5 +1,6 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
+const nfs = @import("nfs");
 
 const zigmod = @import("../lib.zig");
 const u = @import("./../util/funcs.zig");
@@ -13,7 +14,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     _ = args;
 
     const cachepath = try u.find_cachepath();
-    const dir = std.fs.cwd();
+    const dir = nfs.cwd();
 
     var options = common.CollectOptions{
         .log = false,
@@ -25,7 +26,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     //
     const f = try dir.createFile("zigmod.sum", .{});
     defer f.close();
-    const w = f.writer();
+    const w = f;
 
     //
     var module_list = std.ArrayList(zigmod.Module).init(gpa);

@@ -1,6 +1,7 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 const builtin = @import("builtin");
+const nfs = @import("nfs");
 
 const u = @import("./../util/funcs.zig");
 
@@ -14,7 +15,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     const root = @import("root");
     const version = root.build_options.version;
 
-    var gitversion = u.git_rev_HEAD(gpa, std.fs.cwd()) catch "";
+    var gitversion = u.git_rev_HEAD(gpa, nfs.cwd()) catch "";
     gitversion = if (gitversion.len > 0) gitversion[0..9] else gitversion;
 
     const stdout = std.io.getStdOut();
