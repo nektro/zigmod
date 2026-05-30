@@ -63,7 +63,6 @@ pub fn server_fetch(url: string) !json.Document {
 
     var req = try client.open(.GET, try std.Uri.parse(url), .{
         .server_header_buffer = &buf,
-        .redirect_behavior = .not_allowed,
     });
     defer req.deinit();
     try req.send();

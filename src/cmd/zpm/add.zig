@@ -50,7 +50,6 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         const _url = try std.mem.join(gpa, "/", &.{ found.git, "blob", "HEAD", "zig.mod" });
         var _req = try client.open(.GET, try std.Uri.parse(_url), .{
             .server_header_buffer = &buf,
-            .redirect_behavior = .not_allowed,
         });
         defer _req.deinit();
         try _req.send();
@@ -62,7 +61,6 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         const _url = try std.mem.join(gpa, "/", &.{ found.git, "blob", "HEAD", "zigmod.yml" });
         var _req = try client.open(.GET, try std.Uri.parse(_url), .{
             .server_header_buffer = &buf,
-            .redirect_behavior = .not_allowed,
         });
         defer _req.deinit();
         try _req.send();
