@@ -34,7 +34,6 @@ jobs:
       - run: git diff <(cat __snapshots__/explain.mermaid.txt) <(zigmod explain --locked --format mermaid)
       - run: git diff <(cat __snapshots__/explain.dot.txt) <(zigmod explain --locked --format dot)
 
-      - run: zigmod zpm add apple_pie
       - run: zigmod zpm tags
 
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-basic
