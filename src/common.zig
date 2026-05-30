@@ -341,7 +341,8 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: nfs.Dir) ![]const [4]string
     var r = nio.BufferedReader(4096, nfs.File).init(f);
     var i: usize = 0;
     var v: usize = 1;
-    while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line| : (i += 1) {
+    while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line_full| : (i += 1) {
+        const line = line_full[0 .. line_full.len - 1];
         if (i == 0 and std.mem.eql(u8, line, "2")) {
             v = 2;
             continue;

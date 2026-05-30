@@ -216,7 +216,8 @@ fn diff_lockfile(alloc: std.mem.Allocator) !void {
 
         var rems = std.ArrayList(string).init(alloc);
         var adds = std.ArrayList(string).init(alloc);
-        while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line| {
+        while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line_full| {
+            const line = line_full[0 .. line_full.len - 1];
             if (line[0] == ' ') continue;
             if (line[0] == '-') try rems.append(line[1..]);
             if (line[0] == '+') if (line[1] == '2') break else try adds.append(line[1..]);
