@@ -10,6 +10,9 @@ Running `zigmod` with no commands will print this list.
 - [`ci`](ci.md)
 - [`license`](license_.md)
 - [`sum`](sum.md)
+- [`generate`](generate.md)
+- [`explain`](explain.md)
+- [`install`](install.md)
 
 - [`zpm`](zpm.md)
 - [`zpm add`](zpm_add.md)
