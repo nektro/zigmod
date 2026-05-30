@@ -27,21 +27,6 @@ jobs:
       - run: zig build -j1
       - run: echo "$PWD/zig-out/bin" >> $GITHUB_PATH
 
-      # Build All
-      - run: ./build_release.sh x86_64-linux-musl
-      - run: ./build_release.sh x86_64-macos-none
-
-      - run: ./build_release.sh aarch64-linux-musl
-      - run: ./build_release.sh aarch64-macos-none
-
-      - run: ./build_release.sh riscv64-linux-musl
-
-      - run: ./build_release.sh powerpc64le-linux-musl
-
-      - run: ./build_release.sh mips64el-linux-muslabi64
-
-      - run: ./build_release.sh s390x-linux-musl
-
       # Test
       - run: zigmod version
       - run: zigmod ci
@@ -59,6 +44,21 @@ jobs:
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-systemlib-dep
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-local-dep
       - run: ./test_repo.sh https://github.com/nektro/zigmod-test-c-code
+
+      # Build All
+      - run: ./build_release.sh x86_64-linux-musl
+      - run: ./build_release.sh x86_64-macos-none
+
+      - run: ./build_release.sh aarch64-linux-musl
+      - run: ./build_release.sh aarch64-macos-none
+
+      - run: ./build_release.sh riscv64-linux-musl
+
+      - run: ./build_release.sh powerpc64le-linux-musl
+
+      - run: ./build_release.sh mips64el-linux-muslabi64
+
+      - run: ./build_release.sh s390x-linux-musl
 
       # Github Release
       - run: ./changelog.sh
