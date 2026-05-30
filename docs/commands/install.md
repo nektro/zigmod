@@ -22,6 +22,6 @@ zigmod install [git|hg|http] [url]
 ```
 $ zigmod install git https://github.com/nektro/zigmod
 debug: modpath: /home/me/.cache/zigmod/deps/git/github.com/nektro/zigmod
-debug: argv: { /home/me/.local/share/zig/0.14.0/zig, build, --prefix, /home/me/.zigmod }
+debug: argv: { /home/me/.local/share/zig/0.14.1/zig, build, --prefix, /home/me/.zigmod }
 info: success!
 ```
