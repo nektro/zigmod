@@ -2,34 +2,184 @@ root
 	zigmod
 		yaml
 			
-			extras
 		ansi
 		known-folders
 		licenses
-		zfetch
-			hzzp
-			iguanaTLS
 		detect-license
 			licenses-text
+				json
+					extras
+					tracer
+						extras
+						sys-linux
+							c
+						nfs
+							sys-linux
+								c
+							nio
+								sys-linux
+									c
+								extras
+								sys-darwin
+							time
+								extras
+								sys-linux
+									c
+								sys-darwin
+							sys-darwin
+						nio
+							sys-linux
+								c
+							extras
+							sys-darwin
+						time
+							extras
+							sys-linux
+								c
+							sys-darwin
+					intrusive-parser
+						extras
+						nio
+							sys-linux
+								c
+							extras
+							sys-darwin
+					nio
+						sys-linux
+							c
+						extras
+						sys-darwin
 			leven
 		inquirer
 			ansi
 		ini
 		time
 			extras
+			sys-linux
+				c
+			sys-darwin
 		extras
 		git
 			time
 				extras
+				sys-linux
+					c
+				sys-darwin
 			extras
 			tracer
 				extras
+				sys-linux
+					c
+				nfs
+					sys-linux
+						c
+					nio
+						sys-linux
+							c
+						extras
+						sys-darwin
+					time
+						extras
+						sys-linux
+							c
+						sys-darwin
+					sys-darwin
+				nio
+					sys-linux
+						c
+					extras
+					sys-darwin
+				time
+					extras
+					sys-linux
+						c
+					sys-darwin
+			nfs
+				sys-linux
+					c
+				nio
+					sys-linux
+						c
+					extras
+					sys-darwin
+				time
+					extras
+					sys-linux
+						c
+					sys-darwin
+				sys-darwin
+			nio
+				sys-linux
+					c
+				extras
+				sys-darwin
+			
 		json
 			extras
 			tracer
 				extras
+				sys-linux
+					c
+				nfs
+					sys-linux
+						c
+					nio
+						sys-linux
+							c
+						extras
+						sys-darwin
+					time
+						extras
+						sys-linux
+							c
+						sys-darwin
+					sys-darwin
+				nio
+					sys-linux
+						c
+					extras
+					sys-darwin
+				time
+					extras
+					sys-linux
+						c
+					sys-darwin
 			intrusive-parser
 				extras
+				nio
+					sys-linux
+						c
+					extras
+					sys-darwin
+			nio
+				sys-linux
+					c
+				extras
+				sys-darwin
+		nio
+			sys-linux
+				c
+			extras
+			sys-darwin
+		nfs
+			sys-linux
+				c
+			nio
+				sys-linux
+					c
+				extras
+				sys-darwin
+			time
+				extras
+				sys-linux
+					c
+				sys-darwin
+			sys-darwin
 	win32
 	extras
 	ansi
+	nio
+		sys-linux
+			c
+		extras
+		sys-darwin
