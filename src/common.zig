@@ -271,7 +271,10 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: [:0]const u8, options: *Co
                         d.*.name = tryname;
                         d.*.main = trymain.?;
                         var mod_from = try zigmod.Module.from(options.alloc, d.*, cachepath, options);
-                        if (d.type != .local) mod_from.clean_path = extras.trimPrefix(modpath, cachepath)[1..][0.. :0];
+                        if (d.type != .local) {
+                            const new_clean_path = extras.trimPrefix(modpath, cachepath)[1..];
+                            mod_from.clean_path = new_clean_path.ptr[0..new_clean_path.len :0];
+                        }
                         if (mod_from.is_for_this()) return mod_from;
                         return null;
                     }
