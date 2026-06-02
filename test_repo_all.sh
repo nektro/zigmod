@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -ex
+unset ZIG_LOCAL_CACHE_DIR # TODO: link issue here
 
 ./test_repo.sh https://github.com/nektro/zigmod-test-basic
 ./test_repo.sh https://github.com/nektro/zigmod-test-git-dep
