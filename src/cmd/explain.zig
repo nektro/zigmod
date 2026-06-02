@@ -34,11 +34,10 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     };
     const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
-    var seencache = std.ArrayList([48]u8).init(gpa);
+    var seencache = std.array_list.Managed([48]u8).init(gpa);
     defer seencache.deinit();
 
-    const stdout = std.io.getStdOut();
-    const w = stdout.writer();
+    const w = nfs.stdout();
 
     switch (format) {
         .tree => {
@@ -59,14 +58,14 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
 fn printTree(writer: anytype, module: zigmod.Module, depth: u16) !void {
     try writer.writeByteNTimes('\t', depth);
     try writer.writeAll(module.name);
-    try writer.writeByte('\n');
+    try writer.writeAll("\n");
 
     for (module.deps) |dep| {
         try printTree(writer, dep, depth + 1);
     }
 }
 
-fn printMermaid(writer: anytype, module: zigmod.Module, seencache: *std.ArrayList([48]u8)) !void {
+fn printMermaid(writer: anytype, module: zigmod.Module, seencache: *std.array_list.Managed([48]u8)) !void {
     for (seencache.items) |item| {
         if (std.mem.eql(u8, &module.id, &item)) {
             return;
@@ -83,7 +82,7 @@ fn printMermaid(writer: anytype, module: zigmod.Module, seencache: *std.ArrayLis
     }
 }
 
-fn printDot(writer: anytype, module: zigmod.Module, seencache: *std.ArrayList([48]u8)) !void {
+fn printDot(writer: anytype, module: zigmod.Module, seencache: *std.array_list.Managed([48]u8)) !void {
     for (seencache.items) |item| {
         if (std.mem.eql(u8, &module.id, &item)) {
             return;

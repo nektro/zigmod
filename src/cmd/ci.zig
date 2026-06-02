@@ -28,7 +28,7 @@ pub fn do(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nfs.Dir) !void
     };
     const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
-    var list = std.ArrayList(zigmod.Module).init(alloc);
+    var list = std.array_list.Managed(zigmod.Module).init(alloc);
     try common.collect_pkgs(top_module, &list);
 
     const fetch = @import("./fetch.zig");

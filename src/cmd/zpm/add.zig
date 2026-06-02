@@ -42,31 +42,29 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         }
     }
 
-    var buf: [4096]u8 = @splat(0);
+    // var buf: [4096]u8 = @splat(0);
     var client: std.http.Client = .{ .allocator = gpa };
     defer client.deinit();
 
     const has_zigdotmod = blk: {
         const _url = try std.mem.join(gpa, "/", &.{ found.git, "blob", "HEAD", "zig.mod" });
-        var _req = try client.open(.GET, try std.Uri.parse(_url), .{
-            .server_header_buffer = &buf,
+        var _req = try client.request(.GET, try std.Uri.parse(_url), .{
+            .headers = .{ .accept_encoding = .{ .override = "identity" } },
         });
         defer _req.deinit();
-        try _req.send();
-        try _req.finish();
-        try _req.wait();
-        break :blk _req.response.status == .ok;
+        try _req.sendBodiless();
+        const resp = try _req.receiveHead(&.{});
+        break :blk resp.head.status == .ok;
     };
     const has_zigmodyml = blk: {
         const _url = try std.mem.join(gpa, "/", &.{ found.git, "blob", "HEAD", "zigmod.yml" });
-        var _req = try client.open(.GET, try std.Uri.parse(_url), .{
-            .server_header_buffer = &buf,
+        var _req = try client.request(.GET, try std.Uri.parse(_url), .{
+            .headers = .{ .accept_encoding = .{ .override = "identity" } },
         });
         defer _req.deinit();
-        try _req.send();
-        try _req.finish();
-        try _req.wait();
-        break :blk _req.response.status == .ok;
+        try _req.sendBodiless();
+        const resp = try _req.receiveHead(&.{});
+        break :blk resp.head.status == .ok;
     };
 
     _, const file = try zigmod.ModFile.openFile(nfs.cwd(), .{ .mode = .read_write });

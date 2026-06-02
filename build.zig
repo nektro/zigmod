@@ -7,15 +7,17 @@ pub fn build(b: *std.Build) void {
     b.reference_trace = 256;
 
     const target = b.standardTargetOptions(.{});
-    const mode = b.option(std.builtin.Mode, "mode", "") orelse .Debug;
+    const mode = b.option(std.builtin.OptimizeMode, "mode", "") orelse .Debug;
     const use_full_name = b.option(bool, "use-full-name", "") orelse false;
     const with_arch_os = b.fmt("-{s}-{s}", .{ @tagName(target.result.cpu.arch), @tagName(target.result.os.tag) });
     const exe_name = b.fmt("{s}{s}", .{ "zigmod", if (use_full_name) with_arch_os else "" });
     const exe = b.addExecutable(.{
         .name = exe_name,
-        .root_source_file = b.path("src/main.zig"),
-        .target = target,
-        .optimize = mode,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = mode,
+        }),
     });
     const tag = b.option(string, "tag", "");
     const strip = b.option(bool, "strip", "Build without debug info.") orelse false;
@@ -27,6 +29,7 @@ pub fn build(b: *std.Build) void {
     exe_options.addOption(string, "version", tag orelse std.mem.trimRight(u8, b.run(&.{ "git", "describe", "--tags" }), "\n"));
 
     deps.addAllTo(exe);
+    exe.linkLibC();
     exe.root_module.strip = strip;
     // exe.use_llvm = !disable_llvm;
     // exe.use_lld = !disable_llvm;

@@ -34,7 +34,7 @@ pub fn try_index(comptime T: type, array: []const T, n: usize, def: T) T {
 }
 
 pub fn split(alloc: std.mem.Allocator, in: string, delim: u8) ![]string {
-    var list = std.ArrayList(string).init(alloc);
+    var list = std.array_list.Managed(string).init(alloc);
     errdefer list.deinit();
 
     var iter = std.mem.splitScalar(u8, in, delim);
@@ -47,7 +47,7 @@ pub fn split(alloc: std.mem.Allocator, in: string, delim: u8) ![]string {
 pub fn file_list(alloc: std.mem.Allocator, dpath: [:0]const u8) ![][:0]u8 {
     var dir = try nfs.cwd().openDir(dpath, .{});
     defer dir.close();
-    var list = std.ArrayList([:0]u8).init(alloc);
+    var list = std.array_list.Managed([:0]u8).init(alloc);
     errdefer list.deinit();
     errdefer for (list.items) |x| alloc.free(x);
     var walker = try dir.walk(alloc);
@@ -76,7 +76,7 @@ pub fn run_cmd(alloc: std.mem.Allocator, dir: ?string, args: []const string) !u3
 }
 
 pub fn list_remove(alloc: std.mem.Allocator, input: []string, search: string) ![]string {
-    var list = std.ArrayList(string).init(alloc);
+    var list = std.array_list.Managed(string).init(alloc);
     errdefer list.deinit();
     for (input) |item| {
         if (!std.mem.eql(u8, item, search)) {
@@ -249,7 +249,6 @@ const StringEscape = struct {
             ' ', '!', '#'...'&', '('...'[', ']'...'~' => try writer.writeAll(&.{c}),
             else => {
                 try writer.print("\\x{x:0>2}", .{c});
-                // try writer.printInt(c, 16, .lower, .{ .width = 2, .fill = '0' });
             },
         };
     }

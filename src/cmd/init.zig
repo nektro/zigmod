@@ -45,7 +45,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     }) else null;
     const entry = if (entry_bare) |ent| try gpa.dupeZ(u8, ent) else null;
 
-    const maybe_license_text = try detectlicense.detectInDir(gpa, cwd.to_std());
+    const maybe_license_text = try detectlicense.detectInDir(gpa, cwd);
     const license = try inquirer.forString(stdout, stdin, "license:", gpa, maybe_license_text);
 
     const description = try inquirer.forString(stdout, stdin, "description:", gpa, null);
@@ -312,7 +312,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         };
         const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
-        var list = std.ArrayList(zigmod.Module).init(alloc);
+        var list = std.array_list.Managed(zigmod.Module).init(alloc);
         try common.collect_pkgs(top_module, &list);
 
         const fetch = @import("./fetch.zig");

@@ -29,7 +29,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     const w = f;
 
     //
-    var module_list = std.ArrayList(zigmod.Module).init(gpa);
+    var module_list = std.array_list.Managed(zigmod.Module).init(gpa);
     try common.collect_pkgs(top_module, &module_list);
 
     for (module_list.items) |m| {

@@ -10,7 +10,7 @@ const zigmod = @import("../lib.zig");
 const u = @import("./../util/funcs.zig");
 const common = @import("./../common.zig");
 
-const List = std.ArrayList(zigmod.Module);
+const List = std.array_list.Managed(zigmod.Module);
 const Map = std.StringArrayHashMap(*List);
 
 // Inspired by:

@@ -33,7 +33,7 @@ pub const Module = struct {
     pub const ROOT: [48]u8 = ("root" ++ (" " ** 44)).*;
 
     pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, cachepath: [:0]const u8, options: *common.CollectOptions) !Module {
-        var moddeps = std.ArrayList(Module).init(alloc);
+        var moddeps = std.array_list.Managed(Module).init(alloc);
         errdefer moddeps.deinit();
 
         for (dep.deps) |*d| {
@@ -71,7 +71,7 @@ pub const Module = struct {
     pub fn get_hash(self: Module, alloc: std.mem.Allocator, cdpath: string) !string {
         const file_list_1 = try u.file_list(alloc, try std.mem.concatWithSentinel(alloc, u8, &.{ cdpath, "/", self.clean_path }, 0));
 
-        var file_list_2 = std.ArrayList(string).init(alloc);
+        var file_list_2 = std.array_list.Managed(string).init(alloc);
         errdefer file_list_2.deinit();
         for (file_list_1) |item| {
             const _a = extras.trimPrefix(item, cdpath);

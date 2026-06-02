@@ -1,6 +1,7 @@
 const std = @import("std");
 const gpa = std.heap.c_allocator;
 const extras = @import("extras");
+const nfs = @import("nfs");
 
 const zpm = @import("./../zpm.zig");
 
@@ -11,7 +12,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     _ = self_name;
     _ = args;
 
-    const out = std.io.getStdOut().writer();
+    const out = nfs.stdout();
 
     const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, "packages" });
     const list = try zpm.server_fetchArray(url);

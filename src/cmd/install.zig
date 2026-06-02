@@ -73,7 +73,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         zigpath,    "build",
         "--prefix", try std.fs.path.join(gpa, &.{ homepath, ".zigmod" }),
     };
-    std.log.debug("argv: {s}", .{argv});
+    logargv(argv) catch return;
     var proc = std.process.Child.init(argv, gpa);
     proc.cwd = modpath;
     const term = try proc.spawnAndWait();
@@ -84,4 +84,19 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         .Unknown => |v| u.fail("zig build encountered unknown: {d}", .{v}),
     }
     std.log.info("success!", .{});
+}
+
+// needed this after moving to zig 0.15
+// /zig/0.15.2/lib/std/Io/Writer.zig:1122:51: error: expected type '[]const u8', found '[]const []const u8'
+fn logargv(argv: []const []const u8) !void {
+    var buffer: [64]u8 = undefined;
+    const stderr = std.debug.lockStderrWriter(&buffer);
+    defer std.debug.unlockStderrWriter();
+    try stderr.writeAll("debug: argv: {");
+    for (argv, 0..) |v, i| {
+        if (i > 0) try stderr.writeAll(",");
+        try stderr.writeAll(" ");
+        try stderr.writeAll(v);
+    }
+    try stderr.writeAll(" }\n");
 }

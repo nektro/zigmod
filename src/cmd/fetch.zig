@@ -27,7 +27,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     };
     const top_module = try common.collect_deps_deep(cachepath, dir, &options);
 
-    var list = std.ArrayList(zigmod.Module).init(gpa);
+    var list = std.array_list.Managed(zigmod.Module).init(gpa);
     try common.collect_pkgs(top_module, &list);
 
     try create_depszig(gpa, cachepath, dir, top_module, &list);
@@ -44,7 +44,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     try license.do(cachepath, dir, &options, outfile);
 }
 
-pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir, top_module: zigmod.Module, list: *std.ArrayList(zigmod.Module)) !void {
+pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir, top_module: zigmod.Module, list: *std.array_list.Managed(zigmod.Module)) !void {
     const f = try dir.createFile("deps.zig", .{});
     defer f.close();
 
@@ -107,6 +107,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
         \\                switch (jtem) {
         \\                    .path => result.addIncludePath(jtem.path),
         \\                    .path_system, .path_after, .framework_path, .framework_path_system, .other_step, .config_header_step => {},
+        \\                    .embed_path => {},
         \\                }
         \\            }
         \\        }
@@ -120,7 +121,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
         \\            link_lib_c = true;
         \\        }
         \\        for (self.system_libs) |item| {
-        \\            if (skip_libc and std.zig.target.isLibCLibName(target, item)) continue;
+        \\            if (skip_libc and std.zig.target.isLibCLibName(&target, item)) continue;
         \\            result.linkSystemLibrary(item, .{});
         \\            exe.linkSystemLibrary(item);
         \\            link_lib_c = true;
@@ -145,7 +146,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
     try w.print(
         \\fn checkMinZig(current: std.SemanticVersion, exe: *std.Build.Step.Compile) void {{
         \\    const min = std.SemanticVersion.parse("{?}") catch return;
-        \\    if (current.order(min).compare(.lt)) @panic(exe.step.owner.fmt("Your Zig version v{{}} does not meet the minimum build requirement of v{{}}", .{{current, min}}));
+        \\    if (current.order(min).compare(.lt)) @panic(exe.step.owner.fmt("Your Zig version v{{f}} does not meet the minimum build requirement of v{{f}}", .{{current, min}}));
         \\}}
         \\
         \\
@@ -156,8 +157,8 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
     try w.writeAll("};\n\n");
 
     try w.writeAll("pub const package_data = struct {\n");
-    var duped = std.ArrayList(zigmod.Module).init(alloc);
-    var done = std.ArrayList(zigmod.Module).init(alloc);
+    var duped = std.array_list.Managed(zigmod.Module).init(alloc);
+    var done = std.array_list.Managed(zigmod.Module).init(alloc);
     for (list.items) |mod| {
         if (mod.type == .system_lib or mod.type == .framework) {
             continue;
@@ -180,7 +181,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
     try w.writeAll("};\n");
 }
 
-fn create_lockfile(alloc: std.mem.Allocator, list: *std.ArrayList(zigmod.Module), path: string, dir: nfs.Dir) !void {
+fn create_lockfile(alloc: std.mem.Allocator, list: *std.array_list.Managed(zigmod.Module), path: string, dir: nfs.Dir) !void {
     const fl = try dir.createFile("zigmod.lock", .{});
     defer fl.close();
 
@@ -214,8 +215,8 @@ fn diff_lockfile(alloc: std.mem.Allocator) !void {
             if (std.mem.startsWith(u8, line, "@@")) break;
         }
 
-        var rems = std.ArrayList(string).init(alloc);
-        var adds = std.ArrayList(string).init(alloc);
+        var rems = std.array_list.Managed(string).init(alloc);
+        var adds = std.array_list.Managed(string).init(alloc);
         while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line_full| {
             const line = line_full[0 .. line_full.len - 1];
             if (line[0] == ' ') continue;
@@ -322,7 +323,7 @@ fn print_deps(w: nfs.File, m: zigmod.Module) !void {
     try w.writeAll("}");
 }
 
-fn print_pkg_data_to(w: nfs.File, notdone: *std.ArrayList(zigmod.Module), done: *std.ArrayList(zigmod.Module)) !void {
+fn print_pkg_data_to(w: nfs.File, notdone: *std.array_list.Managed(zigmod.Module), done: *std.array_list.Managed(zigmod.Module)) !void {
     var len: usize = notdone.items.len;
     while (notdone.items.len > 0) {
         for (notdone.items, 0..) |mod, i| {

@@ -3,7 +3,7 @@ name: zigmod
 main: src/lib.zig
 license: MIT
 description: A package manager for the Zig programming language.
-min_zig_version: 0.14.1
+min_zig_version: 0.15.2
 min_zigmod_version: r96
 dependencies:
   - src: git https://github.com/nektro/zig-yaml
@@ -13,7 +13,7 @@ dependencies:
     name: known-folders
     main: known-folders.zig
     license: MIT
-    version: commit-aa24df42183ad415d10bc0a33e6238c437fc0f59
+    version: commit-83d39161eac2ed6f37ad3cb4d9dd518696ce90bb
   - src: git https://github.com/nektro/zig-licenses
   - src: git https://github.com/nektro/zig-detect-license
   - src: git https://github.com/nektro/zig-inquirer
@@ -35,3 +35,4 @@ root_dependencies:
   - src: git https://github.com/nektro/zig-extras
   - src: git https://github.com/nektro/zig-ansi
   - src: git https://github.com/nektro/zig-nio
+  - src: git https://github.com/nektro/zig-nfs

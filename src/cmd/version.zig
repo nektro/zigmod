@@ -18,8 +18,8 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     var gitversion = u.git_rev_HEAD(gpa, nfs.cwd()) catch "";
     gitversion = if (gitversion.len > 0) gitversion[0..9] else gitversion;
 
-    const stdout = std.io.getStdOut();
-    const w = stdout.writer();
+    const stdout = nfs.stdout();
+    const w = stdout;
 
     try w.writeAll("zigmod");
 

@@ -5,6 +5,7 @@ pub const build_options = @import("build_options");
 const zigmod = @import("zigmod");
 const win32 = @import("win32");
 const nio = @import("nio");
+const nfs = @import("nfs");
 
 //
 //
@@ -56,7 +57,7 @@ pub fn main() !void {
         }
     }
 
-    var sub_cmd_args = std.ArrayList(string).init(gpa);
+    var sub_cmd_args = std.array_list.Managed(string).init(gpa);
     try sub_cmd_args.append(try nio.fmt.allocPrint(gpa, "zigmod-{s}", .{args[0]}));
     for (args[1..]) |item| {
         try sub_cmd_args.append(item);
@@ -67,8 +68,8 @@ pub fn main() !void {
             fail("unknown command \"{s}\" for \"zigmod\"", .{args[0]});
         },
     };
-    try std.io.getStdOut().writeAll(result.stdout);
-    try std.io.getStdErr().writeAll(result.stderr);
+    try nfs.stdout().writeAll(result.stdout);
+    try nfs.stderr().writeAll(result.stderr);
 }
 
 //

@@ -29,6 +29,3 @@ MPL-2.0:
 Zlib:
 = https://spdx.org/licenses/Zlib
 - git https://github.com/madler/zlib
-
-Unspecified:
-- system_lib c

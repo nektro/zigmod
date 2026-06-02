@@ -61,22 +61,21 @@ pub fn server_fetch(url: string) !json.Document {
     var client: std.http.Client = .{ .allocator = gpa };
     defer client.deinit();
 
-    var req = try client.open(.GET, try std.Uri.parse(url), .{
-        .server_header_buffer = &buf,
+    var req = try client.request(.GET, try std.Uri.parse(url), .{
+        .headers = .{ .accept_encoding = .{ .override = "identity" } },
     });
     defer req.deinit();
-    try req.send();
-    try req.finish();
-    try req.wait();
-    if (req.response.status != .ok) u.fail("expected: 200 from '{s}' got: {s}", .{ url, @tagName(req.response.status) });
-    return json.parse(gpa, "", nio.AnyReadable.fromStd(&req.reader()), .{ .support_trailing_commas = true, .maximum_depth = 100 });
+    try req.sendBodiless();
+    var resp = try req.receiveHead(&.{});
+    if (resp.head.status != .ok) u.fail("expected: 200 from '{s}' got: {s}", .{ url, @tagName(resp.head.status) });
+    return json.parse(gpa, "", nio.AnyReadable.fromStd(resp.reader(&buf)), .{ .support_trailing_commas = true, .maximum_depth = 100 });
 }
 
 pub fn server_fetchArray(url: string) ![]const Package {
     const doc = try server_fetch(url);
     doc.acquire();
     defer doc.release();
-    var list = std.ArrayList(Package).init(gpa);
+    var list = std.array_list.Managed(Package).init(gpa);
     errdefer list.deinit();
 
     for (doc.root.array()) |item| {
@@ -97,7 +96,7 @@ pub fn server_fetchArray(url: string) ![]const Package {
 }
 
 fn valueStrArray(vals: json.Array) ![]string {
-    var list = std.ArrayList(string).init(gpa);
+    var list = std.array_list.Managed(string).init(gpa);
     errdefer list.deinit();
 
     for (vals) |item| {
@@ -108,7 +107,7 @@ fn valueStrArray(vals: json.Array) ![]string {
 }
 
 fn valueLinks(vals: json.ObjectIndex) ![]string {
-    var list = std.ArrayList(string).init(gpa);
+    var list = std.array_list.Managed(string).init(gpa);
     errdefer list.deinit();
 
     if (vals.getS("github")) |x| try list.append(x);

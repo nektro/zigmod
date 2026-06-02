@@ -19,11 +19,11 @@ pub const CollectOptions = struct {
     update: bool,
     lock: ?[]const [4]string = null,
     alloc: std.mem.Allocator,
-    already_fetched: *std.ArrayList(string) = undefined,
+    already_fetched: *std.array_list.Managed(string) = undefined,
 
     pub fn init(self: *CollectOptions) !void {
-        self.already_fetched = try self.alloc.create(std.ArrayList(string));
-        self.already_fetched.* = std.ArrayList(string).init(self.alloc);
+        self.already_fetched = try self.alloc.create(std.array_list.Managed(string));
+        self.already_fetched.* = std.array_list.Managed(string).init(self.alloc);
     }
 };
 
@@ -32,7 +32,7 @@ pub fn collect_deps_deep(cachepath: [:0]const u8, mdir: nfs.Dir, options: *Colle
 
     const m = try zigmod.ModFile.from_dir(options.alloc, mdir, ".");
     try options.init();
-    var moduledeps = std.ArrayList(zigmod.Module).init(options.alloc);
+    var moduledeps = std.array_list.Managed(zigmod.Module).init(options.alloc);
     errdefer moduledeps.deinit();
     if (m.root_files.len > 0) {
         try gen_files_package(options.alloc, cachepath, mdir, m.root_files);
@@ -65,7 +65,7 @@ pub fn collect_deps(cachepath: [:0]const u8, mdir: nfs.Dir, mdir_path: string, d
     try nfs.cwd().makePath(cachepath);
 
     const m = try zigmod.ModFile.from_dir(options.alloc, mdir, mdir_path);
-    var moduledeps = std.ArrayList(zigmod.Module).init(options.alloc);
+    var moduledeps = std.array_list.Managed(zigmod.Module).init(options.alloc);
     errdefer moduledeps.deinit();
     if (m.files.len > 0) {
         try gen_files_package(options.alloc, cachepath, mdir, m.files);
@@ -91,7 +91,7 @@ pub fn collect_deps(cachepath: [:0]const u8, mdir: nfs.Dir, mdir_path: string, d
     };
 }
 
-pub fn collect_pkgs(mod: zigmod.Module, list: *std.ArrayList(zigmod.Module)) anyerror!void {
+pub fn collect_pkgs(mod: zigmod.Module, list: *std.array_list.Managed(zigmod.Module)) anyerror!void {
     if (extras.containsAggregate(zigmod.Module, list.items, mod)) {
         return;
     }
@@ -336,7 +336,7 @@ pub fn gen_files_package(alloc: std.mem.Allocator, cachepath: string, mdir: nfs.
 }
 
 pub fn parse_lockfile(alloc: std.mem.Allocator, dir: nfs.Dir) ![]const [4]string {
-    var list = std.ArrayList([4]string).init(alloc);
+    var list = std.array_list.Managed([4]string).init(alloc);
     const max = std.math.maxInt(usize);
     if (!try dir.exists("zigmod.lock")) return &[_][4]string{};
     var f = try dir.openFile("zigmod.lock", .{});
