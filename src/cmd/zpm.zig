@@ -68,7 +68,8 @@ pub fn server_fetch(url: string) !json.Document {
     try req.sendBodiless();
     var resp = try req.receiveHead(&.{});
     if (resp.head.status != .ok) u.fail("expected: 200 from '{s}' got: {s}", .{ url, @tagName(resp.head.status) });
-    return json.parse(gpa, "", nio.AnyReadable.fromStd(resp.reader(&buf)), .{ .support_trailing_commas = true, .maximum_depth = 100 });
+    const content = try resp.reader(&buf).allocRemaining(gpa, .limited(1024 * 1024 * 5));
+    return json.parseFromSlice(gpa, "", content, .{ .support_trailing_commas = true, .maximum_depth = 100 });
 }
 
 pub fn server_fetchArray(url: string) ![]const Package {
