@@ -82,6 +82,7 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     const version_sct: V = .{ .major = @intCast(zigversion_sv.major), .minor = @intCast(zigversion_sv.minor) };
     const version_int: u32 = (version_sct.major << 2) | version_sct.minor;
     switch (version_int) {
+        0x0000_000c => try @import("./fetch.0.12.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
         0x0000_000d => try @import("./fetch.0.13.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
         0x0000_000e => try @import("./fetch.0.14.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
         0x0000_000f => {}, // that's us, zigmod is already 0.15.2
