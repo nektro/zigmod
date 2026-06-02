@@ -36,13 +36,13 @@ jobs:
 
       - run: zigmod zpm tags
 
-      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-basic
-      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-git-dep
-      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-hg-dep
-      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-http-dep
-      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-systemlib-dep
-      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-local-dep
-      - run: ./test_repo.sh https://github.com/nektro/zigmod-test-c-code
+      - run: unset ZIG_LOCAL_CACHE_DIR && ./test_repo.sh https://github.com/nektro/zigmod-test-basic
+      - run: unset ZIG_LOCAL_CACHE_DIR && ./test_repo.sh https://github.com/nektro/zigmod-test-git-dep
+      - run: unset ZIG_LOCAL_CACHE_DIR && ./test_repo.sh https://github.com/nektro/zigmod-test-hg-dep
+      - run: unset ZIG_LOCAL_CACHE_DIR && ./test_repo.sh https://github.com/nektro/zigmod-test-http-dep
+      - run: unset ZIG_LOCAL_CACHE_DIR && ./test_repo.sh https://github.com/nektro/zigmod-test-systemlib-dep
+      - run: unset ZIG_LOCAL_CACHE_DIR && ./test_repo.sh https://github.com/nektro/zigmod-test-local-dep
+      - run: unset ZIG_LOCAL_CACHE_DIR && ./test_repo.sh https://github.com/nektro/zigmod-test-c-code
 
       # Build All
       - run: ./build_release.sh x86_64-linux-musl
