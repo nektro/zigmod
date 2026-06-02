@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -e
+unset ZIG_LOCAL_CACHE_DIR # TODO: link issue here
 
 clone_url=$1
 clone_dir=$(mktemp -d)
