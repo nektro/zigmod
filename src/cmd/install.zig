@@ -68,6 +68,25 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
     const zigversion = try nio.fmt.allocPrint(gpa, "{s}", .{u.altSemanticVersion(zigversion_sv)});
     const zigpath = try std.fs.path.joinZ(gpa, &.{ datapath, "zig", zigversion, "zig" });
 
+    // regen deps.zig with the repo's zig version
+    var fetch_options = common.CollectOptions{
+        .log = true,
+        .update = false,
+        .lock = try common.parse_lockfile(gpa, moddir),
+        .alloc = gpa,
+    };
+    const fetch_top_module = try common.collect_deps_deep(cachepath, moddir, &fetch_options);
+    var fetch_list = std.array_list.Managed(zigmod.Module).init(gpa);
+    try common.collect_pkgs(fetch_top_module, &fetch_list);
+    const V = struct { major: u32, minor: u32 };
+    const version_sct: V = .{ .major = @intCast(zigversion_sv.major), .minor = @intCast(zigversion_sv.minor) };
+    const version_int: u32 = (version_sct.major << 2) | version_sct.minor;
+    switch (version_int) {
+        0x0000_000e => try @import("./fetch.0.14.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
+        0x0000_000f => {}, // that's us, zigmod is already 0.15.2
+        else => u.fail("zig {d}.{d} unimplemented", .{ version_sct.major, version_sct.minor }),
+    }
+
     // zig build
     const argv: []const string = &.{
         zigpath,    "build",
