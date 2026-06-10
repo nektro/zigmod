@@ -10,6 +10,7 @@ const time = @import("time");
 const extras = @import("extras");
 const nio = @import("nio");
 const nfs = @import("nfs");
+const root = @import("root");
 
 const u = @import("./../util/funcs.zig");
 const common = @import("./../common.zig");
@@ -18,7 +19,7 @@ const zigmod = @import("./../lib.zig");
 //
 //
 
-pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
+pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
     _ = self_name;
 
     std.debug.print("This utility will walk you through creating a zigmod.yml file.\n", .{});
@@ -342,7 +343,8 @@ pub fn writeLibManifest(w: nfs.File, id: string, name: string, license: string, 
 }
 
 fn guessCopyrightName() !?string {
-    const homepath = (try knownfolders.getPath(gpa, .home)).?;
+    const io = root.io;
+    const homepath = (try knownfolders.getPath(io, gpa, root.environ, .home)).?;
     const home = try nfs.cwd().openDirC(homepath, .{});
     if (!(try home.exists(".gitconfig"))) return null;
     const file = try home.openFile(".gitconfig", .{});

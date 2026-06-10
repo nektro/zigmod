@@ -3,6 +3,7 @@ const string = []const u8;
 const ansi = @import("ansi");
 const extras = @import("extras");
 const nfs = @import("nfs");
+const nio = @import("nio");
 
 const zigmod = @import("../lib.zig");
 const u = @import("./../util/funcs.zig");
@@ -12,7 +13,7 @@ const license = @import("./license.zig");
 //
 //
 
-pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
+pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
     _ = self_name;
 
     const gpa = std.heap.c_allocator;
@@ -66,8 +67,8 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
         \\        exe.root_module.addImport(pkg.import.?[0], module);
         \\    }
         \\    for (package_data._root.system_libs) |libname| {
-        \\        exe.linkSystemLibrary(libname);
-        \\        exe.linkLibC();
+        \\        exe.root_module.linkSystemLibrary(libname, .{});
+        \\        exe.root_module.link_libc = true;
         \\    }
         \\    // clear module memo cache so addAllTo can be called more than once in the same build.zig
         \\    module_memo.clearAndFree(exe.step.owner.allocator);
@@ -113,27 +114,27 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
         \\        }
         \\        for (self.c_include_dirs) |item| {
         \\            result.addIncludePath(.{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) });
-        \\            exe.addIncludePath(.{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) });
+        \\            exe.root_module.addIncludePath(.{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) });
         \\            link_lib_c = true;
         \\        }
         \\        for (self.c_source_files) |item| {
-        \\            exe.addCSourceFile(.{ .file = .{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) }, .flags = self.c_source_flags });
+        \\            exe.root_module.addCSourceFile(.{ .file = .{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) }, .flags = self.c_source_flags });
         \\            link_lib_c = true;
         \\        }
         \\        for (self.system_libs) |item| {
         \\            if (skip_libc and std.zig.target.isLibCLibName(&target, item)) continue;
         \\            result.linkSystemLibrary(item, .{});
-        \\            exe.linkSystemLibrary(item);
+        \\            exe.root_module.linkSystemLibrary(item, .{});
         \\            link_lib_c = true;
         \\        }
         \\        for (self.frameworks) |item| {
         \\            result.linkFramework(item, .{});
-        \\            exe.linkFramework(item);
+        \\            exe.root_module.linkFramework(item, .{});
         \\            link_lib_c = true;
         \\        }
         \\        if (link_lib_c and !skip_libc) {
         \\            result.link_libc = true;
-        \\            exe.linkLibC();
+        \\            exe.root_module.link_libc = true;
         \\        }
         \\        module_memo.putNoClobber(b.allocator, self.id, result) catch @panic("OOM");
         \\        return result;
@@ -209,8 +210,8 @@ fn diff_lockfile(alloc: std.mem.Allocator) !void {
 
     if (try nfs.cwd().existsDir(".git")) {
         const result = try u.run_cmd_raw(alloc, null, &.{ "git", "diff", "zigmod.lock" });
-        var stdout = std.io.fixedBufferStream(result.stdout);
-        const r = stdout.reader();
+        var stdout = nio.FixedBufferStream([]const u8).init(result.stdout);
+        const r = &stdout;
         while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line| {
             if (std.mem.startsWith(u8, line, "@@")) break;
         }

@@ -14,12 +14,20 @@ pub const std_options: std.Options = .{
     .log_level = std.log.Level.debug,
 };
 
-pub fn main() !void {
-    const gpa = std.heap.c_allocator;
+pub var io: std.Io = undefined;
+pub var environ: *const std.process.Environ.Map = undefined;
 
-    const proc_args = try std.process.argsAlloc(gpa);
+pub fn main(init: std.process.Init.Minimal) !void {
+    const gpa = std.heap.c_allocator;
+    environ = &try init.environ.createMap(gpa);
+
+    var threaded: std.Io.Threaded = .init(gpa, .{ .environ = init.environ });
+    defer threaded.deinit();
+    io = threaded.io();
+
+    const proc_args = try init.args.toSlice(gpa);
     const args = proc_args[1..];
-    const self_path = try std.fs.selfExePathAlloc(gpa);
+    const self_path = try std.process.executablePathAlloc(io, gpa);
 
     if (args.len == 0) {
         std.debug.print("zigmod {s} {s} {s} {s}\n", .{
@@ -62,7 +70,7 @@ pub fn main() !void {
     for (args[1..]) |item| {
         try sub_cmd_args.append(item);
     }
-    const result = std.process.Child.run(.{ .allocator = gpa, .argv = sub_cmd_args.items }) catch |e| switch (e) {
+    const result = std.process.run(gpa, io, .{ .argv = sub_cmd_args.items }) catch |e| switch (e) {
         else => |ee| return ee,
         error.FileNotFound => {
             fail("unknown command \"{s}\" for \"zigmod\"", .{args[0]});

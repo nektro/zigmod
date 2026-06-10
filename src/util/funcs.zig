@@ -5,6 +5,8 @@ const extras = @import("extras");
 const git = @import("git");
 const ansi = @import("ansi");
 const nfs = @import("nfs");
+const time = @import("time");
+const root = @import("root");
 
 //
 //
@@ -44,7 +46,7 @@ pub fn split(alloc: std.mem.Allocator, in: string, delim: u8) ![]string {
     return list.toOwnedSlice();
 }
 
-pub fn file_list(alloc: std.mem.Allocator, dpath: [:0]const u8) ![][:0]u8 {
+pub fn file_list(alloc: std.mem.Allocator, dpath: [:0]const u8) ![]const [:0]const u8 {
     var dir = try nfs.cwd().openDir(dpath, .{});
     defer dir.close();
     var list = std.array_list.Managed([:0]u8).init(alloc);
@@ -59,8 +61,9 @@ pub fn file_list(alloc: std.mem.Allocator, dpath: [:0]const u8) ![][:0]u8 {
     return list.toOwnedSlice();
 }
 
-pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.process.Child.RunResult {
-    return std.process.Child.run(.{ .allocator = alloc, .cwd = dir, .argv = args, .max_output_bytes = std.math.maxInt(usize) }) catch |e| switch (e) {
+pub fn run_cmd_raw(alloc: std.mem.Allocator, dir: ?string, args: []const string) !std.process.RunResult {
+    const io = root.io;
+    return std.process.run(alloc, io, .{ .cwd = if (dir) |d| .{ .path = d } else .inherit, .argv = args }) catch |e| switch (e) {
         error.FileNotFound => {
             fail("\"{s}\" command not found", .{args[0]});
         },
@@ -72,7 +75,7 @@ pub fn run_cmd(alloc: std.mem.Allocator, dir: ?string, args: []const string) !u3
     const result = try run_cmd_raw(alloc, dir, args);
     alloc.free(result.stdout);
     alloc.free(result.stderr);
-    return result.term.Exited;
+    return result.term.exited;
 }
 
 pub fn list_remove(alloc: std.mem.Allocator, input: []string, search: string) ![]string {
@@ -94,7 +97,7 @@ pub fn last(in: []string) ?string {
 const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 pub fn random_string(comptime len: usize) [len]u8 {
-    const now: u64 = @intCast(std.time.nanoTimestamp());
+    const now: u64 = @intCast(time.nanoTimestamp());
     var rand = std.Random.DefaultPrng.init(now);
     var r = rand.random();
     var buf: [len]u8 = undefined;

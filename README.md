@@ -22,7 +22,7 @@ A package manager for the Zig programming language.
 
 ## Built With
 
-- Zig `0.15.2`
+- Zig `0.16.0`
 - See [`zig.mod`](./zig.mod) and [`zigmod.lock`](./zigmod.lock)
 
 ### Build from Source

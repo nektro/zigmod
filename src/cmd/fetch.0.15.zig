@@ -1,5 +1,3 @@
-// Adapted from https://github.com/nektro/zigmod/blob/r91/src/cmd/fetch.zig
-
 const std = @import("std");
 const string = []const u8;
 const ansi = @import("ansi");
@@ -22,6 +20,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
     try w.writeAll("const string = []const u8;\n");
     try w.writeAll("\n");
     try w.print("pub const cache = \"{}\";\n", .{u.altStringEscape(cachepath)});
+    try w.writeAll("pub var skip_libc = false;\n");
     try w.writeAll("\n");
     try w.writeAll(
         \\pub fn addAllTo(exe: *std.Build.Step.Compile) void {
@@ -35,28 +34,32 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
         \\        exe.linkSystemLibrary(libname);
         \\        exe.linkLibC();
         \\    }
+        \\    // clear module memo cache so addAllTo can be called more than once in the same build.zig
+        \\    module_memo.clearAndFree(exe.step.owner.allocator);
         \\}
         \\
         \\var link_lib_c = false;
+        \\var module_memo: std.StringArrayHashMapUnmanaged(*std.Build.Module) = .empty;
         \\pub const Package = struct {
+        \\    id: string,
         \\    directory: string,
         \\    import: ?struct { string, std.Build.LazyPath } = null,
-        \\    dependencies: []const *Package,
+        \\    dependencies: []const *const Package,
         \\    c_include_dirs: []const string = &.{},
         \\    c_source_files: []const string = &.{},
         \\    c_source_flags: []const string = &.{},
         \\    system_libs: []const string = &.{},
         \\    frameworks: []const string = &.{},
-        \\    module_memo: ?*std.Build.Module = null,
         \\
-        \\    pub fn module(self: *Package, exe: *std.Build.Step.Compile) *std.Build.Module {
-        \\        if (self.module_memo) |cached| {
+        \\    pub fn module(self: *const Package, exe: *std.Build.Step.Compile) *std.Build.Module {
+        \\        if (module_memo.get(self.id)) |cached| {
         \\            return cached;
         \\        }
         \\        const b = exe.step.owner;
         \\        const result = b.createModule(.{
-        \\            .target = exe.root_module.resolved_target orelse b.host,
+        \\            .target = exe.root_module.resolved_target,
         \\        });
+        \\        const target = result.resolved_target.?.result;
         \\        if (self.import) |capture| {
         \\            result.root_source_file = capture[1];
         \\        }
@@ -69,19 +72,21 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
         \\                switch (jtem) {
         \\                    .path => result.addIncludePath(jtem.path),
         \\                    .path_system, .path_after, .framework_path, .framework_path_system, .other_step, .config_header_step => {},
+        \\                    .embed_path => {},
         \\                }
         \\            }
         \\        }
         \\        for (self.c_include_dirs) |item| {
-        \\            result.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
-        \\            exe.addIncludePath(b.path(b.fmt("{s}/{s}", .{ self.directory, item })));
+        \\            result.addIncludePath(.{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) });
+        \\            exe.addIncludePath(.{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) });
         \\            link_lib_c = true;
         \\        }
         \\        for (self.c_source_files) |item| {
-        \\            exe.addCSourceFile(.{ .file = b.path(b.fmt("{s}/{s}", .{ self.directory, item })), .flags = self.c_source_flags });
+        \\            exe.addCSourceFile(.{ .file = .{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) }, .flags = self.c_source_flags });
         \\            link_lib_c = true;
         \\        }
         \\        for (self.system_libs) |item| {
+        \\            if (skip_libc and std.zig.target.isLibCLibName(&target, item)) continue;
         \\            result.linkSystemLibrary(item, .{});
         \\            exe.linkSystemLibrary(item);
         \\            link_lib_c = true;
@@ -91,11 +96,11 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
         \\            exe.linkFramework(item);
         \\            link_lib_c = true;
         \\        }
-        \\        if (link_lib_c) {
+        \\        if (link_lib_c and !skip_libc) {
         \\            result.link_libc = true;
         \\            exe.linkLibC();
         \\        }
-        \\        self.module_memo = result;
+        \\        module_memo.putNoClobber(b.allocator, self.id, result) catch @panic("OOM");
         \\        return result;
         \\    }
         \\};
@@ -106,7 +111,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
     try w.print(
         \\fn checkMinZig(current: std.SemanticVersion, exe: *std.Build.Step.Compile) void {{
         \\    const min = std.SemanticVersion.parse("{?}") catch return;
-        \\    if (current.order(min).compare(.lt)) @panic(exe.step.owner.fmt("Your Zig version v{{}} does not meet the minimum build requirement of v{{}}", .{{current, min}}));
+        \\    if (current.order(min).compare(.lt)) @panic(exe.step.owner.fmt("Your Zig version v{{f}} does not meet the minimum build requirement of v{{f}}", .{{current, min}}));
         \\}}
         \\
         \\
@@ -147,12 +152,12 @@ fn create_lockfile(alloc: std.mem.Allocator, list: *std.array_list.Managed(zigmo
 
     std.mem.sort(zigmod.Module, list.items, {}, zigmod.Module.lessThan);
 
-    const wl = fl.writer();
+    const wl = fl;
     try wl.writeAll("2\n");
     for (list.items) |m| {
         if (m.dep) |md| {
             if (md.type.isLocal()) continue;
-            const mpath = try std.fs.path.join(alloc, &.{ path, m.clean_path });
+            const mpath = try std.fs.path.joinZ(alloc, &.{ path, m.clean_path });
             const version = try md.exact_version(alloc, mpath);
             try wl.print("{s} {s} {s}\n", .{ @tagName(md.type), md.path, version });
         }
@@ -167,7 +172,7 @@ const DiffChange = struct {
 fn diff_lockfile(alloc: std.mem.Allocator) !void {
     const max = std.math.maxInt(usize);
 
-    if (try extras.doesFolderExist(null, ".git")) {
+    if (try nfs.cwd().existsDir(".git")) {
         const result = try u.run_cmd_raw(alloc, null, &.{ "git", "diff", "zigmod.lock" });
         var stdout = std.io.fixedBufferStream(result.stdout);
         const r = stdout.reader();
@@ -177,7 +182,8 @@ fn diff_lockfile(alloc: std.mem.Allocator) !void {
 
         var rems = std.array_list.Managed(string).init(alloc);
         var adds = std.array_list.Managed(string).init(alloc);
-        while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line| {
+        while (try r.readUntilDelimiterOrEofAlloc(alloc, '\n', max)) |line_full| {
+            const line = line_full[0 .. line_full.len - 1];
             if (line[0] == ' ') continue;
             if (line[0] == '-') try rems.append(line[1..]);
             if (line[0] == '+') if (line[1] == '2') break else try adds.append(line[1..]);
@@ -269,7 +275,7 @@ fn print_dirs(w: nfs.File, list: []const zigmod.Module, alloc: std.mem.Allocator
 }
 
 fn print_deps(w: nfs.File, m: zigmod.Module) !void {
-    try w.writeAll("&[_]*Package{\n");
+    try w.writeAll("&[_]*const Package{\n");
     for (m.deps) |d| {
         if (d.main.len == 0) {
             continue;
@@ -288,16 +294,18 @@ fn print_pkg_data_to(w: nfs.File, notdone: *std.array_list.Managed(zigmod.Module
         for (notdone.items, 0..) |mod, i| {
             if (contains_all(mod.deps, done.items)) {
                 try w.print(
-                    \\    pub var _{s} = Package{{
+                    \\    pub const _{s} = Package{{
+                    \\        .id = "{s}",
                     \\        .directory = dirs._{s},
                     \\
                 , .{
                     mod.short_id(),
                     mod.short_id(),
+                    mod.short_id(),
                 });
                 if (mod.main.len > 0 and !std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
                     try w.print(
-                        \\        .import = .{{ "{s}", .{{ .path = dirs._{s} ++ "/{s}" }} }},
+                        \\        .import = .{{ "{s}", .{{ .cwd_relative = dirs._{s} ++ "/{s}" }} }},
                         \\
                     , .{
                         mod.name,

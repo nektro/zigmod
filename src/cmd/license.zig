@@ -11,12 +11,12 @@ const u = @import("./../util/funcs.zig");
 const common = @import("./../common.zig");
 
 const List = std.array_list.Managed(zigmod.Module);
-const Map = std.StringArrayHashMap(*List);
+const Map = std.array_hash_map.String(*List);
 
 // Inspired by:
 // https://github.com/onur/cargo-license
 
-pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
+pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
     _ = self_name;
     _ = args;
 
@@ -40,8 +40,8 @@ pub fn do(cachepath: [:0]const u8, dir: nfs.Dir, options: *common.CollectOptions
     try common.collect_pkgs(top_module, &master_list);
     std.mem.sort(zigmod.Module, master_list.items, {}, zigmod.Module.lessThan);
 
-    var map = Map.init(gpa);
-    errdefer map.deinit();
+    var map = Map{};
+    errdefer map.deinit(gpa);
 
     var unspecified_list = List.init(gpa);
     errdefer unspecified_list.deinit();
@@ -62,7 +62,7 @@ pub fn do(cachepath: [:0]const u8, dir: nfs.Dir, options: *common.CollectOptions
             try unspecified_list.append(item);
             continue;
         }
-        const map_item = try map.getOrPut(license_code);
+        const map_item = try map.getOrPut(gpa, license_code);
         if (!map_item.found_existing) {
             const temp = try gpa.create(List);
             temp.* = List.init(gpa);

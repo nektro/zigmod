@@ -262,7 +262,7 @@ fn print_dirs(w: nfs.File, list: []const zigmod.Module, alloc: std.mem.Allocator
             continue;
         }
         if (std.mem.eql(u8, mod.clean_path, "../..")) {
-            const cwd_realpath = try std.fs.cwd().realpathAlloc(alloc, ".");
+            const cwd_realpath = try nfs.cwd().realpathAlloc(alloc, ".");
             try w.print("    pub const _{s} = \"{}\";\n", .{ mod.short_id(), u.altStringEscape(cwd_realpath) });
             continue;
         }

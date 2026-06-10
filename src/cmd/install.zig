@@ -5,19 +5,21 @@ const knownfolders = @import("known-folders");
 const extras = @import("extras");
 const nio = @import("nio");
 const nfs = @import("nfs");
+const root = @import("root");
 
 const zigmod = @import("./../lib.zig");
 const u = @import("./../util/funcs.zig");
 const common = @import("./../common.zig");
 
-pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
+pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
     _ = self_name;
 
     if (args.len < 2) u.fail("usage: zigmod install [git|hg|http] [url]", .{});
 
-    const homepath = try knownfolders.getPath(gpa, .home) orelse u.fail("failed to read HOME", .{});
-    const cache = try knownfolders.getPath(gpa, .cache) orelse u.fail("failed to read XDG_CACHE_HOME", .{});
-    const datapath = try knownfolders.getPath(gpa, .data) orelse u.fail("failed to read XDG_DATA_HOME", .{});
+    const io = root.io;
+    const homepath = try knownfolders.getPath(io, gpa, root.environ, .home) orelse u.fail("failed to read HOME", .{});
+    const cache = try knownfolders.getPath(io, gpa, root.environ, .cache) orelse u.fail("failed to read XDG_CACHE_HOME", .{});
+    const datapath = try knownfolders.getPath(io, gpa, root.environ, .data) orelse u.fail("failed to read XDG_DATA_HOME", .{});
 
     const RemoteType = enum {
         git,
@@ -86,7 +88,8 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         0x0000_000c => try @import("./fetch.0.12.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
         0x0000_000d => try @import("./fetch.0.13.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
         0x0000_000e => try @import("./fetch.0.14.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
-        0x0000_000f => {}, // that's us, zigmod is already 0.15.2
+        0x0000_000f => try @import("./fetch.0.15.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
+        0x0000_0010 => {}, // that's us, zigmod is already 0.16.0
         else => u.fail("zig {d}.{d} unimplemented", .{ version_sct.major, version_sct.minor }),
     }
 
@@ -96,14 +99,16 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         "--prefix", try std.fs.path.join(gpa, &.{ homepath, ".zigmod" }),
     };
     logargv(argv) catch return;
-    var proc = std.process.Child.init(argv, gpa);
-    proc.cwd = modpath;
-    const term = try proc.spawnAndWait();
+    var proc = try std.process.spawn(io, .{
+        .argv = argv,
+        .cwd = .{ .path = modpath },
+    });
+    const term = try proc.wait(io);
     switch (term) {
-        .Exited => |v| u.assert(v == 0, "zig build failed with exit code: {d}", .{v}),
-        .Signal => |v| u.fail("zig build was stopped with signal: {d}", .{v}),
-        .Stopped => |v| u.fail("zig build was stopped with code: {d}", .{v}),
-        .Unknown => |v| u.fail("zig build encountered unknown: {d}", .{v}),
+        .exited => |v| u.assert(v == 0, "zig build failed with exit code: {d}", .{v}),
+        .signal => |v| u.fail("zig build was stopped with signal: {d}", .{v}),
+        .stopped => |v| u.fail("zig build was stopped with code: {d}", .{v}),
+        .unknown => |v| u.fail("zig build encountered unknown: {d}", .{v}),
     }
     std.log.info("success!", .{});
 }
@@ -111,9 +116,13 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
 // needed this after moving to zig 0.15
 // /zig/0.15.2/lib/std/Io/Writer.zig:1122:51: error: expected type '[]const u8', found '[]const []const u8'
 fn logargv(argv: []const []const u8) !void {
+    const io = std.Options.debug_io;
+    const prev = io.swapCancelProtection(.blocked);
+    defer _ = io.swapCancelProtection(prev);
     var buffer: [64]u8 = undefined;
-    const stderr = std.debug.lockStderrWriter(&buffer);
-    defer std.debug.unlockStderrWriter();
+    const stderrterm = std.debug.lockStderr(&buffer).terminal();
+    defer std.debug.unlockStderr();
+    const stderr = stderrterm.writer;
     try stderr.writeAll("debug: argv: {");
     for (argv, 0..) |v, i| {
         if (i > 0) try stderr.writeAll(",");

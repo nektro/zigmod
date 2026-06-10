@@ -4,6 +4,7 @@ const gpa = std.heap.c_allocator;
 const extras = @import("extras");
 const json = @import("json");
 const nio = @import("nio");
+const root = @import("root");
 
 const u = @import("./../util/funcs.zig");
 
@@ -30,7 +31,7 @@ pub const Package = struct {
     links: []const string,
 };
 
-pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
+pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
     if (args.len == 0) {
         std.debug.print("{s}\n", .{
             \\This is a subcommand for use with https://github.com/zigtools/zpm-server instances but has no default behavior on its own aside from showing you this nice help text.
@@ -57,8 +58,9 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
 }
 
 pub fn server_fetch(url: string) !json.Document {
+    const io = root.io;
     var buf: [4096]u8 = @splat(0);
-    var client: std.http.Client = .{ .allocator = gpa };
+    var client: std.http.Client = .{ .io = io, .allocator = gpa };
     defer client.deinit();
 
     var req = try client.request(.GET, try std.Uri.parse(url), .{

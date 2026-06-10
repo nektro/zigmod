@@ -2,6 +2,7 @@ const std = @import("std");
 const gpa = std.heap.c_allocator;
 const extras = @import("extras");
 const nfs = @import("nfs");
+const root = @import("root");
 
 const zigmod = @import("../../lib.zig");
 const u = @import("./../../util/funcs.zig");
@@ -10,7 +11,7 @@ const zpm = @import("./../zpm.zig");
 //
 //
 
-pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
+pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
     _ = self_name;
 
     const url = try std.mem.join(gpa, "/", &.{ zpm.server_root, "packages" });
@@ -42,8 +43,9 @@ pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
         }
     }
 
+    const io = root.io;
     // var buf: [4096]u8 = @splat(0);
-    var client: std.http.Client = .{ .allocator = gpa };
+    var client: std.http.Client = .{ .io = io, .allocator = gpa };
     defer client.deinit();
 
     const has_zigdotmod = blk: {

@@ -10,7 +10,7 @@ const common = @import("./../common.zig");
 //
 //
 
-pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
+pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
     _ = self_name;
 
     //
@@ -70,7 +70,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\            urlpath = trimPrefix(u8, urlpath, "https://");
         \\            urlpath = trimPrefix(u8, urlpath, "git://");
         \\            const repopath = b.fmt("{s}/zigmod/deps/git/{s}/{s}", .{ b.cache_root.path.?, urlpath, commit });
-        \\            flip(std.fs.cwd().access(repopath, .{})) catch return result;
+        \\            flip(std.Io.Dir.cwd().access(std.Options.debug_io, repopath, .{})) catch return result;
         \\
         \\            var clonestep = std.Build.Step.Run.create(b, "clone");
         \\            clonestep.addArgs(&.{ "git", "clone", "-q", "--progress", url, repopath });
@@ -190,25 +190,25 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\        }
         \\        for (self.c_include_dirs) |item| {
         \\            result.addIncludePath(.{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) });
-        \\            dummy_library.addIncludePath(.{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) });
+        \\            dummy_library.root_module.addIncludePath(.{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) });
         \\            link_lib_c = true;
         \\            links += 1;
         \\        }
         \\        for (self.c_source_files) |item| {
-        \\            dummy_library.addCSourceFile(.{ .file = .{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) }, .flags = self.c_source_flags });
+        \\            dummy_library.root_module.addCSourceFile(.{ .file = .{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) }, .flags = self.c_source_flags });
         \\            links += 1;
         \\        }
         \\        for (self.system_libs) |item| {
         \\            if (std.zig.target.isLibCLibName(&target, item)) continue;
-        \\            dummy_library.linkSystemLibrary(item);
+        \\            dummy_library.root_module.linkSystemLibrary(item, .{});
         \\            links += 1;
         \\        }
         \\        for (self.frameworks) |item| {
-        \\            dummy_library.linkFramework(item);
+        \\            dummy_library.root_module.linkFramework(item, .{});
         \\            links += 1;
         \\        }
         \\        if (links > 0) {
-        \\            dummy_library.linkLibC();
+        \\            dummy_library.root_module.linkSystemLibrary("c", .{});
         \\            exe.root_module.linkLibrary(dummy_library);
         \\            link_lib_c = true;
         \\        }

@@ -10,7 +10,7 @@ const common = @import("./../common.zig");
 //
 //
 
-pub fn execute(self_name: []const u8, args: [][:0]u8) !void {
+pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
     _ = self_name;
 
     const gpa = std.heap.c_allocator;

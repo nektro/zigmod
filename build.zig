@@ -26,10 +26,10 @@ pub fn build(b: *std.Build) void {
 
     const exe_options = b.addOptions();
     exe.root_module.addImport("build_options", exe_options.createModule());
-    exe_options.addOption(string, "version", tag orelse std.mem.trimRight(u8, b.run(&.{ "git", "describe", "--tags" }), "\n"));
+    exe_options.addOption(string, "version", tag orelse std.mem.trimEnd(u8, b.run(&.{ "git", "describe", "--tags" }), "\n"));
 
     deps.addAllTo(exe);
-    exe.linkLibC();
+    exe.root_module.linkSystemLibrary("c", .{});
     exe.root_module.strip = strip;
     // exe.use_llvm = !disable_llvm;
     // exe.use_lld = !disable_llvm;
