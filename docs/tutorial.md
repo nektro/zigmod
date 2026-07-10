@@ -7,7 +7,6 @@ To get started you'll want to navigate to a new folder and run these commands.
 
 ```
 git init
-zig init-exe
 zigmod init
 ```
 
