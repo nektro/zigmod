@@ -11,11 +11,11 @@ git https://github.com/nektro/zig-json commit-60425cbb04ce4b00edfad895771e5bd402
 git https://github.com/nektro/zig-leven commit-014971d4b1e327a5c61322c3a6b9369fd1863864
 git https://github.com/nektro/zig-licenses commit-bc1cd51625c13d6c7df819fd0d85968e617f5c57
 git https://github.com/nektro/zig-licenses-text commit-a9d067c3c4d6c226a1de5531b66785bc15d869ee
-git https://github.com/nektro/zig-nfs commit-ca10dac88432ed0145b43d47c27a04ad7e4858c9
+git https://github.com/nektro/zig-nfs commit-1163f0e7be1400c7e2f80b5719114a7d1dc2cd36
 git https://github.com/nektro/zig-nio commit-61cf2b1af033a83ec2137e21824a8afa01318388
-git https://github.com/nektro/zig-sys-darwin commit-b96e8bad94f53d5f426a32f237d9e8346f51b8f2
+git https://github.com/nektro/zig-sys-darwin commit-b349aa32b55aae4cf2ae56740003f8aff0394920
 git https://github.com/nektro/zig-sys-freebsd commit-a80eaba4499e56256ed2d42959fed5174b1fbf60
-git https://github.com/nektro/zig-sys-linux commit-1b61f4f86230a8980f3b7f30c5876b09064a5a09
+git https://github.com/nektro/zig-sys-linux commit-24cc89eb39fbb1f8b4caa53beeca1c785ce78546
 git https://github.com/nektro/zig-sys-netbsd commit-5ad432ca421c59099be3630b9d0dda49e8bef0a7
 git https://github.com/nektro/zig-sys-openbsd commit-1a77f0cfe55b5fdfa6ac2bedf587bb3b8015c357
 git https://github.com/nektro/zig-time commit-cacde79ed6c866a370dd58f97ed1baa31b0b2c35

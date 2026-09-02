@@ -316,6 +316,26 @@ pub fn gen_files_package(alloc: std.mem.Allocator, cachepath: string, mdir: nfs.
             if (p.type == .DIR) {
                 continue;
             }
+            if (p.type == .LNK) {
+                const parent = try dir.openDirC(std.fs.path.dirname(p.path).?, .{});
+                defer parent.close();
+                var buf: [1024]u8 = undefined;
+                const link_path = try dir.readlink(p.path, &buf);
+                const link_stat = try parent.statFile(link_path);
+                if (link_stat.kind() == .DIR) {
+                    const link = try parent.openDir(link_path, .{});
+                    var walker2 = try link.walk(alloc);
+                    defer walker2.deinit();
+                    while (try walker2.next()) |p2| {
+                        if (p2.type == .DIR) {
+                            continue;
+                        }
+                        const path = try nio.fmt.allocPrint(alloc, "{s}/{s}", .{ p.path, p2.path });
+                        try map.put(path, try nio.fmt.allocPrint(alloc, "{s}/{s}", .{ dir_path, path }));
+                    }
+                    continue;
+                }
+            }
             const path = try alloc.dupe(u8, p.path);
             try map.put(path, try nio.fmt.allocPrint(alloc, "{s}/{s}", .{ dir_path, path }));
         }
