@@ -14,11 +14,27 @@ root
 					sys-linux
 					extras
 					sys-darwin
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 				time
 					extras
 					sys-linux
 					sys-darwin
+					nio
+						sys-linux
+						extras
+						sys-darwin
+						sys-freebsd
+						sys-netbsd
+						sys-openbsd
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 				sys-darwin
+				sys-freebsd
+				sys-netbsd
+				sys-openbsd
 		inquirer
 			ansi
 		ini
@@ -26,12 +42,32 @@ root
 			extras
 			sys-linux
 			sys-darwin
+			nio
+				sys-linux
+				extras
+				sys-darwin
+				sys-freebsd
+				sys-netbsd
+				sys-openbsd
+			sys-freebsd
+			sys-netbsd
+			sys-openbsd
 		extras
 		git
 			time
 				extras
 				sys-linux
 				sys-darwin
+				nio
+					sys-linux
+					extras
+					sys-darwin
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
+				sys-freebsd
+				sys-netbsd
+				sys-openbsd
 			extras
 			tracer
 				extras
@@ -42,34 +78,82 @@ root
 						sys-linux
 						extras
 						sys-darwin
+						sys-freebsd
+						sys-netbsd
+						sys-openbsd
 					time
 						extras
 						sys-linux
 						sys-darwin
+						nio
+							sys-linux
+							extras
+							sys-darwin
+							sys-freebsd
+							sys-netbsd
+							sys-openbsd
+						sys-freebsd
+						sys-netbsd
+						sys-openbsd
 					sys-darwin
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 				nio
 					sys-linux
 					extras
 					sys-darwin
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 				time
 					extras
 					sys-linux
 					sys-darwin
+					nio
+						sys-linux
+						extras
+						sys-darwin
+						sys-freebsd
+						sys-netbsd
+						sys-openbsd
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 			nfs
 				sys-linux
 				nio
 					sys-linux
 					extras
 					sys-darwin
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 				time
 					extras
 					sys-linux
 					sys-darwin
+					nio
+						sys-linux
+						extras
+						sys-darwin
+						sys-freebsd
+						sys-netbsd
+						sys-openbsd
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 				sys-darwin
+				sys-freebsd
+				sys-netbsd
+				sys-openbsd
 			nio
 				sys-linux
 				extras
 				sys-darwin
+				sys-freebsd
+				sys-netbsd
+				sys-openbsd
 			
 		json
 			extras
@@ -82,44 +166,98 @@ root
 						sys-linux
 						extras
 						sys-darwin
+						sys-freebsd
+						sys-netbsd
+						sys-openbsd
 					time
 						extras
 						sys-linux
 						sys-darwin
+						nio
+							sys-linux
+							extras
+							sys-darwin
+							sys-freebsd
+							sys-netbsd
+							sys-openbsd
+						sys-freebsd
+						sys-netbsd
+						sys-openbsd
 					sys-darwin
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 				nio
 					sys-linux
 					extras
 					sys-darwin
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 				time
 					extras
 					sys-linux
 					sys-darwin
+					nio
+						sys-linux
+						extras
+						sys-darwin
+						sys-freebsd
+						sys-netbsd
+						sys-openbsd
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 			intrusive-parser
 				extras
 				nio
 					sys-linux
 					extras
 					sys-darwin
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
 			nio
 				sys-linux
 				extras
 				sys-darwin
+				sys-freebsd
+				sys-netbsd
+				sys-openbsd
 		nio
 			sys-linux
 			extras
 			sys-darwin
+			sys-freebsd
+			sys-netbsd
+			sys-openbsd
 		nfs
 			sys-linux
 			nio
 				sys-linux
 				extras
 				sys-darwin
+				sys-freebsd
+				sys-netbsd
+				sys-openbsd
 			time
 				extras
 				sys-linux
 				sys-darwin
+				nio
+					sys-linux
+					extras
+					sys-darwin
+					sys-freebsd
+					sys-netbsd
+					sys-openbsd
+				sys-freebsd
+				sys-netbsd
+				sys-openbsd
 			sys-darwin
+			sys-freebsd
+			sys-netbsd
+			sys-openbsd
 	win32
 	extras
 	ansi
@@ -127,14 +265,33 @@ root
 		sys-linux
 		extras
 		sys-darwin
+		sys-freebsd
+		sys-netbsd
+		sys-openbsd
 	nfs
 		sys-linux
 		nio
 			sys-linux
 			extras
 			sys-darwin
+			sys-freebsd
+			sys-netbsd
+			sys-openbsd
 		time
 			extras
 			sys-linux
 			sys-darwin
+			nio
+				sys-linux
+				extras
+				sys-darwin
+				sys-freebsd
+				sys-netbsd
+				sys-openbsd
+			sys-freebsd
+			sys-netbsd
+			sys-openbsd
 		sys-darwin
+		sys-freebsd
+		sys-netbsd
+		sys-openbsd
