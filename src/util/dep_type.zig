@@ -16,6 +16,23 @@ pub const DepType = enum {
     git,        // https://git-scm.com/
     hg,         // https://www.mercurial-scm.org/
     http,       // https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
+    pijul,      // https://pijul.org/
+    // svn,        // https://subversion.apache.org/
+    // fossil,     // https://fossil-scm.org/
+    // cvs,        // https://nongnu.org/cvs/
+    // darcs,      // http://darcs.net/
+    // //
+    // bazaar,     // https://bazaar.canonical.com/en/
+    // //
+    // ftp,        // https://en.wikipedia.org/wiki/File_Transfer_Protocol
+    // ssh,        // https://www.ssh.com/ssh/
+    // onion,      // https://www.torproject.org/
+    // i2p,        // https://geti2p.net/en/
+    // torrent,    // https://en.wikipedia.org/wiki/BitTorrent
+    // magnet,     // https://en.wikipedia.org/wiki/BitTorrent
+    // dat,        // https://www.datprotocol.com/
+    // ipfs,       // https://www.ipfs.com/
+    // hypercore,  // https://hypercore-protocol.org/
 
     // zig fmt: on
     pub fn pull(self: DepType, alloc: std.mem.Allocator, rpath: [:0]const u8, dpath: [:0]const u8) !void {
@@ -40,6 +57,9 @@ pub const DepType = enum {
                     u.assert((try u.run_cmd(alloc, dpath, &.{ "tar", "-xf", f, "-C", "." })) == 0, "un-tar {s} failed", .{f});
                 }
             },
+            .pijul => {
+                u.assert((try u.run_cmd(alloc, null, &.{ "pijul", "clone", rpath, dpath })) == 0, "pijul clone {s} {s} failed", .{ rpath, dpath });
+            },
         }
     }
 
@@ -60,6 +80,9 @@ pub const DepType = enum {
             .http => {
                 //
             },
+            .pijul => {
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "pijul", "pull" })) == 0, "pijul pull failed", .{});
+            },
         }
     }
 
@@ -73,6 +96,7 @@ pub const DepType = enum {
             .git => try nio.fmt.allocPrint(alloc, "commit-{s}", .{(try u.git_rev_HEAD(alloc, mdir))}),
             .hg => "",
             .http => "",
+            .pijul => "",
         };
     }
 
@@ -84,6 +108,7 @@ pub const DepType = enum {
             .git => false,
             .hg => false,
             .http => false,
+            .pijul => false,
         };
     }
 
@@ -94,6 +119,7 @@ pub const DepType = enum {
         git: Git,
         hg: void,
         http: void,
+        pijul: Pijul,
 
         pub const Git = enum {
             branch,
@@ -107,6 +133,9 @@ pub const DepType = enum {
                     .commit => true,
                 };
             }
+        };
+        pub const Pijul = enum {
+            channel,
         };
     };
 };
