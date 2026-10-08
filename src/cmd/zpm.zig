@@ -91,7 +91,7 @@ pub fn server_fetchArray(url: string) ![]const Package {
             .tags = try valueStrArray(obj.getA("tags").?),
             .git = obj.getS("git").?,
             .root_file = obj.getS("root_file").?,
-            .source = obj.getN("source").?.get(u32),
+            .source = obj.getN("source").?.get(u32).?,
             .links = try valueLinks(obj.getO("links").?),
         });
     }
