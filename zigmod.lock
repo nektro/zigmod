@@ -1,13 +1,13 @@
 2
-git https://github.com/marlersoft/zigwin32 commit-9f15c276b4e9d05afd34a10d8662a7dfc34647ea
+git https://github.com/marlersoft/zigwin32 commit-fb2645891520f3e99931db17a7eba04057e87e89
 git https://github.com/nektro/arqv-ini commit-d2465c64833590a04bd9b7f50c87363fd03e65bf
 git https://github.com/nektro/zig-ansi commit-bebb39ae30d9848a1c212cee582d0b1c102d8b87
 git https://github.com/nektro/zig-detect-license commit-6de79b4ff8f7462e26f224f4bed3c81710c8893b
-git https://github.com/nektro/zig-extras commit-8f6c4761e5c22c6a5c83a032e764154b840275bc
+git https://github.com/nektro/zig-extras commit-0c90ee9a82d8863e0e142211a587940ee2a09790
 git https://github.com/nektro/zig-git commit-88b94a1960be841bb93a0bca65d556cb6385d1fd
 git https://github.com/nektro/zig-inquirer commit-e745b018f87ddc4c8958370332e6cf61625403cc
-git https://github.com/nektro/zig-intrusive-parser commit-800cbe5b241fc52370cb8f892f0d9c6f97133725
-git https://github.com/nektro/zig-json commit-a731b57ee685ff1ddeea9456a924f45ce4da3031
+git https://github.com/nektro/zig-intrusive-parser commit-2409be829d989bd03b6d123159880660c6089820
+git https://github.com/nektro/zig-json commit-d32454ad6d1a6e6e58a8c12a4f3ee1223be2e316
 git https://github.com/nektro/zig-leven commit-014971d4b1e327a5c61322c3a6b9369fd1863864
 git https://github.com/nektro/zig-licenses commit-bc1cd51625c13d6c7df819fd0d85968e617f5c57
 git https://github.com/nektro/zig-licenses-text commit-a9d067c3c4d6c226a1de5531b66785bc15d869ee

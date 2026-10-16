@@ -27,15 +27,15 @@ pub const GitExactStep = struct {
 pub fn fetch(exe: *std.Build.Step.Compile) *std.Build.Step {
     const b = exe.step.owner;
     const step = b.step("fetch", "");
-    dependOnGit(GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "9f15c276b4e9d05afd34a10d8662a7dfc34647ea"), step, &@field(package_data, "_o6ogpor87xc2"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "fb2645891520f3e99931db17a7eba04057e87e89"), step, &@field(package_data, "_o6ogpor87xc2"));
     dependOnGit(GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "d2465c64833590a04bd9b7f50c87363fd03e65bf"), step, &@field(package_data, "_u7sysdckdymi"));
     dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-ansi", "bebb39ae30d9848a1c212cee582d0b1c102d8b87"), step, &@field(package_data, "_s84v9o48ucb0"));
     dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-detect-license", "6de79b4ff8f7462e26f224f4bed3c81710c8893b"), step, &@field(package_data, "_2ovav391ivak"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-extras", "8f6c4761e5c22c6a5c83a032e764154b840275bc"), step, &@field(package_data, "_f7dubzb7cyqe"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-extras", "0c90ee9a82d8863e0e142211a587940ee2a09790"), step, &@field(package_data, "_f7dubzb7cyqe"));
     dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-git", "88b94a1960be841bb93a0bca65d556cb6385d1fd"), step, &@field(package_data, "_0k64oe2nuzvj"));
     dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-inquirer", "e745b018f87ddc4c8958370332e6cf61625403cc"), step, &@field(package_data, "_c1xirp1ota5p"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-intrusive-parser", "800cbe5b241fc52370cb8f892f0d9c6f97133725"), step, &@field(package_data, "_7l3oxw6nqqws"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-json", "a731b57ee685ff1ddeea9456a924f45ce4da3031"), step, &@field(package_data, "_ocmr9rtohgcc"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-intrusive-parser", "2409be829d989bd03b6d123159880660c6089820"), step, &@field(package_data, "_7l3oxw6nqqws"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-json", "d32454ad6d1a6e6e58a8c12a4f3ee1223be2e316"), step, &@field(package_data, "_ocmr9rtohgcc"));
     dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-leven", "014971d4b1e327a5c61322c3a6b9369fd1863864"), step, &@field(package_data, "_96h80ezrvj7i"));
     dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-licenses", "bc1cd51625c13d6c7df819fd0d85968e617f5c57"), step, &@field(package_data, "_0npcrzfdlrvk"));
     dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-licenses-text", "a9d067c3c4d6c226a1de5531b66785bc15d869ee"), step, &@field(package_data, "_pt88y5d80m25"));
