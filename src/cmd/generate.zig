@@ -47,48 +47,24 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
     try w.writeAll("\n");
     try w.writeAll(
         \\pub const GitExactStep = struct {
-        \\    step: std.Build.Step,
-        \\    builder: *std.Build,
-        \\    url: string,
-        \\    commit: string,
+        \\    step: *std.Build.Step,
+        \\    path: std.Build.LazyPath,
         \\
-        \\        pub fn create(b: *std.Build, url: string, commit: string) *GitExactStep {
-        \\            var result = b.allocator.create(GitExactStep) catch @panic("memory");
-        \\            result.* = GitExactStep{
-        \\                .step = std.Build.Step.init(.{
-        \\                    .id = .custom,
-        \\                    .name = b.fmt("git clone {s} @ {s}", .{ url, commit }),
-        \\                    .owner = b,
-        \\                    .makeFn = make,
-        \\                }),
-        \\                .builder = b,
-        \\                .url = url,
-        \\                .commit = commit,
-        \\            };
-        \\
-        \\            var urlpath = url;
-        \\            urlpath = trimPrefix(u8, urlpath, "https://");
-        \\            urlpath = trimPrefix(u8, urlpath, "git://");
-        \\            const repopath = b.fmt("{s}/zigmod/deps/git/{s}/{s}", .{ b.cache_root.path.?, urlpath, commit });
-        \\            flip(std.Io.Dir.cwd().access(std.Options.debug_io, repopath, .{})) catch return result;
-        \\
-        \\            var clonestep = std.Build.Step.Run.create(b, "clone");
-        \\            clonestep.addArgs(&.{ "git", "clone", "-q", "--progress", url, repopath });
-        \\
-        \\            var checkoutstep = std.Build.Step.Run.create(b, "checkout");
-        \\            checkoutstep.addArgs(&.{ "git", "-C", repopath, "checkout", "-q", commit });
-        \\            result.step.dependOn(&checkoutstep.step);
-        \\            checkoutstep.step.dependOn(&clonestep.step);
-        //            TODO rm the .git folder
-        //            TODO mark folder as read-only
-        \\
-        \\            return result;
-        \\        }
-        \\
-        \\        fn make(step: *std.Build.Step, options: std.Build.Step.MakeOptions) !void {
-        \\            _ = step;
-        \\            _ = options;
-        \\        }
+        \\    pub fn create(b: *std.Build, url: string, commit: string) GitExactStep {
+        \\        const sc_clone = b.addSystemCommand(&.{ "git", "clone" });
+        \\        sc_clone.addArg("--quiet");
+        \\        sc_clone.addArg("--progress");
+        \\        sc_clone.addArg("--depth");
+        \\        sc_clone.addArg("1");
+        \\        sc_clone.addArg("--revision");
+        \\        sc_clone.addArg(commit);
+        \\        sc_clone.addArg(url);
+        \\        const path = sc_clone.addOutputDirectoryArg(std.fs.path.basenamePosix(url));
+        \\        return .{
+        \\            .step = &sc_clone.step,
+        \\            .path = path,
+        \\        };
+        \\    }
         \\};
         \\
         \\pub fn fetch(exe: *std.Build.Step.Compile) *std.Build.Step {
@@ -101,7 +77,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
             .local => {},
             .system_lib => {},
             .framework => {},
-            .git => try w.print("    step.dependOn(&GitExactStep.create(b, \"{s}\", \"{s}\").step);\n", .{ module.dep.?.path, try module.pin(alloc, cachepath, options) }),
+            .git => try w.print("    dependOnGit(GitExactStep.create(b, \"{s}\", \"{s}\"), step, &@field(package_data, \"_{s}\"));\n", .{ module.dep.?.path, try module.pin(alloc, cachepath, options), module.short_id() }),
             .hg => @panic("TODO"),
             .http => @panic("TODO"),
         }
@@ -134,11 +110,16 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\    inline for (comptime std.meta.declarations(package_data)) |decl| @field(package_data, decl.name).module_memo = null;
         \\}
         \\
+        \\pub fn dependOnGit(ge: GitExactStep, s: *std.Build.Step, p: *Package) void {
+        \\    s.dependOn(ge.step);
+        \\    p.path = ge.path;
+        \\}
+        \\
         \\var link_lib_c = false;
         \\pub const Package = struct {
         \\    name: string = "",
-        \\    store: ?string = null,
         \\    main: ?string = null,
+        \\    path: ?std.Build.LazyPath = null,
         \\    deps: []const *Package = &.{},
         \\    c_include_dirs: []const string = &.{},
         \\    c_source_files: []const string = &.{},
@@ -168,8 +149,8 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\        dummy_library.step.dependOn(fetch_step);
         \\        var links: u32 = 0;
         \\        if (self.main) |m| {
-        \\            if (self.store) |s| {
-        \\                result.root_source_file = (std.Build.LazyPath{ .cwd_relative = b.cache_root.path.? }).path(b, "zigmod/deps").path(b, s[1..]).path(b, m);
+        \\            if (self.path) |p| {
+        \\                result.root_source_file = p.path(b, m);
         \\            } else {
         \\                result.root_source_file = b.path(m);
         \\            }
@@ -188,13 +169,13 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\            }
         \\        }
         \\        for (self.c_include_dirs) |item| {
-        \\            result.addIncludePath(.{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) });
-        \\            dummy_library.root_module.addIncludePath(.{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) });
+        \\            result.addIncludePath(self.path.?.path(b, item));
+        \\            dummy_library.root_module.addIncludePath(self.path.?.path(b, item));
         \\            link_lib_c = true;
         \\            links += 1;
         \\        }
         \\        for (self.c_source_files) |item| {
-        \\            dummy_library.root_module.addCSourceFile(.{ .file = .{ .cwd_relative = b.fmt("{s}/zigmod/deps{s}/{s}", .{ b.cache_root.path.?, self.store.?, item }) }, .flags = self.c_source_flags });
+        \\            dummy_library.root_module.addCSourceFile(.{ .file = self.path.?.path(b, item), .flags = self.c_source_flags });
         \\            links += 1;
         \\        }
         \\        for (self.system_libs) |item| {
@@ -240,7 +221,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         }
         try duped.append(mod);
     }
-    try print_pkg_data_to(w, alloc, cachepath, &duped, &done, options);
+    try print_pkg_data_to(w, &duped, &done);
     try w.writeAll("};\n\n");
 
     try w.writeAll("pub const packages = ");
@@ -281,7 +262,7 @@ fn print_deps(w: nfs.File, m: zigmod.Module) !void {
     try w.writeAll("}");
 }
 
-fn print_pkg_data_to(w: nfs.File, alloc: std.mem.Allocator, cachepath: [:0]const u8, notdone: *std.array_list.Managed(zigmod.Module), done: *std.array_list.Managed(zigmod.Module), options: *common.CollectOptions) !void {
+fn print_pkg_data_to(w: nfs.File, notdone: *std.array_list.Managed(zigmod.Module), done: *std.array_list.Managed(zigmod.Module)) !void {
     var len: usize = notdone.items.len;
     while (notdone.items.len > 0) {
         for (notdone.items, 0..) |mod, i| {
@@ -292,14 +273,6 @@ fn print_pkg_data_to(w: nfs.File, alloc: std.mem.Allocator, cachepath: [:0]const
                 , .{
                     mod.short_id(),
                 });
-                const fixed_path = if (std.mem.startsWith(u8, mod.clean_path, "v/")) mod.clean_path[2..std.mem.lastIndexOfScalar(u8, mod.clean_path, '/').?] else mod.clean_path;
-                switch (mod.type) {
-                    .system_lib, .framework => {},
-                    .local => {},
-                    .git => try w.print("        .store = \"/{}/{s}\",\n", .{ u.altStringEscape(fixed_path), try mod.pin(alloc, cachepath, options) }),
-                    .hg => @panic("TODO"),
-                    .http => @panic("TODO"),
-                }
                 if (mod.main.len > 0 and !std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
                     try w.print("        .name = \"{s}\",\n", .{mod.name});
                     try w.print("        .main = \"{s}\",\n", .{mod.main});
