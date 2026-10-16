@@ -144,6 +144,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\    name: string = "",
         \\    entry: ?string = null,
         \\    store: ?string = null,
+        \\    main: ?string = null,
         \\    deps: []const *Package = &.{},
         \\    c_include_dirs: []const string = &.{},
         \\    c_source_files: []const string = &.{},
@@ -304,6 +305,7 @@ fn print_pkg_data_to(w: nfs.File, alloc: std.mem.Allocator, cachepath: [:0]const
                 if (mod.main.len > 0 and !std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
                     try w.print("        .name = \"{s}\",\n", .{mod.name});
                     try w.print("        .entry = \"/{}/{s}/{s}\",\n", .{ u.altStringEscape(fixed_path), try mod.pin(alloc, cachepath, options), mod.main });
+                    try w.print("        .main = \"{s}\",\n", .{mod.main});
 
                     if (mod.deps.len != 0) {
                         try w.writeAll("        .deps = &[_]*Package{");
