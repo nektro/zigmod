@@ -94,11 +94,6 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\pub fn fetch(exe: *std.Build.Step.Compile) *std.Build.Step {
         \\    const b = exe.step.owner;
         \\    const step = b.step("fetch", "");
-        \\    inline for (comptime std.meta.declarations(package_data)) |decl| {
-        \\          const path = &@field(package_data, decl.name).entry;
-        \\          const root = if (@field(package_data, decl.name).store) |_| b.cache_root.path.? else ".";
-        \\          if (path.* != null) path.* = b.fmt("{s}/zigmod/deps{s}", .{ root, path.*.? });
-        \\    }
         \\
     );
     for (list) |module| {
@@ -142,7 +137,6 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\var link_lib_c = false;
         \\pub const Package = struct {
         \\    name: string = "",
-        \\    entry: ?string = null,
         \\    store: ?string = null,
         \\    main: ?string = null,
         \\    deps: []const *Package = &.{},
@@ -173,8 +167,12 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\        });
         \\        dummy_library.step.dependOn(fetch_step);
         \\        var links: u32 = 0;
-        \\        if (self.entry) |capture| {
-        \\            result.root_source_file = .{ .cwd_relative = capture };
+        \\        if (self.main) |m| {
+        \\            if (self.store) |s| {
+        \\                result.root_source_file = (std.Build.LazyPath{ .cwd_relative = b.cache_root.path.? }).path(b, "zigmod/deps").path(b, s[1..]).path(b, m);
+        \\            } else {
+        \\                result.root_source_file = b.path(m);
+        \\            }
         \\        }
         \\        for (self.deps) |item| {
         \\            const module_dep = item.module(exe, fetch_step);
@@ -304,7 +302,6 @@ fn print_pkg_data_to(w: nfs.File, alloc: std.mem.Allocator, cachepath: [:0]const
                 }
                 if (mod.main.len > 0 and !std.mem.eql(u8, &mod.id, &zigmod.Module.ROOT)) {
                     try w.print("        .name = \"{s}\",\n", .{mod.name});
-                    try w.print("        .entry = \"/{}/{s}/{s}\",\n", .{ u.altStringEscape(fixed_path), try mod.pin(alloc, cachepath, options), mod.main });
                     try w.print("        .main = \"{s}\",\n", .{mod.main});
 
                     if (mod.deps.len != 0) {
