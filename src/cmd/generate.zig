@@ -44,6 +44,10 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
     try w.writeAll("const std = @import(\"std\");\n");
     try w.writeAll("const builtin = @import(\"builtin\");\n");
     try w.writeAll("const string = []const u8;\n");
+    try w.print("const any_translate_c = {};\n", .{top_module.any_translate_c()});
+    try w.writeAll("const Translator = @import(\"translate_c\").Translator; // need to depend on ziglang/translate-c#2.0.2\n");
+    try w.writeAll("\n");
+    try w.writeAll("pub var translate_c: ?*std.Build.Dependency = null;\n");
     try w.writeAll("\n");
     try w.writeAll(
         \\pub const GitExactStep = struct {
@@ -107,7 +111,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\        exe.root_module.addImport(pkg.name, module);
         \\    }
         \\    // clear module memo cache so addAllTo can be called more than once in the same build.zig
-        \\    inline for (comptime std.meta.declarations(package_data)) |decl| @field(package_data, decl.name).module_memo = null;
+        \\    inline for (comptime std.meta.declarations(package_data)) |decl| @field(package_data, decl).module_memo = null;
         \\}
         \\
         \\pub fn dependOnGit(ge: GitExactStep, s: *std.Build.Step, p: *Package) void {
@@ -127,6 +131,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\    system_libs: []const string = &.{},
         \\    frameworks: []const string = &.{},
         \\    module_memo: ?*std.Build.Module = null,
+        \\    translate_c_h: ?string = null,
         \\
         \\    pub fn module(self: *Package, exe: *std.Build.Step.Compile, fetch_step: *std.Build.Step) *std.Build.Module {
         \\        if (self.module_memo) |cached| {
@@ -171,6 +176,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\        for (self.c_include_dirs) |item| {
         \\            result.addIncludePath(self.path.?.path(b, item));
         \\            dummy_library.root_module.addIncludePath(self.path.?.path(b, item));
+        \\            exe.root_module.addIncludePath(self.path.?.path(b, item));
         \\            link_lib_c = true;
         \\            links += 1;
         \\        }
@@ -178,6 +184,20 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: [:0]const u8, dir: nf
         \\            dummy_library.root_module.addCSourceFile(.{ .file = self.path.?.path(b, item), .flags = self.c_source_flags });
         \\            links += 1;
         \\        }
+        \\        if (any_translate_c) if (self.translate_c_h) |h| {
+        \\            if (translate_c == null) translate_c = b.dependency("translate_c", .{});
+        \\            const t: Translator = .init(translate_c.?, .{
+        \\                .c_source_file = b.addWriteFile("c.h", b.fmt("// {s}\n#include <{s}>\n", .{ self.name, h })).getDirectory().path(b, "c.h"),
+        \\                .target = exe.root_module.resolved_target.?,
+        \\                .optimize = exe.root_module.optimize.?,
+        \\            });
+        \\            for (exe.root_module.include_dirs.items) |d| {
+        \\                if (d != .path) continue;
+        \\                t.addIncludePath(d.path);
+        \\            }
+        \\            result.addImport("c", t.mod);
+        \\            link_lib_c = true;
+        \\        };
         \\        for (self.system_libs) |item| {
         \\            if (std.zig.target.isLibCLibName(&target, item)) continue;
         \\            dummy_library.root_module.linkSystemLibrary(item, .{});
@@ -328,6 +348,9 @@ fn print_pkg_data_to(w: nfs.File, notdone: *std.array_list.Managed(zigmod.Module
                         if (j != mod.deps.len - 1) try w.writeAll(",");
                     }
                     try w.writeAll(" },\n");
+                }
+                if (mod.translate_c_h) |h| {
+                    try w.print("        .translate_c_h = \"{s}\",\n", .{h});
                 }
                 try w.writeAll("    };\n");
 

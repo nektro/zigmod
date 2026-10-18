@@ -4,10 +4,10 @@ const builtin = @import("builtin");
 const deps = @import("./deps.zig");
 
 pub fn build(b: *std.Build) void {
-    b.reference_trace = 256;
+    // b.reference_trace = 255; // https://codeberg.org/ziglang/zig/issues/37136
 
     const target = b.standardTargetOptions(.{});
-    const mode = b.option(std.builtin.OptimizeMode, "mode", "") orelse .Debug;
+    const optimize = b.standardOptimizeOption(.{});
     const use_full_name = b.option(bool, "use-full-name", "") orelse false;
     const with_arch_os = b.fmt("-{s}-{s}", .{ @tagName(target.result.cpu.arch), @tagName(target.result.os.tag) });
     const exe_name = b.fmt("{s}{s}", .{ "zigmod", if (use_full_name) with_arch_os else "" });
@@ -16,7 +16,7 @@ pub fn build(b: *std.Build) void {
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/main.zig"),
             .target = target,
-            .optimize = mode,
+            .optimize = optimize,
         }),
     });
     const tag = b.option(string, "tag", "");
@@ -37,9 +37,7 @@ pub fn build(b: *std.Build) void {
 
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+    run_cmd.addPassthruArgs();
 
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run_cmd.step);

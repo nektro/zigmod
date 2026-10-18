@@ -2,6 +2,10 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const string = []const u8;
+const any_translate_c = true;
+const Translator = @import("translate_c").Translator; // need to depend on ziglang/translate-c#2.0.2
+
+pub var translate_c: ?*std.Build.Dependency = null;
 
 pub const GitExactStep = struct {
     step: *std.Build.Step,
@@ -28,30 +32,30 @@ pub fn fetch(exe: *std.Build.Step.Compile) *std.Build.Step {
     const b = exe.step.owner;
     const step = b.step("fetch", "");
     dependOnGit(GitExactStep.create(b, "https://github.com/marlersoft/zigwin32", "fb2645891520f3e99931db17a7eba04057e87e89"), step, &@field(package_data, "_o6ogpor87xc2"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "d2465c64833590a04bd9b7f50c87363fd03e65bf"), step, &@field(package_data, "_u7sysdckdymi"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-ansi", "bebb39ae30d9848a1c212cee582d0b1c102d8b87"), step, &@field(package_data, "_s84v9o48ucb0"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-detect-license", "6de79b4ff8f7462e26f224f4bed3c81710c8893b"), step, &@field(package_data, "_2ovav391ivak"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-extras", "0c90ee9a82d8863e0e142211a587940ee2a09790"), step, &@field(package_data, "_f7dubzb7cyqe"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-git", "88b94a1960be841bb93a0bca65d556cb6385d1fd"), step, &@field(package_data, "_0k64oe2nuzvj"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-inquirer", "e745b018f87ddc4c8958370332e6cf61625403cc"), step, &@field(package_data, "_c1xirp1ota5p"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-intrusive-parser", "2409be829d989bd03b6d123159880660c6089820"), step, &@field(package_data, "_7l3oxw6nqqws"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-json", "d32454ad6d1a6e6e58a8c12a4f3ee1223be2e316"), step, &@field(package_data, "_ocmr9rtohgcc"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-leven", "014971d4b1e327a5c61322c3a6b9369fd1863864"), step, &@field(package_data, "_96h80ezrvj7i"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-licenses", "bc1cd51625c13d6c7df819fd0d85968e617f5c57"), step, &@field(package_data, "_0npcrzfdlrvk"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-licenses-text", "a9d067c3c4d6c226a1de5531b66785bc15d869ee"), step, &@field(package_data, "_pt88y5d80m25"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-nfs", "1a27fe574706f0b91c9f66b22fe7d3fa8f5129d5"), step, &@field(package_data, "_vph9l0hxpeze"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-nio", "17c4f044b15917efc1d3f018765881d53fa27e48"), step, &@field(package_data, "_kscsl0145t7x"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-sys-darwin", "b349aa32b55aae4cf2ae56740003f8aff0394920"), step, &@field(package_data, "_73bukkeci2u6"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-sys-freebsd", "f97e6c2de30af76818572490735c84ce1015958b"), step, &@field(package_data, "_qfev2g50alvp"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-sys-linux", "6dabe7cce239d882c8fd132ab5cda1d1f9ff3634"), step, &@field(package_data, "_h7tv7ayhffak"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-sys-netbsd", "5ad432ca421c59099be3630b9d0dda49e8bef0a7"), step, &@field(package_data, "_uvkgl6xf1azv"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-sys-openbsd", "164646a5e7c4129eb92ac524a60f1759605c99df"), step, &@field(package_data, "_4rmxgmcykiba"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-time", "1349fb2c8aaaa1503e8730facea6f87c5fe75dc0"), step, &@field(package_data, "_iecwp4b3bsfm"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-tracer", "4ad0602d52a3f40ef74f59f648602c61409f7ba7"), step, &@field(package_data, "_ede2wygpe1iy"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-yaml", "dff9fd43ebf1046c70090bdccfeb2e4f1c0d584b"), step, &@field(package_data, "_g982zq6e8wsv"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/arqv-ini", "2951069265792192bd714980d44ccb4abee4a6e8"), step, &@field(package_data, "_u7sysdckdymi"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-ansi", "952d0751c359612fc1a7c493453cc6223bbaff5d"), step, &@field(package_data, "_s84v9o48ucb0"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-detect-license", "2ec231c2ae5274d926851f355f0896e0fcbbb5d0"), step, &@field(package_data, "_2ovav391ivak"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-extras", "fb3aa273de9116bbb7befd448835b854d906f2ee"), step, &@field(package_data, "_f7dubzb7cyqe"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-git", "f4bd29ad59967102db4532bda2d95d1512fbf3fb"), step, &@field(package_data, "_0k64oe2nuzvj"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-inquirer", "6feae6d21ac54cba8e5d4da91868c4db9f82343b"), step, &@field(package_data, "_c1xirp1ota5p"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-intrusive-parser", "6d074187f8c5aa2bdab11ee57c7180df768fca72"), step, &@field(package_data, "_7l3oxw6nqqws"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-json", "4f6aa411f1dc93cc86a052d8a69804c8ff762e59"), step, &@field(package_data, "_ocmr9rtohgcc"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-leven", "d990af4f7706edcb0d928d953d1a56c2830fa036"), step, &@field(package_data, "_96h80ezrvj7i"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-licenses", "1fd04fc1b7619ca2ddfd07354a93e6d72334f76f"), step, &@field(package_data, "_0npcrzfdlrvk"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-licenses-text", "a20d31da306967253b8a46c60d8368c7ac4b7229"), step, &@field(package_data, "_pt88y5d80m25"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-nfs", "b32bb30bbdc7e5ad9bb3adb5c477a98897c9cb10"), step, &@field(package_data, "_vph9l0hxpeze"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-nio", "b28c8efc86f3baec3737de86ffde5c4b3a5260f6"), step, &@field(package_data, "_kscsl0145t7x"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-sys-darwin", "312638dcf043c3163e260ec5b42610856fc9eeab"), step, &@field(package_data, "_73bukkeci2u6"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-sys-freebsd", "967ac568e385534825e6849bc82a9b51d45c600c"), step, &@field(package_data, "_qfev2g50alvp"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-sys-linux", "750d2aa874a9ddb473e7cd0af99f1e722aaab79d"), step, &@field(package_data, "_h7tv7ayhffak"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-sys-netbsd", "e16386268223744ac3f6036a028cc4359056731b"), step, &@field(package_data, "_uvkgl6xf1azv"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-sys-openbsd", "081e11079887e8f02d8480b6219a13a41afd8d69"), step, &@field(package_data, "_4rmxgmcykiba"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-time", "29f3f902cc8948faa36b853380c38ff587236661"), step, &@field(package_data, "_iecwp4b3bsfm"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-tracer", "ccf9a6b85a38cc343aba772f2d2aac4df49000e1"), step, &@field(package_data, "_ede2wygpe1iy"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/nektro/zig-yaml", "e4e8dfe78a3a0e39d134382a18e8eb771418e850"), step, &@field(package_data, "_g982zq6e8wsv"));
     dependOnGit(GitExactStep.create(b, "https://github.com/madler/zlib", "da607da739fa6047df13e66a2af6b8bec7c2a498"), step, &@field(package_data, "_0e2d06bb494b"));
     dependOnGit(GitExactStep.create(b, "https://github.com/yaml/libyaml", "2c891fc7a770e8ba2fec34fc6b545c672beb37e6"), step, &@field(package_data, "_8mdbh0zuneb0"));
-    dependOnGit(GitExactStep.create(b, "https://github.com/ziglibs/known-folders", "207c34a16e4365edc20d92c7892f962b3bed46e8"), step, &@field(package_data, "_2ta738wrqbaq"));
+    dependOnGit(GitExactStep.create(b, "https://github.com/ziglibs/known-folders", "6da0d0c41b78b9ed2d34fa364fcb81b5ebece6c4"), step, &@field(package_data, "_2ta738wrqbaq"));
     return step;
 }
 
@@ -76,7 +80,7 @@ pub fn addAllTo(exe: *std.Build.Step.Compile) void {
         exe.root_module.addImport(pkg.name, module);
     }
     // clear module memo cache so addAllTo can be called more than once in the same build.zig
-    inline for (comptime std.meta.declarations(package_data)) |decl| @field(package_data, decl.name).module_memo = null;
+    inline for (comptime std.meta.declarations(package_data)) |decl| @field(package_data, decl).module_memo = null;
 }
 
 pub fn dependOnGit(ge: GitExactStep, s: *std.Build.Step, p: *Package) void {
@@ -96,6 +100,7 @@ pub const Package = struct {
     system_libs: []const string = &.{},
     frameworks: []const string = &.{},
     module_memo: ?*std.Build.Module = null,
+    translate_c_h: ?string = null,
 
     pub fn module(self: *Package, exe: *std.Build.Step.Compile, fetch_step: *std.Build.Step) *std.Build.Module {
         if (self.module_memo) |cached| {
@@ -140,6 +145,7 @@ pub const Package = struct {
         for (self.c_include_dirs) |item| {
             result.addIncludePath(self.path.?.path(b, item));
             dummy_library.root_module.addIncludePath(self.path.?.path(b, item));
+            exe.root_module.addIncludePath(self.path.?.path(b, item));
             link_lib_c = true;
             links += 1;
         }
@@ -147,6 +153,20 @@ pub const Package = struct {
             dummy_library.root_module.addCSourceFile(.{ .file = self.path.?.path(b, item), .flags = self.c_source_flags });
             links += 1;
         }
+        if (any_translate_c) if (self.translate_c_h) |h| {
+            if (translate_c == null) translate_c = b.dependency("translate_c", .{});
+            const t: Translator = .init(translate_c.?, .{
+                .c_source_file = b.addWriteFile("c.h", b.fmt("// {s}\n#include <{s}>\n", .{ self.name, h })).getDirectory().path(b, "c.h"),
+                .target = exe.root_module.resolved_target.?,
+                .optimize = exe.root_module.optimize.?,
+            });
+            for (exe.root_module.include_dirs.items) |d| {
+                if (d != .path) continue;
+                t.addIncludePath(d.path);
+            }
+            result.addImport("c", t.mod);
+            link_lib_c = true;
+        };
         for (self.system_libs) |item| {
             if (std.zig.target.isLibCLibName(&target, item)) continue;
             dummy_library.root_module.linkSystemLibrary(item, .{});
@@ -170,7 +190,7 @@ pub const Package = struct {
 };
 
 fn checkMinZig(current: std.SemanticVersion, exe: *std.Build.Step.Compile) void {
-    const min = std.SemanticVersion.parse("0.16.0") catch return;
+    const min = std.SemanticVersion.parse("0.17.0") catch return;
     if (current.order(min).compare(.lt)) @panic(exe.step.owner.fmt("Your Zig version v{f} does not meet the minimum build requirement of v{f}", .{current, min}));
 }
 
@@ -195,6 +215,7 @@ pub const package_data = struct {
         .name = "inquirer",
         .main = "src/lib.zig",
         .deps = &[_]*Package{ &_s84v9o48ucb0 },
+        .translate_c_h = "termios.h",
     };
     pub var _96h80ezrvj7i = Package{
         .name = "leven",
@@ -215,18 +236,22 @@ pub const package_data = struct {
     pub var _qfev2g50alvp = Package{
         .name = "sys-freebsd",
         .main = "freebsd.zig",
+        .translate_c_h = "pthread.h",
     };
     pub var _h7tv7ayhffak = Package{
         .name = "sys-linux",
         .main = "mod.zig",
+        .translate_c_h = "pthread.h",
     };
     pub var _uvkgl6xf1azv = Package{
         .name = "sys-netbsd",
         .main = "netbsd.zig",
+        .translate_c_h = "pthread.h",
     };
     pub var _4rmxgmcykiba = Package{
         .name = "sys-openbsd",
         .main = "openbsd.zig",
+        .translate_c_h = "pthread.h",
     };
     pub var _kscsl0145t7x = Package{
         .name = "nio",
@@ -262,6 +287,7 @@ pub const package_data = struct {
         .name = "git",
         .main = "git.zig",
         .deps = &[_]*Package{ &_iecwp4b3bsfm, &_f7dubzb7cyqe, &_ede2wygpe1iy, &_vph9l0hxpeze, &_kscsl0145t7x, &_0e2d06bb494b },
+        .translate_c_h = "zlib.h",
     };
     pub var _ocmr9rtohgcc = Package{
         .name = "json",
@@ -272,6 +298,7 @@ pub const package_data = struct {
         .name = "yaml",
         .main = "yaml.zig",
         .deps = &[_]*Package{ &_8mdbh0zuneb0 },
+        .translate_c_h = "yaml.h",
     };
     pub var _0e2d06bb494b = Package{
         .c_include_dirs = &.{ "" },

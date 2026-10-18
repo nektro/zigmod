@@ -54,9 +54,12 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
     try w.writeAll("const std = @import(\"std\");\n");
     try w.writeAll("const builtin = @import(\"builtin\");\n");
     try w.writeAll("const string = []const u8;\n");
+    try w.print("const any_translate_c = {};\n", .{top_module.any_translate_c()});
+    try w.writeAll("const Translator = @import(\"translate_c\").Translator; // need to depend on ziglang/translate-c#2.0.2\n");
     try w.writeAll("\n");
     try w.print("pub const cache = \"{}\";\n", .{u.altStringEscape(cachepath)});
     try w.writeAll("pub var skip_libc = false;\n");
+    try w.writeAll("pub var translate_c: ?*std.Build.Dependency = null;\n");
     try w.writeAll("\n");
     try w.writeAll(
         \\pub fn addAllTo(exe: *std.Build.Step.Compile) void {
@@ -86,6 +89,7 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
         \\    c_source_flags: []const string = &.{},
         \\    system_libs: []const string = &.{},
         \\    frameworks: []const string = &.{},
+        \\    translate_c_h: ?string = null,
         \\
         \\    pub fn module(self: *const Package, exe: *std.Build.Step.Compile) *std.Build.Module {
         \\        if (module_memo.get(self.id)) |cached| {
@@ -121,6 +125,20 @@ pub fn create_depszig(alloc: std.mem.Allocator, cachepath: string, dir: nfs.Dir,
         \\            exe.root_module.addCSourceFile(.{ .file = .{ .cwd_relative = (b.fmt("{s}/{s}", .{ self.directory, item })) }, .flags = self.c_source_flags });
         \\            link_lib_c = true;
         \\        }
+        \\        if (any_translate_c) if (self.translate_c_h) |h| {
+        \\            if (translate_c == null) translate_c = b.dependency("translate_c", .{});
+        \\            const t: Translator = .init(translate_c.?, .{
+        \\                .c_source_file = b.addWriteFile("c.h", b.fmt("// {s}\n#include <{s}>\n", .{ self.id, h })).getDirectory().path(b, "c.h"),
+        \\                .target = exe.root_module.resolved_target.?,
+        \\                .optimize = exe.root_module.optimize.?,
+        \\            });
+        \\            for (exe.root_module.include_dirs.items) |d| {
+        \\                if (d != .path) continue;
+        \\                t.addIncludePath(d.path);
+        \\            }
+        \\            result.addImport("c", t.mod);
+        \\            link_lib_c = true;
+        \\        };
         \\        for (self.system_libs) |item| {
         \\            if (skip_libc and std.zig.target.isLibCLibName(&target, item)) continue;
         \\            result.linkSystemLibrary(item, .{});
@@ -401,6 +419,9 @@ fn print_pkg_data_to(w: nfs.File, notdone: *std.array_list.Managed(zigmod.Module
                         if (j != mod.deps.len - 1) try w.writeAll(",");
                     }
                     try w.writeAll(" },\n");
+                }
+                if (mod.translate_c_h) |h| {
+                    try w.print("        .translate_c_h = \"{s}\",\n", .{h});
                 }
                 try w.writeAll("    };\n");
 

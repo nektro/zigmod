@@ -33,6 +33,7 @@ pub const ModFile = struct {
     rootdeps: []zigmod.Dep,
     builddeps: []zigmod.Dep,
     min_zig_version: ?std.SemanticVersion,
+    translate_c_h: ?string = null,
 
     pub fn openFile(dir: nfs.Dir, ops: nfs.Dir.OpenFileFlags) !struct { string, nfs.File } {
         return .{ "zig.mod", dir.openFile("zig.mod", ops) catch |err| switch (err) {
@@ -91,6 +92,7 @@ pub const ModFile = struct {
             .rootdeps = try dep_list_by_name(alloc, mapping, &.{ "dev_dependencies", "root_dependencies" }, false),
             .builddeps = try dep_list_by_name(alloc, mapping, &.{ "dev_dependencies", "build_dependencies" }, true),
             .min_zig_version = std.SemanticVersion.parse(mapping.get_string("min_zig_version") orelse "") catch null,
+            .translate_c_h = mapping.get_string("translate_c_h"),
         };
     }
 
@@ -110,9 +112,9 @@ pub const ModFile = struct {
                     if (item.mapping.get("src")) |val| {
                         var src_iter = std.mem.tokenizeScalar(u8, val.string, ' ');
                         dtype = src_iter.next().?;
-                        path = try gpa.dupeZ(u8, src_iter.next().?);
+                        path = try gpa.dupeSentinel(u8, src_iter.next().?, 0);
                         if (src_iter.next()) |dver| {
-                            version = try gpa.dupeZ(u8, dver);
+                            version = try gpa.dupeSentinel(u8, dver, 0);
                         }
                     } else {
                         dtype = item.mapping.get("type").?.string;
@@ -151,6 +153,7 @@ pub const ModFile = struct {
                         .deps = try dep_list_by_name(alloc, item.mapping, &.{"dependencies"}, for_build),
                         .keep = std.mem.eql(u8, "true", item.mapping.get_string("keep") orelse ""),
                         .for_build = for_build,
+                        .translate_c_h = item.mapping.get_string("translate_c_h"),
                     });
                     // const d = &dep_list.getLast();
                 }

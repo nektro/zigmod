@@ -44,7 +44,7 @@ pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
         error.CantFindMain => try std.mem.concat(gpa, u8, &.{ flatname, ".zig" }),
         else => |ee| return ee,
     }) else null;
-    const entry = if (entry_bare) |ent| try gpa.dupeZ(u8, ent) else null;
+    const entry = if (entry_bare) |ent| try gpa.dupeSentinel(u8, ent, 0) else null;
 
     const maybe_license_text = try detectlicense.detectInDir(gpa, cwd);
     const license = try inquirer.forString(stdout, stdin, "license:", gpa, maybe_license_text);
@@ -153,6 +153,7 @@ pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
             }
             if (!exists) try w.writeAll(".zig-cache\n");
             if (!exists) try w.writeAll("zig-out\n");
+            if (!exists) try w.writeAll("zig-pkg\n");
             try w.writeAll(".zigmod\n");
             try w.writeAll("deps.zig\n");
             try w.writeAll("files.zig\n");
@@ -194,7 +195,7 @@ pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
                         \\
                         \\pub fn build(b: *std.Build) void {
                         \\    const target = b.standardTargetOptions(.{});
-                        \\    const mode = b.option(std.builtin.Mode, "mode", "") orelse .Debug;
+                        \\    const optimize = b.standardOptimizeOption(.{});
                         \\
                         \\    const exe = b.addExecutable(.{
                         \\
@@ -203,7 +204,7 @@ pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
                     try w.writeAll(
                         \\        .root_source_file = b.path("main.zig"),
                         \\        .target = target,
-                        \\        .optimize = mode,
+                        \\        .optimize = optimize,
                         \\    });
                         \\    deps.addAllTo(exe);
                         \\    b.installArtifact(exe);
@@ -224,12 +225,12 @@ pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
                         \\
                         \\pub fn build(b: *std.Build) void {
                         \\    const target = b.standardTargetOptions(.{});
-                        \\    const mode = b.option(std.builtin.Mode, "mode", "") orelse .Debug;
+                        \\    const optimize = b.standardOptimizeOption(.{});
                         \\
                         \\    const tests = b.addTest(.{
                         \\        .root_source_file = b.path("test.zig"),
                         \\        .target = target,
-                        \\        .optimize = mode,
+                        \\        .optimize = optimize,
                         \\    });
                         \\    deps.addAllTo(tests);
                         \\

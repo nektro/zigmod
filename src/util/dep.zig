@@ -28,8 +28,9 @@ pub const Dep = struct {
     deps: []zigmod.Dep,
     keep: bool = false,
     for_build: bool = false,
+    translate_c_h: ?string = null,
 
-    pub const EMPTY = (" " ** 48).*;
+    pub const EMPTY: [48]u8 = @splat(' ');
 
     pub const Type = @import("./dep_type.zig").DepType;
 

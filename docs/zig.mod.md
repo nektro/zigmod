@@ -42,6 +42,10 @@ This accepts a list of local directories to embed static assets. These files wil
 - Type: `[]string`
 This accepts a list of local directories to embed static assets. These files will be provided through a `files.zig` files in the package root. It generates a list of `@embedFile` calls.
 
+### `translate_c_h`
+- Type: `string`
+A name a header file eg `foo.h` that will be passed as `#include <foo.h>` to [`translate_c`](https://codeberg.org/ziglang/translate-c) and provided in an `@import("c")` module.
+
 ### `dependencies`
 - Type: `[]Dep`
 This is a list of `Dep` objects. `Dep` objects are how you include the other people's code in your project. See the `Dep` documentation below to learn more about the attributes available here.

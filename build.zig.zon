@@ -1,0 +1,19 @@
+.{
+    .fingerprint = 0xc11ddfd84b6c7d6b,
+    .name = .zigmod,
+    .version = "0.0.0",
+    .minimum_zig_version = "0.17.0",
+
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+
+    .dependencies = .{
+        .translate_c = .{
+            .url = "git+https://codeberg.org/ziglang/translate-c?ref=2.0.2#c11030012dc325d446474d17b78c242fd1d622ec",
+            .hash = "translate_c-2.0.2-Q_BUWvBNBwBgPKQJPblip6M7AHNK_IPNPmyv4rSIQMQc",
+        },
+    },
+}

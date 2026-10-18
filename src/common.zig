@@ -58,6 +58,7 @@ pub fn collect_deps_deep(cachepath: [:0]const u8, mdir: nfs.Dir, options: *Colle
         .yaml = m.yaml,
         .dep = null,
         .min_zig_version = m.min_zig_version,
+        .translate_c_h = m.translate_c_h,
     };
 }
 
@@ -88,6 +89,7 @@ pub fn collect_deps(cachepath: [:0]const u8, mdir: nfs.Dir, mdir_path: string, d
         .yaml = m.yaml,
         .dep = null,
         .min_zig_version = m.min_zig_version,
+        .translate_c_h = m.translate_c_h,
     };
 }
 
@@ -121,7 +123,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
     switch (d.type) {
         .local => {
             if (!std.mem.endsWith(u8, d.main, ".zig")) {
-                return gpa.dupeZ(u8, d.main);
+                return gpa.dupeSentinel(u8, d.main, 0);
             }
             return d.path;
         },
@@ -206,7 +208,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
             }
             const file_path_s = try std.fs.path.resolve(options.alloc, &.{ p, file_name });
             defer gpa.free(file_path_s);
-            const file_path = try gpa.dupeZ(u8, file_path_s);
+            const file_path = try gpa.dupeSentinel(u8, file_path_s, 0);
             try d.type.pull(options.alloc, d.path, p);
             try nfs.cwd().deleteFile(file_path);
             return p;
@@ -219,7 +221,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: [:0]const u8, options: *Co
         for (lock) |item| {
             if (std.mem.eql(u8, item[0], try d.clean_path(options.alloc))) {
                 d.type = std.meta.stringToEnum(zigmod.Dep.Type, item[1]).?;
-                d.path = try gpa.dupeZ(u8, item[2]);
+                d.path = try gpa.dupeSentinel(u8, item[2], 0);
                 d.version = item[3];
                 break;
             }
@@ -247,6 +249,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: [:0]const u8, options: *Co
                 .dep = d.*,
                 .for_build = d.for_build,
                 .min_zig_version = null,
+                .translate_c_h = null,
             };
         },
         else => {
@@ -384,7 +387,7 @@ pub fn parse_lockfile(alloc: std.mem.Allocator, dir: nfs.Dir) ![]const [4]string
                 var iter = std.mem.splitScalar(u8, line, ' ');
                 const asdep = zigmod.Dep{
                     .type = std.meta.stringToEnum(zigmod.Dep.Type, iter.next().?).?,
-                    .path = try gpa.dupeZ(u8, iter.next().?),
+                    .path = try gpa.dupeSentinel(u8, iter.next().?, 0),
                     .version = iter.next().?,
                     .id = zigmod.Dep.EMPTY,
                     .name = "",

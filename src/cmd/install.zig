@@ -67,7 +67,7 @@ pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
 
     const modfile = try zigmod.ModFile.from_dir(gpa, moddir, modpath);
     const zigversion_sv = modfile.min_zig_version orelse u.fail("zigmod manifest requires min_zig_version field", .{});
-    const zigversion = try nio.fmt.allocPrint(gpa, "{s}", .{u.altSemanticVersion(zigversion_sv)});
+    const zigversion = try nio.fmt.allocPrint(gpa, "{}", .{u.altSemanticVersion(zigversion_sv)});
     const zigpath = try std.fs.path.joinZ(gpa, &.{ datapath, "zig", zigversion, "zig" });
 
     // regen deps.zig with the repo's zig version
@@ -89,7 +89,8 @@ pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
         0x0000_000d => try @import("./fetch.0.13.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
         0x0000_000e => try @import("./fetch.0.14.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
         0x0000_000f => try @import("./fetch.0.15.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
-        0x0000_0010 => {}, // that's us, zigmod is already 0.16.0
+        0x0000_0010 => try @import("./fetch.0.16.zig").create_depszig(gpa, cachepath, moddir, fetch_top_module, &fetch_list),
+        0x0000_0011 => {}, // that's us, zigmod is already 0.17.0
         else => u.fail("zig {d}.{d} unimplemented", .{ version_sct.major, version_sct.minor }),
     }
 

@@ -39,7 +39,7 @@ pub fn main(init: std.process.Init.Minimal) !void {
         std.debug.print("\n", .{});
         std.debug.print("The commands available are:\n", .{});
         inline for (comptime std.meta.declarations(zigmod.commands)) |decl| {
-            std.debug.print("  - {s}\n", .{decl.name});
+            std.debug.print("  - {s}\n", .{decl});
         }
         return;
     }
@@ -58,8 +58,8 @@ pub fn main(init: std.process.Init.Minimal) !void {
     defer zigmod.deinit();
 
     inline for (comptime std.meta.declarations(zigmod.commands)) |decl| {
-        if (std.mem.eql(u8, args[0], decl.name)) {
-            const cmd = @field(zigmod.commands, decl.name);
+        if (std.mem.eql(u8, args[0], decl)) {
+            const cmd = @field(zigmod.commands, decl);
             try cmd.execute(self_path, args[1..]);
             return;
         }

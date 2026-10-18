@@ -48,8 +48,8 @@ pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
     }
 
     inline for (comptime std.meta.declarations(commands)) |decl| {
-        if (std.mem.eql(u8, args[0], decl.name)) {
-            const cmd = @field(commands, decl.name);
+        if (std.mem.eql(u8, args[0], decl)) {
+            const cmd = @field(commands, decl);
             try cmd.execute(self_name, args[1..]);
             return;
         }

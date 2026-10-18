@@ -56,7 +56,7 @@ pub fn file_list(alloc: std.mem.Allocator, dpath: [:0]const u8) ![]const [:0]con
     defer walker.deinit();
     while (try walker.next()) |entry| {
         if (entry.type != .REG) continue;
-        try list.append(try alloc.dupeZ(u8, entry.path));
+        try list.append(try alloc.dupeSentinel(u8, entry.path, 0));
     }
     return list.toOwnedSlice();
 }
@@ -230,7 +230,7 @@ pub fn find_cachepath() ![:0]const u8 {
     const needle = "/.zigmod/deps";
 
     if (std.mem.indexOf(u8, haystack, needle)) |index| {
-        return gpa.dupeZ(u8, haystack[0 .. index + needle.len]);
+        return gpa.dupeSentinel(u8, haystack[0 .. index + needle.len], 0);
     }
     return try std.fs.path.joinZ(gpa, &.{ haystack, ".zigmod", "deps" });
 }

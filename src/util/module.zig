@@ -29,8 +29,9 @@ pub const Module = struct {
     dep: ?zigmod.Dep,
     for_build: bool = false,
     min_zig_version: ?std.SemanticVersion,
+    translate_c_h: ?string,
 
-    pub const ROOT: [48]u8 = ("root" ++ (" " ** 44)).*;
+    pub const ROOT: [48]u8 = ("root" ++ @as([44]u8, @splat(' '))).*;
 
     pub fn from(alloc: std.mem.Allocator, dep: zigmod.Dep, cachepath: [:0]const u8, options: *common.CollectOptions) !Module {
         var moddeps = std.array_list.Managed(Module).init(alloc);
@@ -61,6 +62,7 @@ pub const Module = struct {
             .dep = dep,
             .for_build = dep.for_build,
             .min_zig_version = null,
+            .translate_c_h = dep.translate_c_h,
         };
     }
 
@@ -80,7 +82,7 @@ pub const Module = struct {
             try file_list_2.append(_b);
         }
 
-        std.mem.sort(string, file_list_2.items, void{}, struct {
+        std.mem.sort(string, file_list_2.items, {}, struct {
             pub fn lt(context: void, lhs: string, rhs: string) bool {
                 _ = context;
                 return std.mem.lessThan(u8, lhs, rhs);
@@ -203,5 +205,11 @@ pub const Module = struct {
                 };
             },
         };
+    }
+
+    pub fn any_translate_c(self: *const Module) bool {
+        if (self.translate_c_h) |_| return true;
+        for (self.deps) |d| if (d.any_translate_c()) return true;
+        return false;
     }
 };
