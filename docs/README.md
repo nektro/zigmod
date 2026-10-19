@@ -4,7 +4,7 @@ Zigmod is a prototype package manager for the Zig programming language.
 
 You can learn more about Zig here:
 - https://ziglang.org/
-- https://github.com/ziglang/zig
+- https://codeberg.org/ziglang/zig
 
 The rest of this documentation will assume you already have Zig installed.
 

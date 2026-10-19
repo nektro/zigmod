@@ -13,8 +13,8 @@ A package manager for the Zig programming language.
 ## Zig
 
 - https://ziglang.org/
-- https://github.com/ziglang/zig
-- https://github.com/ziglang/zig/wiki/Community
+- https://codeberg.org/ziglang/zig
+- https://ziglang.org/community/
 
 ## Download
 
