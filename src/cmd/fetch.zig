@@ -296,6 +296,7 @@ fn diff_lockfile(alloc: std.mem.Allocator) !void {
             if (diff_printchange("git https://github.com", "- {s}/compare/{s}...{s}\n", it)) continue;
             if (diff_printchange("git https://gitlab.com", "- {s}/-/compare/{s}...{s}\n", it)) continue;
             if (diff_printchange("git https://gitea.com", "- {s}/compare/{s}...{s}\n", it)) continue;
+            if (diff_printchange("git https://git.nektro.net", "- {s}/compare/{s}..{s}\n", it)) continue;
 
             std.debug.print("- {s}\n", .{it.key_ptr.*});
             std.debug.print("  - {s} ... {s}\n", .{ it.value_ptr.from, it.value_ptr.to });
