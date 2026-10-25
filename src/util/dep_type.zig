@@ -16,6 +16,7 @@ pub const DepType = enum {
     git,        // https://git-scm.com/
     hg,         // https://www.mercurial-scm.org/
     http,       // https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
+    fossil,     // https://fossil-scm.org/
 
     // zig fmt: on
     pub fn pull(self: DepType, alloc: std.mem.Allocator, rpath: [:0]const u8, dpath: [:0]const u8) !void {
@@ -40,6 +41,10 @@ pub const DepType = enum {
                     u.assert((try u.run_cmd(alloc, dpath, &.{ "tar", "-xf", f, "-C", "." })) == 0, "un-tar {s} failed", .{f});
                 }
             },
+            .fossil => {
+                try std.fs.cwd().makePath(dpath);
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "fossil", "open", rpath })) == 0, "fossil open {s} failed", .{rpath});
+            },
         }
     }
 
@@ -60,6 +65,10 @@ pub const DepType = enum {
             .http => {
                 //
             },
+            .fossil => {
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "fossil", "pull" })) == 0, "fossil pull failed", .{});
+                u.assert((try u.run_cmd(alloc, dpath, &.{ "fossil", "update" })) == 0, "fossil update failed", .{});
+            },
         }
     }
 
@@ -73,6 +82,7 @@ pub const DepType = enum {
             .git => try nio.fmt.allocPrint(alloc, "commit-{s}", .{(try u.git_rev_HEAD(alloc, mdir))}),
             .hg => "",
             .http => "",
+            .fossil => getFossilCheckout(alloc, mpath),
         };
     }
 
@@ -84,6 +94,7 @@ pub const DepType = enum {
             .git => false,
             .hg => false,
             .http => false,
+            .fossil => false,
         };
     }
 
@@ -94,6 +105,7 @@ pub const DepType = enum {
         git: Git,
         hg: void,
         http: void,
+        fossil: void,
 
         pub const Git = enum {
             branch,
@@ -110,3 +122,19 @@ pub const DepType = enum {
         };
     };
 };
+
+fn getFossilCheckout(alloc: std.mem.Allocator, mpath: []const u8) ![]const u8 {
+    const result = try u.run_cmd_raw(alloc, mpath, &.{ "fossil", "status" });
+    alloc.free(result.stderr);
+    defer alloc.free(result.stdout);
+
+    var iter = std.mem.tokenize(u8, result.stdout, " \n");
+    while (iter.next()) |tk| {
+        if (std.mem.eql(u8, tk, "checkout:")) {
+            const co = iter.next() orelse return "";
+            return try alloc.dupe(u8, co);
+        }
+    }
+
+    return "";
+}
