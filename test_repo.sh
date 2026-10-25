@@ -11,4 +11,4 @@ cd $clone_dir
 
 zigmod fetch
 
-zig build test --summary all
+zig build test --summary failures
