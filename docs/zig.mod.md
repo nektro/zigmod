@@ -88,7 +88,7 @@ The available `type`s are:
 
 For the full details on `Dep` types, you can check out the source where the enum is defined: https://github.com/nektro/zigmod/blob/master/src/util/dep_type.zig.
 
-> Note: the `local` type modifies the input behavior to be shorthand for `<name> <main>` rather than `path version` since the latter fields don't make sense for local files.
+> Note: the `local` type modifies the input behavior to be shorthand for `name path` rather than `path ?version` since the latter fields don't make sense for local files.
 
 #### Dep `version`
 - Type: `string-string`

@@ -38,7 +38,7 @@ pub const Module = struct {
         errdefer moddeps.deinit();
 
         for (dep.deps) |*d| {
-            if (try common.get_module_from_dep(d, cachepath, options)) |founddep| {
+            if (try common.get_module_from_dep(d, nfs.cwd(), cachepath, options)) |founddep| {
                 try moddeps.append(founddep);
             }
         }

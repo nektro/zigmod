@@ -39,12 +39,12 @@ pub fn collect_deps_deep(cachepath: [:0]const u8, mdir: nfs.Dir, options: *Colle
     }
     try moduledeps.append(try collect_deps(cachepath, mdir, ".", .local, options));
     for (m.rootdeps) |*d| {
-        if (try get_module_from_dep(d, cachepath, options)) |founddep| {
+        if (try get_module_from_dep(d, mdir, cachepath, options)) |founddep| {
             try moduledeps.append(founddep);
         }
     }
     for (m.builddeps) |*d| {
-        if (try get_module_from_dep(d, cachepath, options)) |founddep| {
+        if (try get_module_from_dep(d, mdir, cachepath, options)) |founddep| {
             try moduledeps.append(founddep);
         }
     }
@@ -72,7 +72,7 @@ pub fn collect_deps(cachepath: [:0]const u8, mdir: nfs.Dir, mdir_path: string, d
         try gen_files_package(options.alloc, cachepath, mdir, m.files);
     }
     for (m.deps) |*d| {
-        if (try get_module_from_dep(d, cachepath, options)) |founddep| {
+        if (try get_module_from_dep(d, if (dtype == .local) mdir else nfs.cwd(), cachepath, options)) |founddep| {
             try moduledeps.append(founddep);
         }
     }
@@ -122,9 +122,6 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
     }
     switch (d.type) {
         .local => {
-            if (!std.mem.endsWith(u8, d.main, ".zig")) {
-                return gpa.dupeSentinel(u8, d.main, 0);
-            }
             return d.path;
         },
         .system_lib, .framework => {
@@ -216,7 +213,7 @@ pub fn get_modpath(cachepath: string, d: zigmod.Dep, options: *CollectOptions) !
     }
 }
 
-pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: [:0]const u8, options: *CollectOptions) anyerror!?zigmod.Module {
+pub fn get_module_from_dep(d: *zigmod.Dep, localdir: nfs.Dir, cachepath: [:0]const u8, options: *CollectOptions) anyerror!?zigmod.Module {
     if (options.lock) |lock| {
         for (lock) |item| {
             if (std.mem.eql(u8, item[0], try d.clean_path(options.alloc))) {
@@ -229,7 +226,7 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: [:0]const u8, options: *Co
     }
     if (!d.is_for_this()) return null;
     const modpath = try get_modpath(cachepath, d.*, options);
-    const moddir = if (modpath.len == 0) try nfs.cwd().openDir(cachepath, .{}) else try nfs.cwd().openDir(modpath, .{});
+    const moddir = if (modpath.len == 0) try nfs.cwd().openDir(cachepath, .{}) else try localdir.openDir(modpath, .{});
 
     const nocache = d.type.isLocal();
     if (!nocache) try options.already_fetched.append(modpath);
@@ -287,10 +284,12 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: [:0]const u8, options: *Co
             };
             dd.dep = d.*;
             dd.for_build = d.for_build;
-            const save = dd;
             if (d.type != .local) {
                 const new_clean_path = extras.trimPrefix(modpath, cachepath)[1..];
                 dd.clean_path = new_clean_path.ptr[0..new_clean_path.len :0];
+            } else {
+                dd.clean_path = try moddir.realpathAlloc(gpa, ".");
+                dd.clean_path = dd.clean_path[std.fs.path.dirname(std.fs.path.dirname(cachepath).?).?.len + 1 ..];
             }
             if (std.mem.eql(u8, &dd.id, &zigmod.Dep.EMPTY)) dd.id = u.random_string(48);
             if (d.name.len > 0) dd.name = d.name;
@@ -300,7 +299,6 @@ pub fn get_module_from_dep(d: *zigmod.Dep, cachepath: [:0]const u8, options: *Co
             if (d.c_source_files.len > 0) dd.c_source_files = d.c_source_files;
             if (d.only_os.len > 0) dd.only_os = d.only_os;
             if (d.except_os.len > 0) dd.except_os = d.except_os;
-            if (d.type == .local) dd.main = try std.fs.path.join(options.alloc, &.{ d.main, save.main });
             if (dd.is_for_this()) return dd;
             return null;
         },

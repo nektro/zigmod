@@ -132,6 +132,10 @@ pub const ModFile = struct {
                             main = version.?;
                             version = "";
                         }
+                        if (!std.mem.endsWith(u8, main, ".zig")) {
+                            path = main;
+                            main = "";
+                        }
                     }
 
                     var id = zigmod.Dep.EMPTY;

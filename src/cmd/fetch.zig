@@ -325,6 +325,10 @@ fn print_dirs(w: nfs.File, list: []const zigmod.Module, alloc: std.mem.Allocator
             try w.print("    pub const _{s} = \"{}\";\n", .{ mod.short_id(), u.altStringEscape(cwd_realpath) });
             continue;
         }
+        if (mod.type == .local) {
+            try w.print("    pub const _{s} = \"{}\";\n", .{ mod.short_id(), u.altStringEscape(mod.clean_path) });
+            continue;
+        }
         try w.print("    pub const _{s} = cache ++ \"/{}\";\n", .{ mod.short_id(), u.altStringEscape(mod.clean_path) });
     }
 }
