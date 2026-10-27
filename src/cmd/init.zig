@@ -143,7 +143,7 @@ pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitignore?", gpa);
         if (do) {
             const exists = try nfs.cwd().exists(".gitignore");
-            const file = try cwd.createFile(".gitignore", .{ .truncate = false });
+            const file = try cwd.createFile(".gitignore", .{ .read = true, .truncate = false });
             defer file.close();
             const len = try file.getEndPos();
             if (len > 0) try file.seekTo(len - 1);
@@ -166,7 +166,7 @@ pub fn execute(self_name: []const u8, args: []const [:0]const u8) !void {
         const do = try inquirer.forConfirm(stdout, stdin, "It appears you're using git. Do you want init to add Zigmod to your .gitattributes?", gpa);
         if (do) {
             const exists = try nfs.cwd().exists(".gitattributes");
-            const file = try cwd.createFile(".gitattributes", .{ .truncate = false });
+            const file = try cwd.createFile(".gitattributes", .{ .read = true, .truncate = false });
             defer file.close();
             const len = try file.getEndPos();
             if (len > 0) try file.seekTo(len - 1);

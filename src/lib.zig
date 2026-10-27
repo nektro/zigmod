@@ -31,6 +31,9 @@ pub const Module = @import("./util/module.zig").Module;
 
 pub const version: u16 = blk: {
     var version_s = build_options.version;
+    if (std.mem.eql(u8, version_s, "dev")) {
+        break :blk std.math.maxInt(u16);
+    }
     version_s = extras.trimPrefixEnsure(version_s, "r").?;
     version_s = version_s[0 .. std.mem.indexOfScalar(u8, version_s, '-') orelse version_s.len];
     var version_i = extras.parseDigits(u16, version_s, 10) catch unreachable;
