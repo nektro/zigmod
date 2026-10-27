@@ -26,7 +26,14 @@ pub fn build(b: *std.Build) void {
 
     const exe_options = b.addOptions();
     exe.root_module.addImport("build_options", exe_options.createModule());
-    exe_options.addOption(string, "version", tag orelse std.mem.trimEnd(u8, b.run(&.{ "git", "describe", "--tags" }), "\n"));
+    const version = tag orelse switch (b.runFallible(
+        &.{ "git", "describe", "--tags" },
+        .{ .stderr_behavior = .ignore },
+    )) {
+        .success => |output| std.mem.trimEnd(u8, output, "\n"),
+        else => "dev",
+    };
+    exe_options.addOption(string, "version", version);
 
     deps.addAllTo(exe);
     exe.root_module.linkSystemLibrary("c", .{});

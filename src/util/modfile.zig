@@ -103,30 +103,48 @@ pub const ModFile = struct {
         for (props) |prop| {
             if (mapping.get(prop)) |dep_seq| {
                 if (dep_seq != .sequence) continue;
-                for (dep_seq.sequence) |item| {
+                for (dep_seq.sequence, 1..) |item, index| {
+                    if (item != .mapping) {
+                        u.fail("invalid {s}[{d}]: expected a dependency mapping", .{ prop, index });
+                    }
                     var dtype: string = undefined;
                     var path: [:0]const u8 = undefined;
                     var version: ?[:0]const u8 = null;
                     var main = item.mapping.get_string("main") orelse "";
 
                     if (item.mapping.get("src")) |val| {
+                        if (val != .string) {
+                            u.fail("invalid {s}[{d}]: 'src' must be a string", .{ prop, index });
+                        }
                         var src_iter = std.mem.tokenizeScalar(u8, val.string, ' ');
-                        dtype = src_iter.next().?;
-                        path = try gpa.dupeSentinel(u8, src_iter.next().?, 0);
+                        dtype = src_iter.next() orelse u.fail("invalid {s}[{d}]: 'src' requires a dependency type and path", .{ prop, index });
+                        const src_path = src_iter.next() orelse u.fail("invalid {s}[{d}]: 'src' requires a path after '{s}'", .{ prop, index, dtype });
+                        path = try gpa.dupeSentinel(u8, src_path, 0);
                         if (src_iter.next()) |dver| {
                             version = try gpa.dupeSentinel(u8, dver, 0);
                         }
                     } else {
-                        dtype = item.mapping.get("type").?.string;
-                        path = item.mapping.get("path").?.string;
+                        const type_value = item.mapping.get("type") orelse u.fail("invalid {s}[{d}]: missing 'src' or 'type'; expected 'src: <type> <path> [version]'", .{ prop, index });
+                        if (type_value != .string) {
+                            u.fail("invalid {s}[{d}]: 'type' must be a string", .{ prop, index });
+                        }
+                        dtype = type_value.string;
+                        const path_value = item.mapping.get("path") orelse u.fail("invalid {s}[{d}]: missing 'path' for dependency type '{s}'", .{ prop, index, dtype });
+                        if (path_value != .string) {
+                            u.fail("invalid {s}[{d}]: 'path' must be a string", .{ prop, index });
+                        }
+                        path = path_value.string;
                     }
                     if (item.mapping.get("version")) |verv| {
+                        if (verv != .string) {
+                            u.fail("invalid {s}[{d}]: 'version' must be a string", .{ prop, index });
+                        }
                         version = verv.string;
                     }
                     if (version == null) {
                         version = "";
                     }
-                    const dep_type = std.meta.stringToEnum(zigmod.Dep.Type, dtype).?;
+                    const dep_type = std.meta.stringToEnum(zigmod.Dep.Type, dtype) orelse u.fail("invalid {s}[{d}]: unknown dependency type '{s}'", .{ prop, index, dtype });
                     if (dep_type == .local) {
                         if (version.?.len > 0) {
                             main = version.?;
